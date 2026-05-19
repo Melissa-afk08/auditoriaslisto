@@ -8,10 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<<<<<<< HEAD
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-=======
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
     <style>
         :root {
             --naranja: #FC6E20;
@@ -3024,14 +3021,11 @@
 
         const PESOS_DEFAULT = { 1: 0.55, 2: 0.20, 3: 0.05, 4: 0.10, 5: 0.10 };
 
-<<<<<<< HEAD
         // Supabase
         const SUPABASE_URL = 'https://rkbgjyuhntdqcawognjk.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJrYmdqeXVobnRkcWNhd29nbmprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyMTUwNjUsImV4cCI6MjA5NDc5MTA2NX0.XEEEjAhtYeqgXOaniPGIjndK-XC48kZWTEhYDp2SYkc';
         const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-=======
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
         // Global State
         window.PREGUNTAS = [];
         window.PESOS = {};
@@ -3084,7 +3078,6 @@
 
             // Questions
             let pq = localStorage.getItem("preguntas_custom");
-<<<<<<< HEAD
             let parsedPreguntas = pq ? JSON.parse(pq) : null;
             window.PREGUNTAS = parsedPreguntas || JSON.parse(JSON.stringify(PREGUNTAS_DEFAULT));
 
@@ -3093,12 +3086,6 @@
             let sumPesos = parsedPesos ? Object.values(parsedPesos).reduce((a,b)=>a+b,0) : 0;
             window.PESOS = (parsedPesos && sumPesos > 0.01) ? parsedPesos : JSON.parse(JSON.stringify(PESOS_DEFAULT));
             if (sumPesos <= 0.01) { localStorage.removeItem("pesos_custom"); }
-=======
-            window.PREGUNTAS = pq ? JSON.parse(pq) : JSON.parse(JSON.stringify(PREGUNTAS_DEFAULT));
-
-            let p_p = localStorage.getItem("pesos_custom");
-            window.PESOS = p_p ? JSON.parse(p_p) : JSON.parse(JSON.stringify(PESOS_DEFAULT));
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
 
             // Default Supervisors
             if (!localStorage.getItem("supervisores")) {
@@ -3745,11 +3732,7 @@
                 hora: document.getElementById("form-aud-hora").textContent,
                 respuestas: window.auditActual.respuestas,
                 firma: window.auditActual.firma,
-<<<<<<< HEAD
                 resultadoGrupos: result.grupos,
-=======
-                resultadoGrupos: Object.values(result.grupos),
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
                 finalScore: result.nota_final, // Backwards compatibility
                 notaFinal: result.nota_final,
                 color: result.color,
@@ -3760,13 +3743,10 @@
             auds.push(auditRecord);
             localStorage.setItem("auditorias", JSON.stringify(auds));
 
-<<<<<<< HEAD
             // Sync a Supabase
             syncAuditoriaSupabase(auditRecord);
 
             window.auditActual = auditRecord;
-=======
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
             renderAuditoriaResultado(auditRecord);
             showView('view-auditoria-resultado');
         }
@@ -3938,19 +3918,10 @@
         async function generarReporte(share = false) {
             let btn1 = document.getElementById('btn-rep-pdf');
             let btn2 = document.getElementById('btn-rep-share');
-<<<<<<< HEAD
             if (btn1) { btn1.disabled = true; btn1.innerHTML = '<div style="width:16px;height:16px;border:2px solid #fff;border-top:2px solid transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;"></div>'; }
             if (btn2) { btn2.disabled = true; btn2.style.opacity = '0.5'; }
             showToast("Generando reporte PDF...", "success");
 
-=======
-            if (btn1) { btn1.disabled = true; btn1.innerHTML = '<div style="width:16px;height:16px;border:2px solid #fff;border-top:2px solid transparent;border-radius:50%;animation:spin 1s linear infinite;"></div>'; }
-            if (btn2) { btn2.disabled = true; btn2.style.opacity = '0.5'; }
-
-            showToast("Generando reporte PDF...", "success");
-
-
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
             const task = async () => {
                 const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
@@ -3993,11 +3964,7 @@
                 y += 8;
                 addText("TIENDA", 8, true, [255, 255, 255]);
                 y += 5;
-<<<<<<< HEAD
                 addText(typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || window.selectedStore?.nombre || ''), 12, true, [255, 255, 255]);
-=======
-                addText(data.tienda || window.selectedStore?.nombre, 12, true, [255, 255, 255]);
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
                 y += 8;
                 let startX = margin + 5;
                 const cols = ["FECHA", "HORA", "SUPERVISOR", "ENCARGADO"];
@@ -4007,7 +3974,6 @@
                 hour = hour % 12; hour = hour ? hour : 12;
                 const formattedTime = `${hour}:${minute} ${ampm}`;
                 const vals = [data.fecha, formattedTime, data.supervisor, data.encargado || '-'];
-<<<<<<< HEAD
                 for (let i = 0; i < 4; i++) {
                     pdf.setFontSize(7);
                     pdf.setFont("helvetica", "bold");
@@ -4015,21 +3981,12 @@
                     pdf.text(cols[i], startX, y);
                     pdf.setFontSize(9);
                     pdf.setFont("helvetica", "normal");
-=======
-
-                for (let i = 0; i < 4; i++) {
-                    pdf.setFontSize(7);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.text(cols[i], startX, y);
-                    pdf.setFontSize(9);
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
                     pdf.text(vals[i], startX, y + 5);
                     startX += 42;
                 }
                 y += 15;
 
                 // SCORE
-<<<<<<< HEAD
                 let finalS = parseFloat(data.finalScore) || 0;
                 let mainColor = finalS <= 70 ? [198, 40, 40] : (finalS <= 90 ? [255, 179, 0] : [52, 199, 89]);
 
@@ -4049,27 +4006,6 @@
 
                 for (let i = 1; i <= 5; i++) {
                     let v = data.resultadoGrupos ? (data.resultadoGrupos[i] || 0) : 0;
-=======
-                let mainColor = [52, 199, 89];
-                let finalS = parseFloat(data.finalScore) || 0;
-                if (finalS <= 70) mainColor = [198, 40, 40];
-                else if (finalS <= 90) mainColor = [255, 179, 0];
-
-                y += 5;
-                addText("RESULTADOS DE CHECKLIST", 14, true, [27, 27, 27], 'center');
-                y += 15;
-                addText(`${finalS.toFixed(1)}%`, 36, true, mainColor, 'center');
-                y += 10;
-                drawPill(data.clasificacion, pageWidth / 2 - 25, y, 50, 10, mainColor, [255, 255, 255]);
-                y += 15;
-
-                // GRUPOS
-                const titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS Y UTENSILIOS", 4: "MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
-                addText("RESULTADOS POR GRUPO", 12, true, [27, 27, 27]);
-                y += 8;
-                for (let i = 1; i <= 5; i++) {
-                    let v = data.resultadoGrupos ? data.resultadoGrupos[i] : 0;
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
                     let c = v <= 70 ? [198, 40, 40] : (v <= 90 ? [255, 179, 0] : [52, 199, 89]);
                     let ptsObtenidos = 0; let ptsMaximos = 0;
                     window.PREGUNTAS.forEach(p => {
@@ -4081,15 +4017,9 @@
                             }
                         }
                     });
-<<<<<<< HEAD
                     checkPageBreak(22);
                     pdf.setFillColor(245, 245, 245);
                     pdf.roundedRect(margin, y, pageWidth - 2 * margin, 20, 2, 2, 'F');
-=======
-
-                    pdf.setFillColor(245, 245, 245);
-                    pdf.roundedRect(margin, y, pageWidth - 2 * margin, 18, 2, 2, 'F');
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
                     y += 6;
                     addText(titulosGrupo[i], 10, true, [27, 27, 27], 'left', margin + 5);
                     addText(`${v.toFixed(1)}%`, 11, true, c, 'right', pageWidth - margin - 5);
@@ -4101,11 +4031,7 @@
                     if (barW > 0) pdf.roundedRect(margin + 5, y - 2, barW, 3, 1.5, 1.5, 'F');
                     y += 5;
                     addText(`${ptsObtenidos.toFixed(0)} de ${ptsMaximos.toFixed(0)} puntos`, 8, false, [150, 150, 150], 'left', margin + 5);
-<<<<<<< HEAD
                     y += 7;
-=======
-                    y += 6;
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
                 }
 
                 y += 10;
@@ -4113,15 +4039,9 @@
                 addText("DETALLE DE RESPUESTAS", 12, true, [27, 27, 27]);
                 y += 10;
 
-<<<<<<< HEAD
                 // PREGUNTAS Y FOTOS
                 for (let index = 0; index < window.PREGUNTAS.length; index++) {
                     if (index % 5 === 0) await new Promise(r => setTimeout(r, 0));
-=======
-                // PREGUNTAS
-                for (let index = 0; index < window.PREGUNTAS.length; index++) {
-                    if (index % 10 === 0) await new Promise(r => setTimeout(r, 0));
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
 
                     let p = window.PREGUNTAS[index];
                     let r = data.respuestas[p.id];
@@ -4129,7 +4049,6 @@
 
                     let qText = `${index + 1}. ${p.texto}`;
                     let splitTitle = pdf.splitTextToSize(qText, pageWidth - 2 * margin - 10);
-<<<<<<< HEAD
                     checkPageBreak(splitTitle.length * 6 + 20);
 
                     pdf.setFillColor(250, 250, 250);
@@ -4202,71 +4121,11 @@
                     }
 
                     pdf.setDrawColor(235, 235, 235);
-=======
-                    checkPageBreak(splitTitle.length * 6 + 15);
-
-                    pdf.setFillColor(255, 255, 255);
-                    pdf.setDrawColor(220, 220, 220);
-                    pdf.setFontSize(10);
-                    pdf.setFont("helvetica", "bold");
-                    pdf.setTextColor(27, 27, 27);
-                    pdf.text(splitTitle, margin + 5, y + 4);
-                    y += splitTitle.length * 5 + 4;
-
-                    let pBg, pCol, pT;
-                    let ptsObtenidos = 0; let ptsMaximos = p.pmax;
-                    if (r.valor === 'SI') { pBg = [232, 245, 233]; pCol = [46, 125, 50]; pT = [46, 125, 50]; ptsObtenidos = p.pmax; }
-                    else if (r.valor === 'NO') { pBg = [255, 235, 238]; pCol = [198, 40, 40]; pT = [198, 40, 40]; }
-                    else { pBg = [238, 238, 238]; pCol = [102, 102, 102]; pT = [102, 102, 102]; ptsMaximos = 0; }
-
-                    drawPill(r.valor, margin + 5, y + 4, 15, 6, pBg, pCol);
-                    addText(`${ptsObtenidos} / ${ptsMaximos} pts`, 9, true, pT, 'right', pageWidth - margin - 5);
-                    y += 8;
-
-                    if (r.obs) {
-                        checkPageBreak(15);
-                        pdf.setFillColor(245, 245, 245);
-                        pdf.roundedRect(margin + 5, y, pageWidth - 2 * margin - 10, 10, 2, 2, 'F');
-                        pdf.setDrawColor(252, 110, 32);
-                        pdf.setLineWidth(1);
-                        pdf.line(margin + 5, y, margin + 5, y + 10);
-                        pdf.setFontSize(9);
-                        pdf.setFont("helvetica", "italic");
-                        pdf.setTextColor(85, 85, 85);
-                        let splitObs = pdf.splitTextToSize(`Obs: ${r.obs}`, pageWidth - 2 * margin - 15);
-                        pdf.text(splitObs, margin + 8, y + 6);
-                        y += splitObs.length * 5 + 6;
-                    } else {
-                        y += 4;
-                    }
-
-                    if (r.fotos && r.fotos.length > 0) {
-                        for (const fotoBase64 of r.fotos) {
-                            checkPageBreak(70);
-                            try {
-                                const imgProps = pdf.getImageProperties(fotoBase64);
-                                const imgW = pageWidth - 2 * margin - 10;
-                                const imgH = (imgProps.height * imgW) / imgProps.width;
-                                const altoCap = Math.min(imgH, 80);
-                                pdf.addImage(fotoBase64, 'JPEG', margin + 5, y, imgW, altoCap, '', 'FAST');
-                                y += altoCap + 4;
-                            } catch (e) {
-                                pdf.setTextColor(150, 150, 150);
-                                pdf.setFontSize(7);
-                                pdf.text('[Foto no disponible]', margin + 5, y + 4);
-                                y += 8;
-                            }
-                            await new Promise(r => setTimeout(r, 10));
-                        }
-                    }
-                    pdf.setDrawColor(220, 220, 220);
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
                     pdf.setLineWidth(0.2);
                     pdf.line(margin, y + 2, pageWidth - margin, y + 2);
                     y += 8;
                 }
 
-<<<<<<< HEAD
                 // FIRMA
                 if (data.firma) {
                     checkPageBreak(55);
@@ -4295,53 +4154,24 @@
                 // GUARDAR / COMPARTIR
                 const blob = pdf.output('blob');
                 const nombreTienda = (typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || window.selectedStore?.nombre || 'Auditoria')).replace(/\s+/g, '_');
-=======
-                const blob = pdf.output('blob');
-                const nombreTienda = window.selectedStore?.nombre?.replace(/\s+/g, '_') || 'Auditoria';
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
                 const fecha = new Date().toLocaleDateString('es-PE').replace(/\//g, '-');
                 const filename = `Auditoria_${nombreTienda}_${fecha}.pdf`;
                 const file = new File([blob], filename, { type: 'application/pdf' });
 
                 if (share && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-<<<<<<< HEAD
                     try { await navigator.share({ files: [file], title: 'Reporte de Auditoría' }); }
                     catch (e) { pdf.save(filename); }
-=======
-                    try {
-                        await navigator.share({ files: [file], title: 'Reporte de Auditoría' });
-                    } catch (e) {
-                        showToast("No se pudo compartir", "error");
-                    }
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
                 } else {
                     pdf.save(filename);
                 }
             };
 
-<<<<<<< HEAD
             try {
                 await task();
                 showToast("✓ Reporte generado", "success");
             } catch (error) {
                 console.error(error);
                 showToast("Error al generar reporte", "error");
-=======
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('TIMEOUT')), 15000);
-            });
-
-            try {
-                await Promise.race([task(), timeoutPromise]);
-                showToast("✓ Reporte generado", "success");
-            } catch (error) {
-                console.error(error);
-                if (error.message === 'TIMEOUT') {
-                    showToast("Error al generar reporte (Tiempo agotado)", "error");
-                } else {
-                    showToast("Error al generar reporte", "error");
-                }
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
             } finally {
                 if (btn1) { btn1.disabled = false; btn1.innerHTML = '📄 Reporte'; }
                 if (btn2) { btn2.disabled = false; btn2.style.opacity = '1'; }
@@ -4389,12 +4219,9 @@
             viss.push(v);
             localStorage.setItem("visitas", JSON.stringify(viss));
 
-<<<<<<< HEAD
             // Sync a Supabase
             syncVisitaSupabase(v);
 
-=======
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
             document.getElementById("form-vis-fecha").disabled = true;
             document.getElementById("form-vis-sup").disabled = true;
             document.getElementById("form-vis-comentario").disabled = true;
@@ -4752,7 +4579,6 @@
             }
         }
 
-<<<<<<< HEAD
         // --- SUPABASE SYNC ---
 
         async function supabaseUploadFoto(base64, auditoriaId, preguntaId, fotoIndex) {
@@ -4846,8 +4672,6 @@
             }
         }
 
-=======
->>>>>>> 677a13fb00dbcdca35a81236b380016af9eee9ac
         // BOOT
         window.onload = () => {
             initData();
