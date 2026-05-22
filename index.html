@@ -4456,9 +4456,17 @@
                 const filename = `Auditoria_${nombreTienda}_${fecha}.pdf`;
                 const file = new File([blob], filename, { type: 'application/pdf' });
 
+                const asunto = `Reporte de Auditoría – ${nombreTienda.replace(/_/g,' ')} | ${data.fecha} | Sup: ${data.supervisor}`;
+                const cuerpo = `Estimado/a,\n\nSe adjunta el reporte de auditoría:\n\nTienda: ${nombreTienda.replace(/_/g,' ')}\nFecha: ${data.fecha} ${data.hora}\nSupervisor: ${data.supervisor}\nEncargado: ${data.encargado || 'N/A'}\nResultado: ${data.clasificacion} (${(data.notaFinal || data.finalScore).toFixed(1)}%)\n\nSaludos.`;
+
                 if (share && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try { await navigator.share({ files: [file], title: `Reporte de Auditoría – ${tiendaNombre} | ${data.fecha} | Supervisor: ${data.supervisor}` }); }
+                    try { await navigator.share({ files: [file], title: asunto }); }
                     catch (e) { pdf.save(filename); }
+                } else if (share) {
+                    pdf.save(filename);
+                    setTimeout(() => {
+                        window.open(`mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_self');
+                    }, 1500);
                 } else {
                     pdf.save(filename);
                 }
