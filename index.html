@@ -18,7 +18,7 @@
             --blanco-roto: #FAFAFA;
             --fondo: #F5F5F5;
             --gris-input: #EEEEEE;
-            --verde: #2E7D32;
+            --verde: #43A047;
             --rojo: #C62828;
             --amarillo: #F9A825;
         }
@@ -3590,7 +3590,7 @@
             window.auditActual = data;
 
             let score = Math.round(data.notaFinal || data.finalScore);
-            let colorHex = score <= 70 ? "#C62828" : score <= 90 ? "#F9A825" : "#2E7D32";
+            let colorHex = score <= 70 ? "#C62828" : score <= 90 ? "#F9A825" : "#43A047";
             let tiendaNombre = typeof data.tienda === 'string' ? data.tienda : data.tienda.nombre;
 
             let semRojo     = score <= 70              ? `background:${colorHex};box-shadow:0 0 10px ${colorHex};` : "background:#3a0000;";
@@ -3659,10 +3659,10 @@
                 </div>
                 <div style="text-align:center;margin-bottom:24px;">
                     <div style="font-size:13px;font-weight:800;color:#1B1B1B;letter-spacing:1px;margin-bottom:14px;">RESULTADOS DE CHECKLIST</div>
-                    <div style="background:#1B1B1B;border-radius:14px;padding:6px;width:36px;height:78px;box-sizing:border-box;margin:0 auto 12px auto;box-shadow:0 4px 14px rgba(0,0,0,0.4);display:flex;flex-direction:column;justify-content:space-around;align-items:center;">
-                        <div style="width:18px;height:18px;border-radius:50%;${semRojo}transition:all 0.5s ease;flex-shrink:0;"></div>
-                        <div style="width:18px;height:18px;border-radius:50%;${semAmarillo}transition:all 0.5s ease;flex-shrink:0;"></div>
-                        <div style="width:18px;height:18px;border-radius:50%;${semVerde}transition:all 0.5s ease;flex-shrink:0;"></div>
+                    <div style="background:#1B1B1B;border-radius:20px;padding:8px;width:52px;height:112px;box-sizing:border-box;margin:0 auto 12px auto;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:flex;flex-direction:column;justify-content:space-around;align-items:center;">
+                        <div style="width:28px;height:28px;border-radius:50%;${semRojo}transition:all 0.5s ease;flex-shrink:0;"></div>
+                        <div style="width:28px;height:28px;border-radius:50%;${semAmarillo}transition:all 0.5s ease;flex-shrink:0;"></div>
+                        <div style="width:28px;height:28px;border-radius:50%;${semVerde}transition:all 0.5s ease;flex-shrink:0;"></div>
                     </div>
                     <div style="font-size:52px;font-weight:800;color:${colorHex};margin-top:16px;">${score}%</div>
                     <div style="display:inline-block;background:${colorHex};color:white;font-weight:700;border-radius:50px;padding:8px 28px;font-size:14px;margin-top:10px;">${data.clasificacion}</div>
@@ -4307,7 +4307,7 @@
 
                 // GRUPOS
                 const titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS Y UTENSILIOS", 4: "MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
-                checkPageBreak(20);
+                checkPageBreak(110);
                 addText("RESULTADOS POR GRUPO", 12, true, [27, 27, 27]);
                 y += 8;
 
