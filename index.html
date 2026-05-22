@@ -4996,13 +4996,7 @@
         }
 
         function abrirModalEnviar() {
-            let data = window.auditActual;
-            if (!data) return;
-            let tienda = typeof data.tienda === 'string' ? data.tienda : data.tienda.nombre;
-            let asunto = `Reporte de Auditoría – ${tienda} | ${data.fecha} | Supervisor: ${data.supervisor}`;
-            let cuerpo = `Estimado/a,\n\nSe adjunta el reporte de auditoría correspondiente a:\n\nTienda: ${tienda}\nFecha: ${data.fecha} ${data.hora}\nSupervisor: ${data.supervisor}\nEncargado: ${data.encargado || 'N/A'}\nResultado: ${data.clasificacion} (${(data.notaFinal || data.finalScore).toFixed(1)}%)\n\nPor favor revise el PDF adjunto.\n\nSaludos.`;
-            let mailto = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-            window.open(mailto, '_self');
+            generarReporte(true);
         }
 
         // BOOT
