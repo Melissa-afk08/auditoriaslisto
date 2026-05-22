@@ -2569,19 +2569,19 @@
 
                 <!-- SEMÁFORO -->
                 <div
-                    style="background:#1B1B1B; border-radius:24px; padding:10px 20px; width:80px; height:160px; box-sizing:border-box; margin:0 auto; box-shadow:0 8px 24px rgba(0,0,0,0.4); border-left:6px solid #333; border-right:6px solid #333; display:flex; flex-direction:column; justify-content:space-between; align-items:center;">
+                    style="background:#1B1B1B; border-radius:20px; padding:8px; width:52px; height:110px; box-sizing:border-box; margin:0 auto 16px auto; box-shadow:0 8px 24px rgba(0,0,0,0.4); display:flex; flex-direction:column; justify-content:space-around; align-items:center;">
                     <div id="sem-rojo"
-                        style="width:44px; height:44px; border-radius:50%; background:#3a0000; transition:all 0.5s ease; flex-shrink:0;">
+                        style="width:28px; height:28px; border-radius:50%; background:#3a0000; transition:all 0.5s ease; flex-shrink:0;">
                     </div>
                     <div id="sem-amarillo"
-                        style="width:44px; height:44px; border-radius:50%; background:#3a2e00; transition:all 0.5s ease; flex-shrink:0;">
+                        style="width:28px; height:28px; border-radius:50%; background:#3a2e00; transition:all 0.5s ease; flex-shrink:0;">
                     </div>
                     <div id="sem-verde"
-                        style="width:44px; height:44px; border-radius:50%; background:#003a00; transition:all 0.5s ease; flex-shrink:0;">
+                        style="width:28px; height:28px; border-radius:50%; background:#003a00; transition:all 0.5s ease; flex-shrink:0;">
                     </div>
                 </div>
 
-                <div id="res-aud-score" style="font-size:52px; font-weight:800; margin-top:20px;"></div>
+                <div id="res-aud-score" style="font-size:52px; font-weight:800; margin-top:0;"></div>
                 <div style="display:flex; justify-content:center;">
                     <div id="res-aud-label"
                         style="color:white; font-weight:700; border-radius:50px; padding:8px 28px; font-size:15px; margin-top:12px;">
@@ -3587,6 +3587,16 @@
             let data = auds.find(a => a.id === id);
             if (!data) return;
 
+            window.auditActual = data;
+
+            let score = Math.round(data.notaFinal || data.finalScore);
+            let colorHex = score <= 70 ? "#C62828" : score <= 90 ? "#F9A825" : "#2E7D32";
+            let tiendaNombre = typeof data.tienda === 'string' ? data.tienda : data.tienda.nombre;
+
+            let semRojo     = score <= 70              ? `background:${colorHex};box-shadow:0 0 10px ${colorHex};` : "background:#3a0000;";
+            let semAmarillo = (score>70 && score<=90)  ? `background:${colorHex};box-shadow:0 0 10px ${colorHex};` : "background:#3a2e00;";
+            let semVerde    = score > 90               ? `background:${colorHex};box-shadow:0 0 10px ${colorHex};` : "background:#003a00;";
+
             let titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS Y UTENSILIOS", 4: "MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
             let grpHtml = "";
             for (let i = 1; i <= 5; i++) {
@@ -3609,35 +3619,76 @@
             window.PREGUNTAS.forEach(p => {
                 let resp = data.respuestas[p.id];
                 if (!resp) return;
-                let fotosHtml = (resp.fotos || []).map(f => `<img src="${f}">`).join("");
                 let obsHtml = resp.obs ? `<div class="ro-obs">📝 ${resp.obs}</div>` : "";
+                let fotos = resp.fotos || [];
+                let fotosHtml = "";
+                if (fotos.length === 1) {
+                    fotosHtml = `<div style="text-align:center;margin-top:10px;"><img src="${fotos[0]}" style="width:70%;border-radius:10px;object-fit:cover;"></div>`;
+                } else if (fotos.length > 1) {
+                    let slides = fotos.map((f, idx) =>
+                        `<div class="ro-slide-${p.id}" style="display:${idx===0?'block':'none'};text-align:center;">
+                            <img src="${f}" style="width:70%;border-radius:10px;object-fit:cover;">
+                         </div>`
+                    ).join("");
+                    fotosHtml = `
+                        <div style="margin-top:10px;position:relative;">
+                            ${slides}
+                            <div style="display:flex;justify-content:center;align-items:center;gap:16px;margin-top:8px;">
+                                <button onclick="roCarouselNav(${p.id},${fotos.length},-1)" style="background:var(--naranja);color:white;border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
+                                <span id="ro-counter-${p.id}" style="font-size:12px;color:#888;font-weight:600;">1 / ${fotos.length}</span>
+                                <button onclick="roCarouselNav(${p.id},${fotos.length},1)" style="background:var(--naranja);color:white;border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
+                            </div>
+                        </div>`;
+                }
                 resHtml += `
                     <div class="ro-question">
                         <div class="ro-question-text">${p.id}. ${p.texto}</div>
                         <div class="ro-pill ${resp.valor}">${resp.valor}</div>
                         ${obsHtml}
-                        ${fotosHtml ? `<div class="ro-img-container">${fotosHtml}</div>` : ""}
+                        ${fotosHtml}
                     </div>
                 `;
             });
 
             document.getElementById("content-ro-auditoria").innerHTML = `
-                <h3 style="font-size:18px; font-weight:800; text-align:center;">Detalle de Auditoría</h3>
-                <div class="ro-banner">
-                    <p><strong>Tienda:</strong> ${typeof data.tienda === 'string' ? data.tienda : data.tienda.nombre}</p>
-                    <p><strong>Fecha:</strong> ${data.fecha} ${data.hora}</p>
-                    <p><strong>Supervisor:</strong> ${data.supervisor}</p>
-                    <p><strong>Encargado:</strong> ${data.encargado || 'N/A'}</p>
+                <div style="background:#FC6E20;border-radius:16px;padding:16px;color:white;margin-bottom:20px;margin-top:8px;">
+                    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">${tiendaNombre}</div>
+                    <div style="font-size:12px;opacity:0.9;">${data.fecha} ${data.hora}</div>
+                    <div style="font-size:12px;opacity:0.9;margin-top:2px;">Supervisor: <strong>${data.supervisor}</strong></div>
+                    <div style="font-size:12px;opacity:0.9;margin-top:2px;">Encargado: <strong>${data.encargado || 'N/A'}</strong></div>
                 </div>
-                <div class="ro-score-container">
-                    <div class="ro-score-number" style="color:${data.color};">${Math.round(data.notaFinal || data.finalScore)}%</div>
-                    <div class="ro-score-label" style="background:${data.color};">${data.clasificacion}</div>
+                <div style="text-align:center;margin-bottom:24px;">
+                    <div style="font-size:13px;font-weight:800;color:#1B1B1B;letter-spacing:1px;margin-bottom:14px;">RESULTADOS DE CHECKLIST</div>
+                    <div style="background:#1B1B1B;border-radius:14px;padding:6px;width:36px;height:78px;box-sizing:border-box;margin:0 auto 12px auto;box-shadow:0 4px 14px rgba(0,0,0,0.4);display:flex;flex-direction:column;justify-content:space-around;align-items:center;">
+                        <div style="width:18px;height:18px;border-radius:50%;${semRojo}transition:all 0.5s ease;flex-shrink:0;"></div>
+                        <div style="width:18px;height:18px;border-radius:50%;${semAmarillo}transition:all 0.5s ease;flex-shrink:0;"></div>
+                        <div style="width:18px;height:18px;border-radius:50%;${semVerde}transition:all 0.5s ease;flex-shrink:0;"></div>
+                    </div>
+                    <div style="font-size:52px;font-weight:800;color:${colorHex};margin-top:16px;">${score}%</div>
+                    <div style="display:inline-block;background:${colorHex};color:white;font-weight:700;border-radius:50px;padding:8px 28px;font-size:14px;margin-top:10px;">${data.clasificacion}</div>
                 </div>
+                <div style="display:flex;gap:10px;margin-bottom:24px;">
+                    <button onclick="generarReporte(false)" style="background:#1B1B1B;color:white;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;flex:1;height:44px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;">📄 Reporte</button>
+                    <button onclick="generarReporte(true)" style="background:#FC6E20;color:white;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;flex:1;height:44px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;">📤 Compartir</button>
+                    <button onclick="closeModalRo('modal-ro-auditoria')" style="background:#EEE;color:#1B1B1B;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;flex:1;height:44px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;">✕ Cerrar</button>
+                </div>
+                <div style="font-size:13px;font-weight:800;color:#1B1B1B;letter-spacing:1px;margin-bottom:14px;">RESULTADOS POR GRUPO</div>
                 <div style="margin-bottom:24px;">${grpHtml}</div>
-                <h4 style="font-weight:800; margin-bottom:16px;">DETALLE DE RESPUESTAS</h4>
+                <div style="font-size:13px;font-weight:800;color:#1B1B1B;letter-spacing:1px;margin-bottom:14px;">DETALLE DE RESPUESTAS</div>
                 <div>${resHtml}</div>
             `;
             document.getElementById("modal-ro-auditoria").style.display = "flex";
+        }
+
+        function roCarouselNav(pid, total, dir) {
+            let slides = document.querySelectorAll(`.ro-slide-${pid}`);
+            let counter = document.getElementById(`ro-counter-${pid}`);
+            let current = 0;
+            slides.forEach((s, i) => { if (s.style.display === 'block') current = i; });
+            slides[current].style.display = 'none';
+            current = (current + dir + total) % total;
+            slides[current].style.display = 'block';
+            if (counter) counter.textContent = `${current + 1} / ${total}`;
         }
 
         function openModalRoVisita(id) {
@@ -4119,7 +4170,23 @@
                 let ptsObtenidos = (r.valor === 'SI') ? p.pmax : 0;
                 let ptsMaximos = (r.valor === 'NA') ? 0 : p.pmax;
 
-                let fotosHtml = r.fotos && r.fotos.length > 0 ? r.fotos.map(f => `<img src="${f}" class="foto-auditoria" style="width:100%; height:220px; border-radius:12px; object-fit:cover; box-shadow:0 4px 12px rgba(0,0,0,0.15); margin-top:10px;">`).join("") : "";
+                let fotosHtml = "";
+                if (r.fotos && r.fotos.length > 0) {
+                    const pid = p.id;
+                    if (r.fotos.length === 1) {
+                        fotosHtml = `<img src="${r.fotos[0]}" style="width:70%; display:block; margin:10px auto 0; border-radius:12px; object-fit:cover; box-shadow:0 4px 12px rgba(0,0,0,0.15);">`;
+                    } else {
+                        const slides = r.fotos.map((f, i) => `<div class="carousel-slide" style="display:${i===0?'block':'none'};"><img src="${f}" style="width:70%; display:block; margin:0 auto; border-radius:12px; object-fit:cover; box-shadow:0 4px 12px rgba(0,0,0,0.15);"></div>`).join("");
+                        fotosHtml = `<div class="foto-carousel" id="carousel-${pid}" style="margin-top:10px; position:relative; text-align:center;">
+                            ${slides}
+                            <div style="display:flex; justify-content:center; align-items:center; gap:16px; margin-top:8px;">
+                                <button onclick="carouselNav('${pid}',-1)" style="background:#FC6E20;color:white;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;font-weight:700;">‹</button>
+                                <span id="carousel-counter-${pid}" style="font-size:12px;color:#888;">1 / ${r.fotos.length}</span>
+                                <button onclick="carouselNav('${pid}',1)" style="background:#FC6E20;color:white;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;font-weight:700;">›</button>
+                            </div>
+                        </div>`;
+                    }
+                }
 
                 detHtml += `
           <div style="background:white; border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,0.07); padding:16px; margin-bottom:10px; break-inside: avoid;">
@@ -4183,9 +4250,9 @@
                 pdf.setFillColor(252, 110, 32);
                 pdf.roundedRect(margin, y, pageWidth - 2 * margin, 35, 3, 3, 'F');
                 y += 8;
-                addText("TIENDA", 8, true, [255, 255, 255]);
+                addText("TIENDA", 8, true, [255, 255, 255], 'left', margin + 5);
                 y += 5;
-                addText(typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || window.selectedStore?.nombre || ''), 12, true, [255, 255, 255]);
+                addText(typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || window.selectedStore?.nombre || ''), 12, true, [255, 255, 255], 'left', margin + 5);
                 y += 8;
                 let startX = margin + 5;
                 const cols = ["FECHA", "HORA", "SUPERVISOR", "ENCARGADO"];
@@ -4212,16 +4279,35 @@
                 let mainColor = finalS <= 70 ? [198, 40, 40] : (finalS <= 90 ? [255, 179, 0] : [52, 199, 89]);
 
                 y += 8;
-                addText("RESULTADOS DE CHECKLIST", 14, true, [27, 27, 27], 'center');
-                y += 12;
-                addText(`${finalS.toFixed(1)}%`, 36, true, mainColor, 'center');
+                addText("RESULTADOS DE CHECKLIST", 13, true, [100, 100, 100], 'center');
                 y += 10;
-                drawPill(data.clasificacion || '', pageWidth / 2 - 25, y, 50, 10, mainColor, [255, 255, 255]);
-                y += 18;
+
+                // SEMÁFORO
+                const semW = 22; const semH = 52;
+                const semX = pageWidth / 2 - semW / 2;
+                pdf.setFillColor(27, 27, 27);
+                pdf.roundedRect(semX, y, semW, semH, 5, 5, 'F');
+                const luzColors = {
+                    rojo:     finalS <= 70 ? [198, 40, 40] : [60, 0, 0],
+                    amarillo: finalS > 70 && finalS <= 90 ? [255, 179, 0] : [60, 50, 0],
+                    verde:    finalS > 90 ? [52, 199, 89] : [0, 60, 0]
+                };
+                const luzR = 6;
+                [[luzColors.rojo, y+9], [luzColors.amarillo, y+24], [luzColors.verde, y+39]].forEach(([c, ly]) => {
+                    pdf.setFillColor(c[0], c[1], c[2]);
+                    pdf.circle(semX + semW / 2, ly, luzR, 'F');
+                });
+                y += semH + 14;
+
+                addText(`${finalS.toFixed(1)}%`, 32, true, mainColor, 'center');
+                y += 11;
+                const pillW = 52;
+                drawPill(data.clasificacion || '', pageWidth / 2 - pillW / 2, y, pillW, 10, mainColor, [255, 255, 255]);
+                y += 16;
 
                 // GRUPOS
                 const titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS Y UTENSILIOS", 4: "MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
-                checkPageBreak(120);
+                checkPageBreak(20);
                 addText("RESULTADOS POR GRUPO", 12, true, [27, 27, 27]);
                 y += 8;
 
@@ -4294,50 +4380,39 @@
 
                     if (r.obs) {
                         checkPageBreak(16);
-                        pdf.setFillColor(245, 245, 245);
+                        pdf.setFillColor(230, 230, 230);
                         pdf.roundedRect(margin + 3, y, pageWidth - 2 * margin - 6, 12, 2, 2, 'F');
                         pdf.setDrawColor(252, 110, 32);
                         pdf.setLineWidth(1.5);
                         pdf.line(margin + 3, y, margin + 3, y + 12);
                         pdf.setLineWidth(0.3);
-                        pdf.setFontSize(9); pdf.setFont("helvetica", "italic");
-                        pdf.setTextColor(85, 85, 85);
+                        pdf.setFontSize(11); pdf.setFont("helvetica", "italic");
+                        pdf.setTextColor(60, 60, 60);
                         let splitObs = pdf.splitTextToSize(`Obs: ${r.obs}`, pageWidth - 2 * margin - 14);
-                        pdf.text(splitObs, margin + 7, y + 7);
-                        y += splitObs.length * 5 + 8;
+                        pdf.text(splitObs, margin + 7, y + 8);
+                        y += splitObs.length * 6 + 10;
                     }
 
                     if (r.fotos && r.fotos.length > 0) {
-                        const fotosPerRow = r.fotos.length === 1 ? 1 : 2;
-                        const fotoW = fotosPerRow === 1 ? (pageWidth - 2 * margin - 6) : (pageWidth - 2 * margin - 10) / 2;
-
-                        for (let fi = 0; fi < r.fotos.length; fi += fotosPerRow) {
+                        const fotoW = pageWidth - 2 * margin - 6;
+                        for (const fotoBase64 of r.fotos) {
                             await new Promise(res => setTimeout(res, 0));
-                            let fotosRow = r.fotos.slice(fi, fi + fotosPerRow);
-                            let heights = [];
-                            for (const fotoBase64 of fotosRow) {
-                                try {
-                                    const imgProps = pdf.getImageProperties(fotoBase64);
-                                    const h = Math.min((imgProps.height * fotoW) / imgProps.width, 75);
-                                    heights.push(h);
-                                } catch(e) { heights.push(50); }
+                            try {
+                                const imgProps = pdf.getImageProperties(fotoBase64);
+                                const maxW = pageWidth - 2 * margin - 6;
+                                const maxH = 100;
+                                const ratio = Math.min(maxW / imgProps.width, maxH / imgProps.height, 1);
+                                const fotoW2 = imgProps.width * ratio;
+                                const fotoH = imgProps.height * ratio;
+                                const xCentered = margin + 3 + (maxW - fotoW2) / 2;
+                                checkPageBreak(fotoH + 6);
+                                pdf.addImage(fotoBase64, 'JPEG', xCentered, y, fotoW2, fotoH, '', 'NONE');
+                                y += fotoH + 6;
+                            } catch(e) {
+                                pdf.setTextColor(150,150,150); pdf.setFontSize(7);
+                                pdf.text('[Foto no disponible]', margin + 5, y + 10);
+                                y += 14;
                             }
-                            let rowHeight = Math.max(...heights);
-                            checkPageBreak(rowHeight + 6);
-
-                            for (let fj = 0; fj < fotosRow.length; fj++) {
-                                const fotoBase64 = fotosRow[fj];
-                                const xPos = margin + 3 + fj * (fotoW + 4);
-                                try {
-                                    const imgProps = pdf.getImageProperties(fotoBase64);
-                                    const fotoH = Math.min((imgProps.height * fotoW) / imgProps.width, 75);
-                                    pdf.addImage(fotoBase64, 'JPEG', xPos, y, fotoW, fotoH, '', 'NONE');
-                                } catch(e) {
-                                    pdf.setTextColor(150,150,150); pdf.setFontSize(7);
-                                    pdf.text('[Foto no disponible]', xPos + 2, y + 10);
-                                }
-                            }
-                            y += rowHeight + 4;
                         }
                     }
 
@@ -4354,7 +4429,7 @@
                     pdf.setFillColor(245, 245, 245);
                     pdf.roundedRect(margin, y, pageWidth - 2 * margin, 50, 3, 3, 'F');
                     y += 8;
-                    addText("FIRMA DEL SUPERVISOR", 11, true, [27, 27, 27], 'center');
+                    addText("FIRMA DEL ENCARGADO DE TIENDA", 11, true, [27, 27, 27], 'center');
                     y += 6;
                     const firmaW = 80;
                     const firmaH = 30;
@@ -4367,7 +4442,7 @@
                     pdf.setLineWidth(0.5);
                     pdf.line(firmaX, y, firmaX + firmaW, y);
                     y += 5;
-                    addText(data.supervisor || '', 9, false, [100, 100, 100], 'center');
+                    addText(data.encargado || '', 9, false, [100, 100, 100], 'center');
                     y += 5;
                     addText(`Generado: ${new Date().toLocaleString('es-PE')}`, 8, false, [180, 180, 180], 'center');
                 }
@@ -4400,6 +4475,16 @@
         }
 
         // --- VISITA FLOW ---
+        function carouselNav(pid, dir) {
+            const carousel = document.getElementById(`carousel-${pid}`);
+            const slides = carousel.querySelectorAll('.carousel-slide');
+            let current = Array.from(slides).findIndex(s => s.style.display === 'block');
+            slides[current].style.display = 'none';
+            current = (current + dir + slides.length) % slides.length;
+            slides[current].style.display = 'block';
+            document.getElementById(`carousel-counter-${pid}`).textContent = `${current + 1} / ${slides.length}`;
+        }
+
         function iniciarVisita() {
             document.getElementById("form-vis-tienda").textContent = window.selectedStore.nombre;
 
