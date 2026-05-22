@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Auditorías Listo!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -479,6 +479,188 @@
         .home-subtitle {
             color: rgba(255, 255, 255, 0.85);
             font-size: 13px;
+        }
+
+        /* ── RESPONSIVE DESKTOP ── */
+        @media (min-width: 1024px) {
+            body {
+                max-width: 100%;
+                font-family: 'Inter', 'Nunito', sans-serif;
+            }
+
+            #view-home {
+                display: grid;
+                grid-template-columns: 300px 1fr;
+                grid-template-rows: auto;
+                min-height: 100vh;
+                padding: 0;
+                background: none;
+                background-color: #f0f2f5;
+                background-image:
+                    radial-gradient(ellipse at 0% 0%, rgba(252,110,32,0.08) 0%, transparent 60%),
+                    radial-gradient(ellipse at 100% 100%, rgba(252,110,32,0.05) 0%, transparent 60%);
+            }
+
+            #view-home .home-header {
+                flex-direction: column;
+                align-items: flex-start;
+                margin-bottom: 32px;
+            }
+
+            #view-home .home-header .avatar {
+                order: -1;
+                width: 52px;
+                height: 52px;
+                font-size: 20px;
+                margin-bottom: 20px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+
+            /* SIDEBAR */
+            #home-sidebar {
+                grid-column: 1;
+                grid-row: 1 / -1;
+                background: linear-gradient(160deg, #FC6E20 0%, #e55a0a 100%);
+                padding: 40px 28px;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                box-shadow: 4px 0 24px rgba(252,110,32,0.18);
+            }
+
+            /* MAIN CONTENT */
+            #home-main {
+                grid-column: 2;
+                padding: 48px 48px 32px 48px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            #home-greeting {
+                font-size: 28px;
+                font-weight: 800;
+                color: white;
+            }
+
+            .home-subtitle {
+                font-size: 14px;
+                color: rgba(255,255,255,0.8);
+            }
+
+            /* SEARCH en sidebar */
+            #home-search-wrapper {
+                margin-top: auto;
+            }
+
+            #view-home .search-bar {
+                margin-bottom: 0;
+                background: rgba(255,255,255,0.15);
+                backdrop-filter: blur(8px);
+                border: 1px solid rgba(255,255,255,0.25);
+                box-shadow: none;
+            }
+
+            #view-home .search-bar input {
+                color: white;
+                font-size: 14px;
+            }
+
+            #view-home .search-bar input::placeholder {
+                color: rgba(255,255,255,0.65);
+            }
+
+            #view-home .search-bar svg {
+                stroke: rgba(255,255,255,0.7);
+            }
+
+            /* TÍTULO en main */
+            #home-main-title {
+                font-size: 22px;
+                font-weight: 700;
+                color: #1B1B1B;
+                margin-bottom: 8px;
+            }
+
+            #home-main-subtitle {
+                font-size: 14px;
+                color: #888;
+                margin-bottom: 36px;
+            }
+
+            /* GRID de cards en desktop */
+            #view-home .action-grid {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 20px;
+                max-width: 900px;
+            }
+
+            #view-home .action-card {
+                height: 140px;
+                border-radius: 24px;
+                padding: 28px 20px;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                transition: all 0.3s ease;
+                background: white;
+            }
+
+            #view-home .action-card:hover {
+                transform: translateY(-6px);
+                border-bottom: 3px solid var(--naranja);
+                box-shadow: 0 12px 32px rgba(252,110,32,0.18);
+                border-left: none;
+            }
+
+            #view-home .action-icon {
+                width: 48px;
+                height: 48px;
+                font-size: 22px;
+                margin-bottom: 14px;
+                box-shadow: 0 4px 12px rgba(252,110,32,0.3);
+            }
+
+            #view-home .action-label {
+                font-size: 14px;
+                font-weight: 700;
+                color: #1B1B1B;
+            }
+
+            #view-home #home-historial-opts {
+                grid-column: span 3;
+            }
+
+            #view-home .btn-home-historial {
+                border-radius: 16px;
+                padding: 14px 20px;
+                font-size: 14px;
+            }
+
+            /* Ocultar elementos mobile en desktop */
+            .home-header-mobile,
+            .search-bar-mobile {
+                display: none !important;
+            }
+
+            #home-main-title,
+            #home-main-subtitle {
+                display: block;
+            }
+        }
+
+        /* Ocultar sidebar y títulos desktop en móvil */
+        @media (max-width: 1023px) {
+            #home-sidebar {
+                display: none;
+            }
+            #home-main {
+                display: block;
+            }
+            #home-main-title,
+            #home-main-subtitle {
+                display: none;
+            }
         }
 
         .avatar {
@@ -1797,25 +1979,58 @@
 
     <!-- VIEW: HOME -->
     <div id="view-home" class="view fade-in">
-        <div class="home-header">
-            <div>
-                <h2 id="home-greeting">Hola, </h2>
-                <p class="home-subtitle">¿Qué deseas hacer hoy?</p>
+
+        <!-- SIDEBAR (visible solo en desktop) -->
+        <div id="home-sidebar">
+            <div class="home-header">
+                <div id="home-avatar" class="avatar"></div>
+                <div>
+                    <h2 id="home-greeting">Hola, </h2>
+                    <p class="home-subtitle">¿Qué deseas hacer hoy?</p>
+                </div>
             </div>
-            <div id="home-avatar" class="avatar"></div>
+            <div id="home-search-wrapper">
+                <div class="search-bar">
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </span>
+                    <input type="text" id="home-search" placeholder="Buscar tienda..." onfocus="showView('view-tiendas')"
+                        oninput="document.getElementById('tiendas-search').value=this.value; renderTiendasList('view-tiendas')">
+                </div>
+            </div>
         </div>
 
-        <div class="search-bar">
-            <span>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-            </span>
-            <input type="text" id="home-search" placeholder="Buscar tienda..." onfocus="showView('view-tiendas')"
-                oninput="document.getElementById('tiendas-search').value=this.value; renderTiendasList('view-tiendas')">
-        </div>
+        <!-- MAIN CONTENT -->
+        <div id="home-main">
+
+            <!-- Header mobile (visible solo en móvil) -->
+            <div class="home-header home-header-mobile">
+                <div>
+                    <h2 id="home-greeting-mobile" class="home-greeting-clone"></h2>
+                    <p class="home-subtitle">¿Qué deseas hacer hoy?</p>
+                </div>
+                <div class="avatar" id="home-avatar-mobile"></div>
+            </div>
+
+            <!-- Search bar mobile -->
+            <div class="search-bar search-bar-mobile">
+                <span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                </span>
+                <input type="text" id="home-search-mobile" placeholder="Buscar tienda..." onfocus="showView('view-tiendas')"
+                    oninput="document.getElementById('tiendas-search').value=this.value; renderTiendasList('view-tiendas')">
+            </div>
+
+            <p id="home-main-title">Acciones rápidas</p>
+            <p id="home-main-subtitle">Selecciona una opción para comenzar</p>
 
         <div class="action-grid">
             <div class="action-card" onclick="showView('view-auditoria-tiendas')">
@@ -1892,6 +2107,7 @@
                 <div class="action-label">Ajustes</div>
             </div>
         </div>
+        </div><!-- /home-main -->
     </div>
 
     <!-- VIEW: AUDITORIA TIENDAS -->
@@ -3157,6 +3373,9 @@
         // Init App
         function initApp() {
             let u = JSON.parse(localStorage.getItem("currentUser"));
+            // Sync mobile greeting
+            let mobileGreeting = document.getElementById("home-greeting-mobile");
+            let mobileAvatar = document.getElementById("home-avatar-mobile");
             if (!u) {
                 showView("view-login");
                 return;
@@ -3167,6 +3386,8 @@
 
             let inis = u.nombre.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
             document.getElementById("home-avatar").textContent = inis;
+            if (mobileGreeting) mobileGreeting.textContent = `Hola, ${u.nombre.split(" ")[0]}`;
+            if (mobileAvatar) mobileAvatar.textContent = inis;
 
             // Update Ajustes Profile
             document.getElementById("ajustes-avatar").textContent = inis;
