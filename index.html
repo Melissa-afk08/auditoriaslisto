@@ -2597,7 +2597,7 @@
                             style="background:#FC6E20; color:white; border:none; border-radius:50px; padding:10px 20px; font-size:13px; font-weight:700; flex:1; height:44px; box-shadow:0 4px 12px rgba(252,110,32,0.3); cursor:pointer; display:flex; justify-content:center; align-items:center;">📤
                             Compartir</button>
                     </div>
-                    <button onclick="showView('view-home')"
+                    <button id="btn-volver-resultado" onclick="volverDesdeResultado()"
                         style="background:transparent; color:#FC6E20; border:1.5px solid #FC6E20; border-radius:50px; padding:12px; width:100%; font-size:14px; font-weight:700; cursor:pointer;">←
                         Volver al inicio</button>
                 </div>
@@ -4062,6 +4062,8 @@
         }
 
         function renderAuditoriaResultado(data) {
+            let btnVolver = document.getElementById('btn-volver-resultado');
+            if (btnVolver) btnVolver.textContent = window.auditDesdeHistorial ? '← Volver al historial' : '← Volver al inicio';
             document.getElementById("res-aud-tienda").textContent = typeof data.tienda === 'string' ? data.tienda : data.tienda.nombre;
 
             // formatear fecha y hora
@@ -4630,7 +4632,22 @@
         }
 
         function verDetalleAuditoria(id) {
-            openModalRoAuditoria(id);
+            let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
+            let data = auds.find(a => a.id === id);
+            if (!data) return;
+            window.auditActual = data;
+            window.auditDesdeHistorial = true;
+            renderAuditoriaResultado(data);
+            showView('view-auditoria-resultado');
+        }
+
+        function volverDesdeResultado() {
+            if (window.auditDesdeHistorial) {
+                window.auditDesdeHistorial = false;
+                showView('view-historial-auditorias');
+            } else {
+                showView('view-home');
+            }
         }
 
         function renderHistorialVisitas() {
