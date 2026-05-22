@@ -4457,7 +4457,7 @@
                 const file = new File([blob], filename, { type: 'application/pdf' });
 
                 if (share && navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-                    try { await navigator.share({ files: [file], title: 'Reporte de Auditoría' }); }
+                    try { await navigator.share({ files: [file], title: `Reporte de Auditoría – ${tiendaNombre} | ${data.fecha} | Supervisor: ${data.supervisor}` }); }
                     catch (e) { pdf.save(filename); }
                 } else {
                     pdf.save(filename);
