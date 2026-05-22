@@ -2593,9 +2593,9 @@
                         <button id="btn-rep-pdf" onclick="generarReporte(false)"
                             style="background:#1B1B1B; color:white; border:none; border-radius:50px; padding:10px 20px; font-size:13px; font-weight:700; flex:1; height:44px; box-shadow:0 4px 12px rgba(0,0,0,0.15); cursor:pointer; display:flex; justify-content:center; align-items:center;">📄
                             Reporte</button>
-                        <button id="btn-rep-share" onclick="generarReporte(true)"
-                            style="background:#FC6E20; color:white; border:none; border-radius:50px; padding:10px 20px; font-size:13px; font-weight:700; flex:1; height:44px; box-shadow:0 4px 12px rgba(252,110,32,0.3); cursor:pointer; display:flex; justify-content:center; align-items:center;">📤
-                            Compartir</button>
+                        <button id="btn-rep-share" onclick="abrirModalEnviar()"
+                            style="background:#FC6E20; color:white; border:none; border-radius:50px; padding:10px 20px; font-size:13px; font-weight:700; flex:1; height:44px; box-shadow:0 4px 12px rgba(252,110,32,0.3); cursor:pointer; display:flex; justify-content:center; align-items:center;">📧
+                            Enviar a:</button>
                     </div>
                     <button id="btn-volver-resultado" onclick="volverDesdeResultado()"
                         style="background:transparent; color:#FC6E20; border:1.5px solid #FC6E20; border-radius:50px; padding:12px; width:100%; font-size:14px; font-weight:700; cursor:pointer;">←
@@ -3669,7 +3669,7 @@
                 </div>
                 <div style="display:flex;gap:10px;margin-bottom:24px;">
                     <button onclick="generarReporte(false)" style="background:#1B1B1B;color:white;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;flex:1;height:44px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;">📄 Reporte</button>
-                    <button onclick="generarReporte(true)" style="background:#FC6E20;color:white;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;flex:1;height:44px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;">📤 Compartir</button>
+                    <button onclick="abrirModalEnviar()" style="background:#FC6E20;color:white;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;flex:1;height:44px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;">📧 Enviar a:</button>
                     <button onclick="closeModalRo('modal-ro-auditoria')" style="background:#EEE;color:#1B1B1B;border:none;border-radius:50px;padding:10px 20px;font-size:13px;font-weight:700;flex:1;height:44px;cursor:pointer;display:flex;justify-content:center;align-items:center;gap:6px;">✕ Cerrar</button>
                 </div>
                 <div style="font-size:13px;font-weight:800;color:#1B1B1B;letter-spacing:1px;margin-bottom:14px;">RESULTADOS POR GRUPO</div>
@@ -3789,7 +3789,7 @@
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> Adjuntar foto
               </button>
               <div class="fotos-grid" id="fotos-grid-${p.id}"></div>
-              <textarea id="obs-${p.id}" placeholder="Escribe tus observaciones..." oninput="saveObs(${p.id}, this.value)"></textarea>
+              <textarea id="obs-${p.id}" placeholder="Escribe tus observaciones..." oninput="saveObs(${p.id}, this.value)" spellcheck="true" lang="es" autocorrect="on" autocapitalize="sentences"></textarea>
             </div>
           </div>
         `;
@@ -4993,6 +4993,16 @@
                 console.error('Error sync visita:', e);
                 showToast('⚠ Guardado local OK, fallo en nube', 'error');
             }
+        }
+
+        function abrirModalEnviar() {
+            let data = window.auditActual;
+            if (!data) return;
+            let tienda = typeof data.tienda === 'string' ? data.tienda : data.tienda.nombre;
+            let asunto = `Reporte de Auditoría – ${tienda} | ${data.fecha} | Supervisor: ${data.supervisor}`;
+            let cuerpo = `Estimado/a,\n\nSe adjunta el reporte de auditoría correspondiente a:\n\nTienda: ${tienda}\nFecha: ${data.fecha} ${data.hora}\nSupervisor: ${data.supervisor}\nEncargado: ${data.encargado || 'N/A'}\nResultado: ${data.clasificacion} (${(data.notaFinal || data.finalScore).toFixed(1)}%)\n\nPor favor revise el PDF adjunto.\n\nSaludos.`;
+            let mailto = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+            window.open(mailto, '_self');
         }
 
         // BOOT
