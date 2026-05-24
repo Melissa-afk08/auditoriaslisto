@@ -3150,6 +3150,16 @@
         </div><!-- /home-main -->
     </div>
 
+    <!-- VIEW: RESULTADO PÚBLICO (sin login) -->
+    <div id="view-resultado-publico" style="display:none; background:#F5F5F5; min-height:100vh; padding:20px 16px 40px;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#FC6E20;display:flex;align-items:center;justify-content:center;">🍊</div>
+            <div style="font-size:14px;font-weight:800;color:#1B1B1B;">Auditorías Listo!</div>
+            <span style="margin-left:auto;background:#FFF0E6;color:#FC6E20;font-size:11px;font-weight:700;padding:4px 10px;border-radius:50px;">Solo lectura</span>
+        </div>
+        <div id="res-pub-contenido"></div>
+    </div>
+
     <!-- VIEW: AUDITORIA TIENDAS -->
     <div id="view-auditoria-tiendas" class="view fade-in">
         <div class="header-dark">
@@ -3636,6 +3646,7 @@
                             style="background:#FC6E20; color:white; border:none; border-radius:50px; padding:10px 20px; font-size:13px; font-weight:700; flex:1; height:44px; box-shadow:0 4px 12px rgba(252,110,32,0.3); cursor:pointer; display:flex; justify-content:center; align-items:center;">📧
                             Enviar a:</button>
                     </div>
+                    <button onclick="compartirEnlaceAuditoria()" style="background:white; color:#1B1B1B; border:1.5px solid #E0E0E0; border-radius:50px; padding:10px 20px; font-size:13px; font-weight:700; width:100%; height:44px; cursor:pointer; display:flex; justify-content:center; align-items:center; gap:8px;">🔗 Copiar enlace público</button>
                     <button id="btn-volver-resultado" onclick="volverDesdeResultado()"
                         style="background:transparent; color:#FC6E20; border:1.5px solid #FC6E20; border-radius:50px; padding:12px; width:100%; font-size:14px; font-weight:700; cursor:pointer;">←
                         Volver al inicio</button>
@@ -6903,10 +6914,191 @@
             generarReporte(true);
         }
 
+        function compartirEnlaceAuditoria() {
+            let data = window.auditoriaActualData || window.auditActual;
+            if (!data || !data.id) { showToast("No hay auditoría activa", "error"); return; }
+            let url = `${location.origin}${location.pathname}?resultado=${data.id}`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => showToast("✓ Enlace copiado", "success"));
+            } else {
+                let inp = document.createElement('input');
+                inp.value = url;
+                document.body.appendChild(inp);
+                inp.select();
+                document.execCommand('copy');
+                document.body.removeChild(inp);
+                showToast("✓ Enlace copiado", "success");
+            }
+        }
+
+        async function cargarResultadoPublico(id) {
+            let vista = document.getElementById('view-resultado-publico');
+            let contenido = document.getElementById('res-pub-contenido');
+            vista.style.display = 'block';
+            contenido.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#aaa;">Cargando auditoría...</div>';
+
+            try {
+                let { data, error } = await sbClient.from('auditorias').select('*').eq('id', id).single();
+                if (error || !data) throw new Error('No encontrada');
+
+                const titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS HERRAMIENTAS Y UTENSILIOS", 4: "CONTROL Y MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
+                let score = data.nota_final || 0;
+                let mainColor = score <= 70 ? "#FF3B30" : score <= 90 ? "#FFCC00" : "#34C759";
+                let clasificacion = score <= 70 ? "Alto Riesgo" : score <= 90 ? "Observado" : "Aprobado";
+                let semR = score <= 70 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#3a0000';
+                let semA = score > 70 && score <= 90 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#3a2e00';
+                let semV = score > 90 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#003a00';
+
+                let grupos = data.resultado_grupos || {};
+                let grpHtml = Object.keys(titulosGrupo).map(i => {
+                    let v = grupos[i] || 0;
+                    let c = v < 70 ? "#FF3B30" : v <= 90 ? "#FFCC00" : "#34C759";
+                    return `<div style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <span style="font-size:13px;font-weight:700;color:#1B1B1B;">${titulosGrupo[i]}</span>
+                            <span style="font-size:14px;font-weight:700;color:${c};">${v.toFixed(1)}%</span>
+                        </div>
+                        <div style="background:#F0F0F0;border-radius:50px;height:10px;overflow:hidden;">
+                            <div style="width:${v}%;background:${c};height:100%;border-radius:50px;transition:width 0.8s ease;"></div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                let tienda = data.tienda_nombre || '';
+                contenido.innerHTML = `
+                    <div style="background:#FC6E20;border-radius:16px;padding:16px 20px;margin-bottom:16px;">
+                        <div style="font-size:10px;color:white;opacity:0.8;text-transform:uppercase;margin-bottom:4px;">Tienda</div>
+                        <div style="font-size:15px;color:white;font-weight:800;margin-bottom:12px;">${tienda}</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Fecha</div><div style="font-size:13px;color:white;font-weight:700;">${data.fecha||'—'}</div></div>
+                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Hora</div><div style="font-size:13px;color:white;font-weight:700;">${data.hora||'—'}</div></div>
+                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Supervisor</div><div style="font-size:13px;color:white;font-weight:700;">${data.supervisor||'—'}</div></div>
+                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Encargado</div><div style="font-size:13px;color:white;font-weight:700;">${data.encargado||'—'}</div></div>
+                        </div>
+                    </div>
+                    <div style="background:white;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,0.08);padding:24px 20px;margin-bottom:16px;text-align:center;">
+                        <div style="font-size:16px;font-weight:900;color:#1B1B1B;letter-spacing:1px;margin-bottom:20px;">RESULTADOS DE CHECKLIST</div>
+                        <div style="background:#1B1B1B;border-radius:20px;padding:8px;width:52px;height:110px;margin:0 auto 16px;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:flex;flex-direction:column;justify-content:space-around;align-items:center;">
+                            <div style="width:28px;height:28px;border-radius:50%;${semR};"></div>
+                            <div style="width:28px;height:28px;border-radius:50%;${semA};"></div>
+                            <div style="width:28px;height:28px;border-radius:50%;${semV};"></div>
+                        </div>
+                        <div style="font-size:52px;font-weight:800;color:${mainColor};">${score.toFixed(1)}%</div>
+                        <span style="background:${mainColor};color:white;font-weight:700;border-radius:50px;padding:8px 28px;font-size:15px;display:inline-block;margin-top:12px;">${clasificacion}</span>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <div style="font-size:13px;font-weight:700;color:#1B1B1B;letter-spacing:1px;margin-bottom:12px;">RESULTADOS POR GRUPO</div>
+                        ${grpHtml}
+                    </div>
+                    <div style="background:#FFF8F3;border:1px solid rgba(252,110,32,0.2);border-radius:16px;padding:16px;text-align:center;">
+                        <div style="font-size:11px;color:#aaa;">Auditoría generada con</div>
+                        <div style="font-size:14px;font-weight:800;color:#FC6E20;">Auditorías Listo! 🍊</div>
+                    </div>
+                `;
+            } catch(e) {
+                contenido.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:40px;margin-bottom:12px;">🔍</div><div style="font-size:16px;font-weight:700;color:#1B1B1B;">Auditoría no encontrada</div><div style="font-size:13px;color:#aaa;margin-top:8px;">El enlace puede haber expirado o ser incorrecto.</div></div>';
+            }
+        }
+
+        function compartirEnlaceAuditoria() {
+            let data = window.auditoriaActualData || window.auditActual;
+            if (!data || !data.id) { showToast("No hay auditoría activa", "error"); return; }
+            let url = `${location.origin}${location.pathname}?resultado=${data.id}`;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => showToast("✓ Enlace copiado", "success"));
+            } else {
+                let inp = document.createElement('input');
+                inp.value = url;
+                document.body.appendChild(inp);
+                inp.select();
+                document.execCommand('copy');
+                document.body.removeChild(inp);
+                showToast("✓ Enlace copiado", "success");
+            }
+        }
+
+        async function cargarResultadoPublico(id) {
+            let vista = document.getElementById('view-resultado-publico');
+            let contenido = document.getElementById('res-pub-contenido');
+            vista.style.display = 'block';
+            contenido.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#aaa;">Cargando auditoría...</div>';
+
+            try {
+                let { data, error } = await sbClient.from('auditorias').select('*').eq('id', id).single();
+                if (error || !data) throw new Error('No encontrada');
+
+                const titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS HERRAMIENTAS Y UTENSILIOS", 4: "CONTROL Y MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
+                let score = data.nota_final || 0;
+                let mainColor = score <= 70 ? "#FF3B30" : score <= 90 ? "#FFCC00" : "#34C759";
+                let clasificacion = score <= 70 ? "Alto Riesgo" : score <= 90 ? "Observado" : "Aprobado";
+                let semR = score <= 70 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#3a0000';
+                let semA = score > 70 && score <= 90 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#3a2e00';
+                let semV = score > 90 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#003a00';
+
+                let grupos = data.resultado_grupos || {};
+                let grpHtml = Object.keys(titulosGrupo).map(i => {
+                    let v = grupos[i] || 0;
+                    let c = v < 70 ? "#FF3B30" : v <= 90 ? "#FFCC00" : "#34C759";
+                    return `<div style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+                            <span style="font-size:13px;font-weight:700;color:#1B1B1B;">${titulosGrupo[i]}</span>
+                            <span style="font-size:14px;font-weight:700;color:${c};">${v.toFixed(1)}%</span>
+                        </div>
+                        <div style="background:#F0F0F0;border-radius:50px;height:10px;overflow:hidden;">
+                            <div style="width:${v}%;background:${c};height:100%;border-radius:50px;transition:width 0.8s ease;"></div>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                let tienda = data.tienda_nombre || '';
+                contenido.innerHTML = `
+                    <div style="background:#FC6E20;border-radius:16px;padding:16px 20px;margin-bottom:16px;">
+                        <div style="font-size:10px;color:white;opacity:0.8;text-transform:uppercase;margin-bottom:4px;">Tienda</div>
+                        <div style="font-size:15px;color:white;font-weight:800;margin-bottom:12px;">${tienda}</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Fecha</div><div style="font-size:13px;color:white;font-weight:700;">${data.fecha||'—'}</div></div>
+                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Hora</div><div style="font-size:13px;color:white;font-weight:700;">${data.hora||'—'}</div></div>
+                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Supervisor</div><div style="font-size:13px;color:white;font-weight:700;">${data.supervisor||'—'}</div></div>
+                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Encargado</div><div style="font-size:13px;color:white;font-weight:700;">${data.encargado||'—'}</div></div>
+                        </div>
+                    </div>
+                    <div style="background:white;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,0.08);padding:24px 20px;margin-bottom:16px;text-align:center;">
+                        <div style="font-size:16px;font-weight:900;color:#1B1B1B;letter-spacing:1px;margin-bottom:20px;">RESULTADOS DE CHECKLIST</div>
+                        <div style="background:#1B1B1B;border-radius:20px;padding:8px;width:52px;height:110px;margin:0 auto 16px;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:flex;flex-direction:column;justify-content:space-around;align-items:center;">
+                            <div style="width:28px;height:28px;border-radius:50%;${semR};"></div>
+                            <div style="width:28px;height:28px;border-radius:50%;${semA};"></div>
+                            <div style="width:28px;height:28px;border-radius:50%;${semV};"></div>
+                        </div>
+                        <div style="font-size:52px;font-weight:800;color:${mainColor};">${score.toFixed(1)}%</div>
+                        <span style="background:${mainColor};color:white;font-weight:700;border-radius:50px;padding:8px 28px;font-size:15px;display:inline-block;margin-top:12px;">${clasificacion}</span>
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <div style="font-size:13px;font-weight:700;color:#1B1B1B;letter-spacing:1px;margin-bottom:12px;">RESULTADOS POR GRUPO</div>
+                        ${grpHtml}
+                    </div>
+                    <div style="background:#FFF8F3;border:1px solid rgba(252,110,32,0.2);border-radius:16px;padding:16px;text-align:center;">
+                        <div style="font-size:11px;color:#aaa;">Auditoría generada con</div>
+                        <div style="font-size:14px;font-weight:800;color:#FC6E20;">Auditorías Listo! 🍊</div>
+                    </div>
+                `;
+            } catch(e) {
+                contenido.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:40px;margin-bottom:12px;">🔍</div><div style="font-size:16px;font-weight:700;color:#1B1B1B;">Auditoría no encontrada</div><div style="font-size:13px;color:#aaa;margin-top:8px;">El enlace puede haber expirado o ser incorrecto.</div></div>';
+            }
+        }
+
         // BOOT
         window.onload = () => {
-            initData();
-            initApp();
+            let params = new URLSearchParams(window.location.search);
+            let resultadoId = params.get('resultado');
+            if (resultadoId) {
+                // Ocultar todas las vistas normales y mostrar resultado público
+                document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
+                initData();
+                cargarResultadoPublico(resultadoId);
+            } else {
+                initData();
+                initApp();
+            }
         };
 
     </script>
