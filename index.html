@@ -489,74 +489,63 @@
             }
 
             #view-home {
-                display: grid;
-                grid-template-columns: 300px 1fr;
-                grid-template-rows: auto;
+                display: flex;
+                flex-direction: column;
                 min-height: 100vh;
                 padding: 0;
-                background: none;
-                background-color: #f0f2f5;
-                background-image:
-                    radial-gradient(ellipse at 0% 0%, rgba(252,110,32,0.08) 0%, transparent 60%),
-                    radial-gradient(ellipse at 100% 100%, rgba(252,110,32,0.05) 0%, transparent 60%);
+                background: #f8f9fa;
+            }
+
+            /* HEADER COMPACTO */
+            #home-sidebar {
+                display: flex !important;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                background: linear-gradient(135deg, #FC6E20 0%, #e8550a 60%, #c94400 100%);
+                padding: 16px 48px;
+                box-shadow: 0 2px 16px rgba(252,110,32,0.25);
+                gap: 24px;
             }
 
             #view-home .home-header {
-                flex-direction: column;
-                align-items: flex-start;
-                margin-bottom: 32px;
+                flex-direction: row;
+                align-items: center;
+                margin-bottom: 0;
+                gap: 14px;
             }
 
             #view-home .home-header .avatar {
-                order: -1;
-                width: 52px;
-                height: 52px;
-                font-size: 20px;
-                margin-bottom: 20px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            }
-
-            /* SIDEBAR */
-            #home-sidebar {
-                grid-column: 1;
-                grid-row: 1 / -1;
-                background: linear-gradient(160deg, #FC6E20 0%, #e55a0a 100%);
-                padding: 40px 28px;
-                display: flex;
-                flex-direction: column;
-                min-height: 100vh;
-                box-shadow: 4px 0 24px rgba(252,110,32,0.18);
-            }
-
-            /* MAIN CONTENT */
-            #home-main {
-                grid-column: 2;
-                padding: 48px 48px 32px 48px;
-                display: flex;
-                flex-direction: column;
+                width: 44px;
+                height: 44px;
+                font-size: 17px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                flex-shrink: 0;
             }
 
             #home-greeting {
-                font-size: 28px;
+                font-size: 18px;
                 font-weight: 800;
                 color: white;
+                margin-bottom: 0;
             }
 
             .home-subtitle {
-                font-size: 14px;
+                font-size: 12px;
                 color: rgba(255,255,255,0.8);
             }
 
-            /* SEARCH en sidebar */
             #home-search-wrapper {
-                margin-top: auto;
+                flex: 1;
+                max-width: 360px;
+                margin-top: 0;
             }
 
             #view-home .search-bar {
                 margin-bottom: 0;
                 background: rgba(255,255,255,0.15);
                 backdrop-filter: blur(8px);
-                border: 1px solid rgba(255,255,255,0.25);
+                border: 1px solid rgba(255,255,255,0.3);
                 box-shadow: none;
             }
 
@@ -573,58 +562,131 @@
                 stroke: rgba(255,255,255,0.7);
             }
 
-            /* TÍTULO en main */
-            #home-main-title {
-                font-size: 22px;
+            /* MAIN CONTENT — 2 columnas */
+            #home-main {
+                display: grid;
+                grid-template-columns: 1fr 320px;
+                grid-template-rows: auto auto 1fr;
+                gap: 0 28px;
+                padding: 36px 48px 32px 48px;
+                align-items: start;
+            }
+
+            /* KPI CARDS */
+            #home-kpi-section {
+                grid-column: 1;
+                grid-row: 1;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 16px;
+                margin-bottom: 28px;
+            }
+
+            .kpi-card {
+                background: white;
+                border-radius: 16px;
+                padding: 20px 22px;
+                box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+                border-top: 3px solid var(--naranja);
+                transition: transform 0.2s ease, box-shadow 0.2s ease;
+            }
+
+            .kpi-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 24px rgba(252,110,32,0.12);
+            }
+
+            .kpi-label {
+                font-size: 11px;
                 font-weight: 700;
-                color: #1B1B1B;
+                color: #999;
+                letter-spacing: 0.8px;
+                text-transform: uppercase;
                 margin-bottom: 8px;
             }
 
-            #home-main-subtitle {
-                font-size: 14px;
-                color: #888;
-                margin-bottom: 36px;
+            .kpi-value {
+                font-size: 32px;
+                font-weight: 800;
+                color: #1B1B1B;
+                line-height: 1;
+                margin-bottom: 4px;
             }
 
-            /* GRID de cards en desktop */
+            .kpi-sub {
+                font-size: 12px;
+                color: #aaa;
+            }
+
+            /* TÍTULO Acciones */
+            #home-main-title {
+                grid-column: 1;
+                grid-row: 2;
+                font-size: 16px;
+                font-weight: 700;
+                color: #1B1B1B;
+                margin-bottom: 4px;
+            }
+
+            #home-main-subtitle {
+                display: none;
+            }
+
+            /* GRID de cards */
+            #home-actions-wrapper {
+                grid-column: 1;
+                grid-row: 3;
+            }
+
             #view-home .action-grid {
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
-                gap: 20px;
-                max-width: 900px;
+                gap: 16px;
+                max-width: 100%;
+                margin-top: 16px;
             }
 
             #view-home .action-card {
-                height: 140px;
-                border-radius: 24px;
-                padding: 28px 20px;
-                box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+                height: auto;
+                min-height: 120px;
+                border-radius: 16px;
+                padding: 22px 20px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.06);
                 border-left: none;
                 border-bottom: 3px solid transparent;
-                transition: all 0.3s ease;
+                transition: all 0.25s ease;
                 background: white;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
             }
 
             #view-home .action-card:hover {
-                transform: translateY(-6px);
+                transform: translateY(-4px);
                 border-bottom: 3px solid var(--naranja);
-                box-shadow: 0 12px 32px rgba(252,110,32,0.18);
+                box-shadow: 0 10px 28px rgba(252,110,32,0.15);
                 border-left: none;
             }
 
             #view-home .action-icon {
-                width: 48px;
-                height: 48px;
-                font-size: 22px;
-                margin-bottom: 14px;
-                box-shadow: 0 4px 12px rgba(252,110,32,0.3);
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                margin-bottom: 0;
+                box-shadow: 0 2px 8px rgba(252,110,32,0.25);
             }
 
             #view-home .action-label {
-                font-size: 14px;
+                font-size: 13px;
                 font-weight: 700;
                 color: #1B1B1B;
+            }
+
+            #view-home .action-desc {
+                font-size: 11px;
+                color: #aaa;
+                font-weight: 400;
+                margin-top: 2px;
             }
 
             #view-home #home-historial-opts {
@@ -633,18 +695,86 @@
 
             #view-home .btn-home-historial {
                 border-radius: 16px;
-                padding: 14px 20px;
-                font-size: 14px;
+                padding: 12px 20px;
+                font-size: 13px;
             }
 
-            /* Ocultar elementos mobile en desktop */
+            /* PANEL LATERAL */
+            #home-panel-lateral {
+                grid-column: 2;
+                grid-row: 1 / 4;
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .panel-card {
+                background: white;
+                border-radius: 16px;
+                padding: 20px;
+                box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            }
+
+            .panel-title {
+                font-size: 13px;
+                font-weight: 800;
+                color: #1B1B1B;
+                letter-spacing: 0.5px;
+                margin-bottom: 16px;
+                text-transform: uppercase;
+            }
+
+            .audit-item-lateral {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+                padding: 10px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .audit-item-lateral:last-child { border-bottom: none; }
+
+            .audit-item-tienda {
+                font-size: 13px;
+                font-weight: 700;
+                color: #1B1B1B;
+            }
+
+            .audit-item-meta {
+                font-size: 11px;
+                color: #aaa;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .audit-badge {
+                font-size: 10px;
+                font-weight: 700;
+                padding: 2px 8px;
+                border-radius: 20px;
+                color: white;
+            }
+
+            .recordatorio-card {
+                background: linear-gradient(135deg, #FFF8F3 0%, #FFF0E6 100%);
+                border: 1px solid rgba(252,110,32,0.15);
+                border-left: 4px solid var(--naranja);
+            }
+
+            .recordatorio-text {
+                font-size: 12px;
+                color: #666;
+                line-height: 1.6;
+            }
+
+            /* Ocultar elementos mobile */
             .home-header-mobile,
             .search-bar-mobile {
                 display: none !important;
             }
 
-            #home-main-title,
-            #home-main-subtitle {
+            #home-main-title {
                 display: block;
             }
         }
@@ -808,7 +938,7 @@
 
         .progress-bar-container {
             position: sticky;
-            top: 48px;
+            top: 57px;
             background: white;
             padding: 12px 16px;
             z-index: 90;
@@ -1002,6 +1132,33 @@
             justify-content: center;
             font-size: 12px;
             cursor: pointer;
+        }
+
+        #modal-firma {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        #modal-firma-box {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+        }
+
+        #firma-canvas-modal {
+            width: 100%;
+            height: 200px;
+            display: block;
+            touch-action: none;
         }
 
         .canvas-container {
@@ -1212,6 +1369,110 @@
             color: #888;
         }
 
+        .ajustes-perfil-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .ajustes-perfil-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #FC6E20, #e55a0a);
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(252,110,32,0.3);
+        }
+
+        .ajustes-perfil-info { flex: 1; }
+        .ajustes-perfil-nombre { font-size: 16px; font-weight: 800; color: #1B1B1B; margin-bottom: 2px; }
+        .ajustes-perfil-cargo { font-size: 12px; font-weight: 700; color: #FC6E20; margin-bottom: 2px; }
+        .ajustes-perfil-email { font-size: 12px; color: #888; margin-bottom: 6px; }
+        .ajustes-perfil-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #E8F5E9;
+            color: #43A047;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 50px;
+        }
+
+        .ajustes-section-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #aaa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin: 20px 0 10px 4px;
+        }
+
+        .ajustes-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .ajustes-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 16px 20px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .ajustes-item:last-child { border-bottom: none; }
+
+        .ajustes-item:hover { background: #f9f9f9; }
+
+        .ajustes-item-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .ajustes-item-text { flex: 1; }
+        .ajustes-item-label { font-size: 14px; font-weight: 700; color: #1B1B1B; }
+        .ajustes-item-desc { font-size: 12px; color: #aaa; margin-top: 1px; }
+        .ajustes-item-arrow { font-size: 18px; color: #ccc; }
+
+        .ajustes-logout {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            margin-top: 8px;
+        }
+
+        .ajustes-logout:hover { background: #fff5f5; }
+
         .ajustes-row {
             background: white;
             border-radius: 16px;
@@ -1311,17 +1572,12 @@
         }
 
         .filter-dropdown {
-            position: absolute;
-            z-index: 100;
+            display: none;
             background: white;
             border-radius: 16px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-            padding: 12px;
-            max-height: 300px;
-            overflow-y: auto;
-            width: 250px;
-            right: 16px;
-            top: 65px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            padding: 16px;
+            margin-bottom: 12px;
         }
 
         .filter-option {
@@ -1407,6 +1663,331 @@
         }
 
         /* Detalle Vistas */
+        /* ── NUEVO DETALLE TIENDA ── */
+        .td-banner {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .td-banner img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .td-banner-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.75) 100%);
+        }
+
+        .td-banner-back {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            background: rgba(0,0,0,0.35);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .td-banner-nombre {
+            position: absolute;
+            bottom: 16px;
+            left: 20px;
+            right: 20px;
+            color: white;
+            font-size: 22px;
+            font-weight: 800;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+
+        .td-body {
+            background: #f8f9fa;
+            padding: 20px 16px 32px 16px;
+        }
+
+        @media (min-width: 1024px) {
+            .td-body {
+                display: grid;
+                grid-template-columns: 40% 60%;
+                gap: 24px;
+                padding: 28px 48px 40px 48px;
+                align-items: start;
+            }
+            .td-banner { height: 260px; }
+            .td-banner-nombre { font-size: 28px; }
+        }
+
+        .td-info-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .td-info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .td-info-row:last-of-type { border-bottom: none; }
+
+        .td-info-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: #FFF0E6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--naranja);
+        }
+
+        .td-info-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #aaa;
+            letter-spacing: 0.5px;
+            margin-bottom: 2px;
+        }
+
+        .td-info-val {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1B1B1B;
+        }
+
+        .td-btn-ubicacion {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: white;
+            border: 1.5px solid var(--naranja);
+            color: var(--naranja);
+            border-radius: 50px;
+            padding: 8px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .td-btn-ubicacion:hover {
+            background: var(--naranja);
+            color: white;
+        }
+
+        /* Mapa embed — solo desktop */
+        .td-mapa-wrapper {
+            display: none;
+        }
+        @media (min-width: 1024px) {
+            .td-mapa-wrapper {
+                display: block;
+                border-radius: 12px;
+                overflow: hidden;
+                margin-top: 16px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            }
+            .td-mapa-wrapper iframe {
+                width: 100%;
+                height: 220px;
+                border: none;
+                display: block;
+            }
+        }
+
+        /* KPIs tienda */
+        .td-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .td-kpi-card {
+            background: white;
+            border-radius: 14px;
+            padding: 14px 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            text-align: center;
+            border-top: 3px solid var(--naranja);
+        }
+
+        .td-kpi-val {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1B1B1B;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .td-kpi-label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #aaa;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .td-ranking-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 16px 20px;
+            margin-top: 16px;
+        }
+
+        .td-ranking-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #aaa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .td-ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .td-ranking-item:last-child { border-bottom: none; }
+
+        .td-donut-wrap {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            flex-shrink: 0;
+        }
+
+        .td-donut-wrap svg {
+            transform: rotate(-90deg);
+        }
+
+        .td-donut-label {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            color: #FC6E20;
+        }
+
+        .td-ranking-info { flex: 1; min-width: 0; }
+
+        .td-ranking-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1B1B1B;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .td-ranking-badges {
+            display: flex;
+            gap: 6px;
+        }
+
+        .td-ranking-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 50px;
+        }
+
+        .td-ranking-crown {
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .td-hist-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+
+        .td-hist-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #1B1B1B;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .td-hist-scroll {
+            max-height: 350px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #ddd transparent;
+        }
+
+        .td-hist-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .td-hist-item:last-child { border-bottom: none; }
+        .td-hist-item:hover { background: #fafafa; border-radius: 8px; }
+
+        .td-hist-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+
+        .td-hist-item-sup {
+            font-size: 12px;
+            color: var(--naranja);
+            font-weight: 600;
+        }
+
+        .td-hist-item-fecha {
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .td-hist-item-comentario {
+            font-size: 12px;
+            color: #888;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90%;
+        }
+
         .detalle-header-wrapper {
             position: relative;
             width: 100%;
@@ -1467,7 +2048,7 @@
         .detalle-content-card {
             background: white;
             border-radius: 24px 24px 0 0;
-            margin-top: -20px;
+            margin-top: 8px;
             position: relative;
             z-index: 20;
             padding: 24px 20px;
@@ -1546,6 +2127,141 @@
             font-weight: 600;
         }
 
+        /* Resumen preparación */
+        .prep-section {
+            margin: 16px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .prep-card {
+            background: white;
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+
+        .prep-card-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #aaa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .prep-score-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .prep-score-num {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .prep-score-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 50px;
+            color: white;
+        }
+
+        .prep-score-fecha {
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 4px;
+        }
+
+        .prep-alerta-card {
+            background: #FFFBF0;
+            border: 1px solid rgba(249,168,37,0.3);
+            border-left: 4px solid #F9A825;
+            border-radius: 14px;
+            padding: 14px 16px;
+        }
+
+        .prep-alerta-text {
+            font-size: 13px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .diag-group-bar {
+            margin-bottom: 10px;
+        }
+
+        .diag-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .diag-group-name {
+            font-size: 11px;
+            font-weight: 700;
+            color: #555;
+            letter-spacing: 0.3px;
+        }
+
+        .diag-group-pct {
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .diag-bar-bg {
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .diag-bar-fill {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .diag-alerta-item {
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: #FFFBF0;
+            border-left: 3px solid #F9A825;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .diag-alerta-item.critico {
+            background: #FFF5F5;
+            border-left-color: #C62828;
+        }
+
+        .diag-alerta-grupo {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            margin-bottom: 3px;
+        }
+
+        .diag-alerta-pregunta {
+            font-size: 12px;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .diag-alerta-obs {
+            font-size: 11px;
+            color: #888;
+            font-style: italic;
+        }
+
         .btn-main-auditoria {
             margin-top: 28px;
             width: 100%;
@@ -1564,6 +2280,68 @@
         .btn-main-auditoria:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(252, 110, 32, 0.55);
+        }
+
+        .vis-bitacora-card {
+            background: white;
+            border-radius: 14px;
+            border-left: 4px solid var(--naranja);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            padding: 14px 16px;
+            margin: 16px 0 12px 0;
+        }
+
+        .vis-bitacora-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #aaa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .vis-bitacora-meta {
+            font-size: 11px;
+            color: var(--naranja);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .vis-bitacora-texto {
+            font-size: 13px;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .vis-textarea {
+            width: 100%;
+            min-height: 100px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-family: inherit;
+            color: #1B1B1B;
+            resize: vertical;
+            outline: none;
+            box-sizing: border-box;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 14px;
+        }
+
+        .vis-textarea:focus {
+            border-color: var(--naranja);
+            box-shadow: 0 0 0 3px rgba(252,110,32,0.1);
+        }
+
+        .vis-apunte-label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #aaa;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            display: block;
         }
 
         .btn-main-visita {
@@ -1980,7 +2758,7 @@
     <!-- VIEW: HOME -->
     <div id="view-home" class="view fade-in">
 
-        <!-- SIDEBAR (visible solo en desktop) -->
+        <!-- HEADER COMPACTO (sidebar en desktop) -->
         <div id="home-sidebar">
             <div class="home-header">
                 <div id="home-avatar" class="avatar"></div>
@@ -2007,7 +2785,7 @@
         <!-- MAIN CONTENT -->
         <div id="home-main">
 
-            <!-- Header mobile (visible solo en móvil) -->
+            <!-- Header mobile -->
             <div class="home-header home-header-mobile">
                 <div>
                     <h2 id="home-greeting-mobile" class="home-greeting-clone"></h2>
@@ -2029,84 +2807,125 @@
                     oninput="document.getElementById('tiendas-search').value=this.value; renderTiendasList('view-tiendas')">
             </div>
 
+            <!-- KPI SECTION (solo desktop) -->
+            <div id="home-kpi-section">
+                <div class="kpi-card">
+                    <div class="kpi-label">📋 Mis Auditorías (Mes)</div>
+                    <div class="kpi-value" id="kpi-mis-auditorias">—</div>
+                    <div class="kpi-sub">formularios completados</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">⭐ Mi Puntaje Promedio</div>
+                    <div class="kpi-value" id="kpi-mi-promedio">—</div>
+                    <div class="kpi-sub">promedio personal del mes</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">📊 Promedio del Equipo</div>
+                    <div class="kpi-value" id="kpi-promedio-equipo">—</div>
+                    <div class="kpi-sub">todos los supervisores</div>
+                </div>
+            </div>
+
             <p id="home-main-title">Acciones rápidas</p>
             <p id="home-main-subtitle">Selecciona una opción para comenzar</p>
 
-        <div class="action-grid">
-            <div class="action-card" onclick="showView('view-auditoria-tiendas')">
-                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-                        <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-                    </svg></div>
-                <div class="action-label">Realizar Auditoría</div>
+            <!-- ACCIONES + PANEL LATERAL -->
+            <div id="home-actions-wrapper">
+                <div class="action-grid">
+                    <div class="action-card" onclick="showView('view-auditoria-tiendas')">
+                        <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                                <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                                <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                            </svg></div>
+                        <div class="action-label">Realizar Auditoría</div>
+                        <div class="action-desc">Evalúa una tienda con el checklist</div>
+                    </div>
+                    <div class="action-card" onclick="showView('view-visita-tiendas')">
+                        <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg></div>
+                        <div class="action-label">Registrar Visita</div>
+                        <div class="action-desc">Registra una visita operativa</div>
+                    </div>
+                    <div class="action-card" onclick="showView('view-tiendas')">
+                        <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg></div>
+                        <div class="action-label">Ver Tiendas</div>
+                        <div class="action-desc">Directorio completo de tiendas</div>
+                    </div>
+                    <div class="action-card" onclick="toggleHistorialHome(this)">
+                        <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg></div>
+                        <div class="action-label">Historial</div>
+                        <div class="action-desc">Auditorías y visitas anteriores</div>
+                    </div>
+                    <div id="home-historial-opts" style="display:none; grid-column: 1/-1; gap: 8px;">
+                        <button class="btn-home-historial" onclick="showView('view-historial-auditorias')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="16" y1="13" x2="8" y2="13"></line>
+                                <line x1="16" y1="17" x2="8" y2="17"></line>
+                                <polyline points="10 9 9 9 8 9"></polyline>
+                            </svg>
+                            Auditorías
+                        </button>
+                        <button class="btn-home-historial" onclick="showView('view-historial-visitas')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Visitas
+                        </button>
+                    </div>
+                    <div class="action-card" onclick="showView('view-usuarios')">
+                        <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg></div>
+                        <div class="action-label">Usuarios</div>
+                        <div class="action-desc">Gestión del equipo de supervisores</div>
+                    </div>
+                    <div class="action-card" onclick="showView('view-ajustes')">
+                        <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg></div>
+                        <div class="action-label">Ajustes</div>
+                        <div class="action-desc">Perfil y configuración</div>
+                    </div>
+                </div>
             </div>
-            <div class="action-card" onclick="showView('view-visita-tiendas')">
-                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg></div>
-                <div class="action-label">Registrar Visita</div>
+
+            <!-- PANEL LATERAL (solo desktop) -->
+            <div id="home-panel-lateral">
+                <div class="panel-card">
+                    <div class="panel-title">🕐 Últimas Auditorías</div>
+                    <div id="panel-ultimas-auditorias">
+                        <div style="font-size:12px;color:#bbb;text-align:center;padding:16px 0;">Sin registros aún</div>
+                    </div>
+                </div>
+                <div class="panel-card recordatorio-card">
+                    <div class="panel-title" style="color:#FC6E20;">⚠️ Recordatorio Operativo</div>
+                    <p class="recordatorio-text">Si el puntaje de una tienda es <strong>menor a 70%</strong>, es obligatorio registrar observaciones detalladas y coordinar un plan de acción inmediato con el encargado de tienda.</p>
+                </div>
             </div>
-            <div class="action-card" onclick="showView('view-tiendas')">
-                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg></div>
-                <div class="action-label">Ver Tiendas</div>
-            </div>
-            <div class="action-card" onclick="toggleHistorialHome(this)">
-                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                    </svg></div>
-                <div class="action-label">Historial</div>
-            </div>
-            <div id="home-historial-opts" style="display:none; grid-column: 1/-1; gap: 8px;">
-                <button class="btn-home-historial" onclick="showView('view-historial-auditorias')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
-                    </svg>
-                    Auditorías
-                </button>
-                <button class="btn-home-historial" onclick="showView('view-historial-visitas')">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    Visitas
-                </button>
-            </div>
-            <div class="action-card" onclick="showView('view-usuarios')">
-                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg></div>
-                <div class="action-label">Usuarios</div>
-            </div>
-            <div class="action-card" onclick="showView('view-ajustes')">
-                <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path
-                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
-                        </path>
-                    </svg></div>
-                <div class="action-label">Ajustes</div>
-            </div>
-        </div>
+
         </div><!-- /home-main -->
     </div>
 
@@ -2258,6 +3077,9 @@
                 </div>
             </div>
             <button class="btn-main-auditoria" onclick="iniciarAuditoria()">INICIAR AUDITORÍA</button>
+
+            <!-- RESUMEN PREPARACIÓN -->
+            <div class="prep-section" id="aud-prep-section"></div>
         </div>
     </div>
 
@@ -2306,89 +3128,86 @@
                     <div class="info-val" id="vis-det-direccion"></div>
                 </div>
             </div>
+            <!-- ÚLTIMAS VISITAS -->
+            <div id="vis-ultimas-card" style="display:none; margin:16px 0;" class="vis-bitacora-card">
+                <div class="vis-bitacora-label">📍 Últimas visitas registradas</div>
+                <div id="vis-ultimas-lista"></div>
+            </div>
+
             <button class="btn-main-visita" onclick="iniciarVisita()">REGISTRAR VISITA</button>
         </div>
     </div>
 
     <!-- VIEW: TIENDA DETALLE -->
     <div id="view-tienda-detalle" class="view fade-in">
-        <div class="detalle-header-wrapper">
-            <img src="https://gestion.pe/resizer/v2/DKHKHLQZVRBBDGAY4ZXIZ2LOTI.jpg?auth=7e5f8ca269fc3b853a62dec4b3203d6e632b2e847be691426bfebb65c1a613e7&width=1200&height=1200&quality=75&smart=true"
-                class="detalle-img">
-            <div class="detalle-gradient"></div>
-            <button class="back-btn-detalle" onclick="showView('view-tiendas')">←</button>
-            <h2 id="td-det-nombre" class="detalle-title"></h2>
+        <!-- BANNER -->
+        <div class="td-banner">
+            <img src="https://gestion.pe/resizer/v2/DKHKHLQZVRBBDGAY4ZXIZ2LOTI.jpg?auth=7e5f8ca269fc3b853a62dec4b3203d6e632b2e847be691426bfebb65c1a613e7&width=1200&height=1200&quality=75&smart=true">
+            <div class="td-banner-gradient"></div>
+            <button class="td-banner-back" onclick="showView('view-tiendas')">←</button>
+            <div id="td-det-nombre" class="td-banner-nombre"></div>
         </div>
-        <div class="detalle-content-card">
-            <button class="btn-ubicacion" id="td-det-map">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                Abrir ubicación
-            </button>
 
-            <div class="info-row">
-                <div class="info-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                        <polyline points="2 17 12 22 22 17"></polyline>
-                        <polyline points="2 12 12 17 22 12"></polyline>
-                    </svg>
-                </div>
-                <div class="info-text-col">
-                    <div class="info-label">DISTRITO</div>
-                    <div class="info-val" id="td-det-distrito"></div>
-                </div>
-            </div>
-            <div class="info-row" style="border-bottom:none; margin-bottom:12px;">
-                <div class="info-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
-                </div>
-                <div class="info-text-col">
-                    <div class="info-label">DIRECCIÓN</div>
-                    <div class="info-val" id="td-det-direccion"></div>
-                </div>
-            </div>
+        <!-- BODY -->
+        <div class="td-body">
 
-            <div class="accordion" id="acc-auditorias">
-                <div class="accordion-header" onclick="toggleAccordion('acc-auditorias')">
-                    <div class="acc-icon-box">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                            <polyline points="14 2 14 8 20 8"></polyline>
-                            <line x1="16" y1="13" x2="8" y2="13"></line>
-                            <line x1="16" y1="17" x2="8" y2="17"></line>
-                            <polyline points="10 9 9 9 8 9"></polyline>
-                        </svg>
+            <!-- COLUMNA IZQUIERDA: INFO -->
+            <div>
+                <div class="td-info-card">
+                    <div class="td-info-row">
+                        <div class="td-info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                                <polyline points="2 17 12 22 22 17"></polyline>
+                                <polyline points="2 12 12 17 22 12"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="td-info-label">DISTRITO</div>
+                            <div class="td-info-val" id="td-det-distrito"></div>
+                        </div>
                     </div>
-                    <div class="acc-title">Historial de Auditorías</div>
-                    <div class="acc-arrow">›</div>
-                </div>
-                <div class="accordion-body" id="td-hist-aud"></div>
-            </div>
-
-            <div class="accordion" id="acc-visitas">
-                <div class="accordion-header" onclick="toggleAccordion('acc-visitas')">
-                    <div class="acc-icon-box">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
+                    <div class="td-info-row">
+                        <div class="td-info-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+                                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="td-info-label">DIRECCIÓN</div>
+                            <div class="td-info-val" id="td-det-direccion"></div>
+                        </div>
+                    </div>
+                    <button class="td-btn-ubicacion" id="td-det-map">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
                             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                             <circle cx="12" cy="10" r="3"></circle>
                         </svg>
-                    </div>
-                    <div class="acc-title">Historial de Visitas</div>
-                    <div class="acc-arrow">›</div>
+                        Abrir ubicación
+                    </button>
                 </div>
-                <div class="accordion-body" id="td-hist-vis"></div>
+                <!-- MAPA EMBED (solo desktop) -->
+                <div class="td-mapa-wrapper" id="td-mapa-wrapper"></div>
+                <!-- RANKING -->
+                <div class="td-ranking-card" id="td-ranking-card"></div>
             </div>
+
+            <!-- COLUMNA DERECHA: HISTORIALES -->
+            <div>
+                <!-- KPIs -->
+                <div class="td-kpi-grid" id="td-kpis"></div>
+
+                <div class="td-hist-card">
+                    <div class="td-hist-title">📋 Historial de Auditorías</div>
+                    <div class="td-hist-scroll" id="td-hist-aud"></div>
+                </div>
+                <div class="td-hist-card">
+                    <div class="td-hist-title">📍 Historial de Visitas</div>
+                    <div class="td-hist-scroll" id="td-hist-vis"></div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -2500,22 +3319,21 @@
 
             <div
                 style="background:white; border-radius:20px; padding:20px; margin:16px 0 24px; box-shadow:0 4px 16px rgba(0,0,0,0.08);">
-                <div style="font-size:15px; font-weight:800; color:#1B1B1B; margin-bottom:4px;">✍️ Firma de Conformidad
-                </div>
+                <div style="font-size:15px; font-weight:800; color:#1B1B1B; margin-bottom:4px;">✍️ Firma de Conformidad</div>
                 <div style="font-size:12px; color:#FC6E20; margin-bottom:16px;">Requerida para finalizar</div>
-                <div class="canvas-container"
-                    style="background:#F5F5F5; border-radius:12px; border:2px dashed #DDDDDD; position:relative; overflow:hidden;">
-                    <div class="canvas-placeholder" id="canvas-placeholder"
-                        style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#AAA; font-size:14px; pointer-events:none;">
-                        Firma con el dedo aquí</div>
-                    <canvas id="firma-canvas" width="300" height="150"
-                        style="width:100%; height:150px; display:block;"></canvas>
+
+                <!-- Preview firma -->
+                <div id="firma-preview-container" style="background:#F5F5F5; border-radius:12px; border:2px dashed #DDD; position:relative; overflow:hidden; cursor:pointer;" onclick="abrirModalFirma()">
+                    <div id="canvas-placeholder" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#AAA; font-size:14px; pointer-events:none; white-space:nowrap;">
+                        Toca para firmar</div>
+                    <canvas id="firma-canvas" width="600" height="150" style="width:100%; height:150px; display:block;"></canvas>
                 </div>
-                <div style="text-align:right;">
-                    <button
-                        style="background:#EEEEEE; color:#555; border:none; border-radius:50px; padding:6px 12px; font-size:11px; font-weight:700; margin-top:8px; cursor:pointer;"
-                        onclick="limpiarFirma()">Limpiar</button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                    <span id="firma-status" style="font-size:12px; color:#aaa;">Sin firma</span>
+                    <button style="background:#EEE; color:#555; border:none; border-radius:50px; padding:6px 12px; font-size:11px; font-weight:700; cursor:pointer;" onclick="limpiarFirma()">Limpiar</button>
                 </div>
+
+                
             </div>
         </div>
 
@@ -2735,15 +3553,32 @@
                     <input type="text" id="hist-aud-search" placeholder="Buscar tienda..."
                         oninput="renderHistorialAuditorias()">
                 </div>
-                <button class="btn-filter"
-                    style="width:40px;height:40px;border-radius:50%;background:var(--naranja);border:none;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"
-                    onclick="openFilterModal('auditoria')">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
+                <button style="display:flex;align-items:center;gap:6px;background:white;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:50px;padding:0 16px;height:40px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;"
+                    onclick="toggleFiltroAud()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                     </svg>
+                    Filtrar
                 </button>
             </div>
+
+            <!-- PANEL FILTRO AUDITORÍAS -->
+            <div id="panel-filtro-aud" style="display:none; background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">SUPERVISOR</div>
+                <div id="filtro-aud-sups" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
+                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">MES</div>
+                <div id="filtro-aud-meses" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
+                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">ORDEN</div>
+                <div style="display:flex;gap:8px;margin-bottom:16px;">
+                    <button id="btn-aud-desc" onclick="setOrdenAud('desc')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--naranja);background:var(--naranja);color:white;">↓ Más reciente</button>
+                    <button id="btn-aud-asc" onclick="setOrdenAud('asc')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #ddd;background:white;color:#555;">↑ Más antiguo</button>
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="limpiarFiltroAud()" style="flex:1;padding:10px;border-radius:50px;background:transparent;border:1.5px solid #ddd;color:#888;font-size:13px;font-weight:700;cursor:pointer;">Borrar</button>
+                    <button onclick="aplicarFiltroAud()" style="flex:1;padding:10px;border-radius:50px;background:var(--naranja);border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;">Aplicar</button>
+                </div>
+            </div>
+
             <div id="lista-historial-auditorias"></div>
         </div>
     </div>
@@ -2766,21 +3601,38 @@
                     <input type="text" id="hist-vis-search" placeholder="Buscar tienda..."
                         oninput="renderHistorialVisitas()">
                 </div>
-                <button class="btn-filter"
-                    style="width:40px;height:40px;border-radius:50%;background:var(--naranja);border:none;color:white;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;"
-                    onclick="openFilterModal('visita')">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
+                <button style="display:flex;align-items:center;gap:6px;background:white;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:50px;padding:0 16px;height:40px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;"
+                    onclick="toggleFiltroVis()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                     </svg>
+                    Filtrar
                 </button>
             </div>
+
+            <!-- PANEL FILTRO VISITAS -->
+            <div id="panel-filtro-vis" style="display:none; background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">SUPERVISOR</div>
+                <div id="filtro-vis-sups" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
+                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">MES</div>
+                <div id="filtro-vis-meses" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
+                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">ORDEN</div>
+                <div style="display:flex;gap:8px;margin-bottom:16px;">
+                    <button id="btn-vis-desc" onclick="setOrdenVis('desc')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--naranja);background:var(--naranja);color:white;">↓ Más reciente</button>
+                    <button id="btn-vis-asc" onclick="setOrdenVis('asc')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #ddd;background:white;color:#555;">↑ Más antiguo</button>
+                </div>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="limpiarFiltroVis()" style="flex:1;padding:10px;border-radius:50px;background:transparent;border:1.5px solid #ddd;color:#888;font-size:13px;font-weight:700;cursor:pointer;">Borrar</button>
+                    <button onclick="aplicarFiltroVis()" style="flex:1;padding:10px;border-radius:50px;background:var(--naranja);border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;">Aplicar</button>
+                </div>
+            </div>
+
             <div id="lista-historial-visitas"></div>
         </div>
     </div>
 
     <!-- MODAL FILTRO HISTORIAL -->
-    <div id="modal-filter-historial" class="modal-overlay" style="display:none; z-index:999;"
+    <div id="modal-filter-historial" class="modal-overlay" style="display:none; z-index:9999;"
         onclick="closeModalFilter()">
         <div class="modal-slideup" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center mb-16">
@@ -2830,42 +3682,81 @@
     </div>
 
     <!-- VIEW: AJUSTES -->
-    <div id="view-ajustes" class="view fade-in">
+    <div id="view-ajustes" class="view fade-in" style="background:#f8f9fa; min-height:100vh;">
         <div class="header-dark" style="background:var(--naranja);">
             <button onclick="showView('view-home')" style="color:white;">←</button>
             <span class="bold" style="color:white; font-size:16px;">AJUSTES</span>
         </div>
         <div class="p-16">
-            <div class="card mb-16 flex items-center gap-16">
-                <div id="ajustes-avatar" class="avatar" style="width: 52px; height: 52px; font-size: 20px;"></div>
-                <div>
-                    <div id="ajustes-nombre" class="bold" style="font-size: 15px;"></div>
-                    <div id="ajustes-email" class="text-gris" style="font-size: 12px;"></div>
-                    <div id="ajustes-cargo" class="text-naranja" style="font-size: 12px; font-weight: 700;"></div>
+
+            <!-- TARJETA PERFIL -->
+            <div class="ajustes-perfil-card">
+                <div id="ajustes-avatar" class="ajustes-perfil-avatar"></div>
+                <div class="ajustes-perfil-info">
+                    <div id="ajustes-nombre" class="ajustes-perfil-nombre"></div>
+                    <div id="ajustes-cargo" class="ajustes-perfil-cargo"></div>
+                    <div id="ajustes-email" class="ajustes-perfil-email"></div>
+                    <span class="ajustes-perfil-badge">● Activo</span>
+                    <button onclick="editarMiPerfil()" style="margin-top:8px;background:transparent;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:50px;padding:5px 14px;font-size:12px;font-weight:700;cursor:pointer;">✏️ Editar perfil</button>
                 </div>
             </div>
 
-            <div class="card mb-16">
-                <div class="flex justify-between items-center mb-12">
-                    <span class="bold">Supervisores</span>
-                    <button class="btn btn-light" style="padding: 4px 12px; border-radius: 50px; font-size: 12px;"
-                        onclick="addSupervisor()">+ Añadir</button>
+            <!-- SUPERVISORES -->
+            <div class="ajustes-section-title">Equipo</div>
+            <div class="ajustes-card">
+                <div class="ajustes-item" style="cursor:default;">
+                    <div class="ajustes-item-icon" style="background:#FFF0E6;">👥</div>
+                    <div class="ajustes-item-text">
+                        <div class="ajustes-item-label">Supervisores</div>
+                        <div class="ajustes-item-desc">Gestiona el equipo de supervisores</div>
+                    </div>
+                    
                 </div>
-                <div id="list-supervisores"></div>
+                <div id="list-supervisores" style="padding:0 20px 12px 20px;"></div>
             </div>
 
-            <div id="ajustes-editor" class="card mb-16"
-                style="display:none; border: 2px solid var(--naranja); cursor:pointer;" onclick="openEditorChecklist()">
-                <div class="flex justify-between items-center">
-                    <span class="bold">⚙️ Editor de Checklist</span>
-                    <span>›</span>
+            <!-- PANEL ADMINISTRACIÓN -->
+            <div class="ajustes-section-title">Panel de Administración</div>
+            <div class="ajustes-card">
+                <div class="ajustes-item" onclick="solicitarPasswordAdmin('editor')">
+                    <div class="ajustes-item-icon" style="background:#FFF0E6;">📋</div>
+                    <div class="ajustes-item-text">
+                        <div class="ajustes-item-label">🔒 Editor de Checklist</div>
+                        <div class="ajustes-item-desc">Gestiona preguntas, puntajes y pesos</div>
+                    </div>
+                    <span class="ajustes-item-arrow">›</span>
                 </div>
             </div>
 
-            <div class="ajustes-row danger" onclick="logout()">
-                <span class="bold">🚪 Cerrar sesión</span>
+            <!-- CERRAR SESIÓN -->
+            <div class="ajustes-logout" onclick="logout()">
+                <div class="ajustes-item-icon" style="background:#FFF0F0;">🚪</div>
+                <div class="ajustes-item-text">
+                    <div class="ajustes-item-label" style="color:#C62828;">Cerrar sesión</div>
+                    <div class="ajustes-item-desc">Salir de la cuenta actual</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MODAL CONTRASEÑA ADMIN -->
+        <div id="modal-admin-pass" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+            <div style="background:white; border-radius:24px; padding:28px 24px; width:90%; max-width:340px; box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+                <div style="font-size:32px; text-align:center; margin-bottom:8px;">🔒</div>
+                <div style="font-size:16px; font-weight:800; text-align:center; margin-bottom:4px;">Acceso restringido</div>
+                <div style="font-size:13px; color:#888; text-align:center; margin-bottom:20px;">Ingresa la contraseña de administrador</div>
+                <input id="admin-pass-input" type="password" placeholder="Contraseña"
+                    style="width:100%; padding:12px 16px; border-radius:12px; border:1.5px solid #ddd; font-size:14px; box-sizing:border-box; margin-bottom:8px; outline:none;">
+                <div id="admin-pass-error" style="color:#C62828; font-size:12px; text-align:center; margin-bottom:12px; display:none;">Contraseña incorrecta</div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="document.getElementById('modal-admin-pass').style.display='none'"
+                        style="flex:1; padding:12px; border-radius:50px; background:#EEE; border:none; font-size:13px; font-weight:700; cursor:pointer;">Cancelar</button>
+                    <button onclick="verificarPasswordAdmin()"
+                        style="flex:1; padding:12px; border-radius:50px; background:var(--naranja); border:none; color:white; font-size:13px; font-weight:700; cursor:pointer;">Ingresar</button>
+                </div>
             </div>
         </div>
+
     </div>
 
     <!-- EDITOR CHECKLIST SUBVIEW -->
@@ -2878,36 +3769,51 @@
             <div
                 style="background:white; border-radius:20px; box-shadow:0 2px 10px rgba(0,0,0,0.05); padding:20px; margin-bottom:24px;">
                 <h4 class="bold mb-16" style="font-size:16px; color:#1B1B1B; margin:0;">Pesos por categoría</h4>
-                <div class="flex gap-8 justify-between">
-                    <div
-                        style="background:#FFE7D0; border-radius:50px; padding:8px 16px; text-align:center; width:60px; box-sizing:border-box;">
-                        <div style="color:var(--naranja); font-size:12px; font-weight:800; margin-bottom:4px;">G1</div>
-                        <input type="number" step="0.01" id="edit-g1"
-                            style="width:100%; padding:0; border:none; background:transparent; text-align:center; font-size:18px; font-weight:800; color:#1B1B1B; outline:none;">
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; background:#F9F9F9; border-radius:12px; padding:12px 16px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:800; color:#1B1B1B;">G1 — Customer Journey</div>
+                            <div style="font-size:11px; color:#aaa;">Valor entre 0.00 y 1.00</div>
+                        </div>
+                        <input type="text" inputmode="decimal" id="edit-g1" maxlength="4"
+                            oninput="this.value=this.value.replace(/[^0-9.]/g,'')"
+                            style="width:72px; padding:8px 12px; border:1.5px solid #ddd; border-radius:10px; font-size:16px; font-weight:800; color:#FC6E20; text-align:center; outline:none; background:white;">
                     </div>
-                    <div
-                        style="background:#FFE7D0; border-radius:50px; padding:8px 16px; text-align:center; width:60px; box-sizing:border-box;">
-                        <div style="color:var(--naranja); font-size:12px; font-weight:800; margin-bottom:4px;">G2</div>
-                        <input type="number" step="0.01" id="edit-g2"
-                            style="width:100%; padding:0; border:none; background:transparent; text-align:center; font-size:18px; font-weight:800; color:#1B1B1B; outline:none;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; background:#F9F9F9; border-radius:12px; padding:12px 16px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:800; color:#1B1B1B;">G2 — Control de Calidad</div>
+                            <div style="font-size:11px; color:#aaa;">Valor entre 0.00 y 1.00</div>
+                        </div>
+                        <input type="text" inputmode="decimal" id="edit-g2" maxlength="4"
+                            oninput="this.value=this.value.replace(/[^0-9.]/g,'')"
+                            style="width:72px; padding:8px 12px; border:1.5px solid #ddd; border-radius:10px; font-size:16px; font-weight:800; color:#FC6E20; text-align:center; outline:none; background:white;">
                     </div>
-                    <div
-                        style="background:#FFE7D0; border-radius:50px; padding:8px 16px; text-align:center; width:60px; box-sizing:border-box;">
-                        <div style="color:var(--naranja); font-size:12px; font-weight:800; margin-bottom:4px;">G3</div>
-                        <input type="number" step="0.01" id="edit-g3"
-                            style="width:100%; padding:0; border:none; background:transparent; text-align:center; font-size:18px; font-weight:800; color:#1B1B1B; outline:none;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; background:#F9F9F9; border-radius:12px; padding:12px 16px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:800; color:#1B1B1B;">G3 — Equipos y Utensilios</div>
+                            <div style="font-size:11px; color:#aaa;">Valor entre 0.00 y 1.00</div>
+                        </div>
+                        <input type="text" inputmode="decimal" id="edit-g3" maxlength="4"
+                            oninput="this.value=this.value.replace(/[^0-9.]/g,'')"
+                            style="width:72px; padding:8px 12px; border:1.5px solid #ddd; border-radius:10px; font-size:16px; font-weight:800; color:#FC6E20; text-align:center; outline:none; background:white;">
                     </div>
-                    <div
-                        style="background:#FFE7D0; border-radius:50px; padding:8px 16px; text-align:center; width:60px; box-sizing:border-box;">
-                        <div style="color:var(--naranja); font-size:12px; font-weight:800; margin-bottom:4px;">G4</div>
-                        <input type="number" step="0.01" id="edit-g4"
-                            style="width:100%; padding:0; border:none; background:transparent; text-align:center; font-size:18px; font-weight:800; color:#1B1B1B; outline:none;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; background:#F9F9F9; border-radius:12px; padding:12px 16px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:800; color:#1B1B1B;">G4 — Monitoreo de Equipos</div>
+                            <div style="font-size:11px; color:#aaa;">Valor entre 0.00 y 1.00</div>
+                        </div>
+                        <input type="text" inputmode="decimal" id="edit-g4" maxlength="4"
+                            oninput="this.value=this.value.replace(/[^0-9.]/g,'')"
+                            style="width:72px; padding:8px 12px; border:1.5px solid #ddd; border-radius:10px; font-size:16px; font-weight:800; color:#FC6E20; text-align:center; outline:none; background:white;">
                     </div>
-                    <div
-                        style="background:#FFE7D0; border-radius:50px; padding:8px 16px; text-align:center; width:60px; box-sizing:border-box;">
-                        <div style="color:var(--naranja); font-size:12px; font-weight:800; margin-bottom:4px;">G5</div>
-                        <input type="number" step="0.01" id="edit-g5"
-                            style="width:100%; padding:0; border:none; background:transparent; text-align:center; font-size:18px; font-weight:800; color:#1B1B1B; outline:none;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; background:#F9F9F9; border-radius:12px; padding:12px 16px;">
+                        <div>
+                            <div style="font-size:13px; font-weight:800; color:#1B1B1B;">G5 — Control Documentario</div>
+                            <div style="font-size:11px; color:#aaa;">Valor entre 0.00 y 1.00</div>
+                        </div>
+                        <input type="text" inputmode="decimal" id="edit-g5" maxlength="4"
+                            oninput="this.value=this.value.replace(/[^0-9.]/g,'')"
+                            style="width:72px; padding:8px 12px; border:1.5px solid #ddd; border-radius:10px; font-size:16px; font-weight:800; color:#FC6E20; text-align:center; outline:none; background:white;">
                     </div>
                 </div>
                 <div id="edit-peso-error"
@@ -3365,6 +4271,29 @@
             }
         }
 
+        const ADMIN_PASSWORD = "listo2026";
+        window.adminDestino = null;
+
+        function solicitarPasswordAdmin(destino) {
+            window.adminDestino = destino;
+            document.getElementById('admin-pass-input').value = '';
+            document.getElementById('admin-pass-error').style.display = 'none';
+            document.getElementById('modal-admin-pass').style.display = 'flex';
+            setTimeout(() => document.getElementById('admin-pass-input').focus(), 100);
+        }
+
+        function verificarPasswordAdmin() {
+            let pass = document.getElementById('admin-pass-input').value;
+            if (pass === ADMIN_PASSWORD) {
+                document.getElementById('modal-admin-pass').style.display = 'none';
+                if (window.adminDestino === 'editor') openEditorChecklist();
+                else if (window.adminDestino === 'pesos') openEditorChecklist();
+            } else {
+                document.getElementById('admin-pass-error').style.display = 'block';
+                document.getElementById('admin-pass-input').value = '';
+            }
+        }
+
         function logout() {
             localStorage.removeItem("currentUser");
             showView("view-login");
@@ -3383,6 +4312,7 @@
 
             window.currentUser = u;
             document.getElementById("home-greeting").textContent = `Hola, ${u.nombre.split(" ")[0]}`;
+            renderHomeDashboard();
 
             let inis = u.nombre.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
             document.getElementById("home-avatar").textContent = inis;
@@ -3391,15 +4321,12 @@
 
             // Update Ajustes Profile
             document.getElementById("ajustes-avatar").textContent = inis;
+            document.getElementById("ajustes-avatar").className = "ajustes-perfil-avatar";
             document.getElementById("ajustes-nombre").textContent = u.nombre;
             document.getElementById("ajustes-email").textContent = u.email;
             document.getElementById("ajustes-cargo").textContent = u.cargo;
 
-            if (u.email === "alshy.14.92@gmail.com") {
-                document.getElementById("ajustes-editor").style.display = "block";
-            } else {
-                document.getElementById("ajustes-editor").style.display = "none";
-            }
+            // Panel admin visible para todos via contraseña
 
             renderAjustesSupervisores();
             populateFilters();
@@ -3432,12 +4359,21 @@
             let dropdown = document.getElementById('dropdown-' + viewId);
             let isVisible = dropdown.style.display === 'block';
             document.querySelectorAll('.filter-dropdown').forEach(d => d.style.display = 'none');
-            if (!isVisible) dropdown.style.display = 'block';
+            if (!isVisible) {
+                // Renderizar chips de distritos
+                let distritos = [...new Set(TIENDAS.map(t => t.distrito))].sort();
+                let activo = window.activeFilters[viewId];
+                let chipsHtml = [`<button onclick="selectDistrict('${viewId}','')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${activo===''?'var(--naranja)':'#ddd'};background:${activo===''?'var(--naranja)':'white'};color:${activo===''?'white':'#555'};">Todos</button>`];
+                distritos.forEach(d => {
+                    chipsHtml.push(`<button onclick="selectDistrict('${viewId}','${d}')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${activo===d?'var(--naranja)':'#ddd'};background:${activo===d?'var(--naranja)':'white'};color:${activo===d?'white':'#555'};">${d}</button>`);
+                });
+                dropdown.innerHTML = `
+                    <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">FILTRAR POR DISTRITO</div>
+                    <div style="display:flex;flex-wrap:wrap;gap:8px;">${chipsHtml.join('')}</div>
+                `;
+                dropdown.style.display = 'block';
+            }
         }
-
-        document.addEventListener('click', () => {
-            document.querySelectorAll('.filter-dropdown').forEach(d => d.style.display = 'none');
-        });
 
         function selectDistrict(viewId, district) {
             window.activeFilters[viewId] = district;
@@ -3517,6 +4453,110 @@
             document.getElementById('aud-det-distrito').textContent = tienda.distrito;
             document.getElementById('aud-det-direccion').textContent = tienda.direccion;
             document.getElementById('aud-det-map').onclick = () => window.open(`https://maps.google.com/?q=${tienda.direccion}`, '_blank');
+
+            // Resumen preparación
+            let prep = document.getElementById('aud-prep-section');
+            if (!prep) return;
+            let auds = JSON.parse(localStorage.getItem('auditorias')||'[]')
+                .filter(a => (a.tienda?.nombre||a.tienda) === tienda.nombre)
+                .sort((a,b) => b.id - a.id);
+            let visitas = JSON.parse(localStorage.getItem('visitas')||'[]')
+                .filter(v => (v.tienda?.nombre||v.tienda) === tienda.nombre)
+                .sort((a,b) => new Date(b.datetime||0) - new Date(a.datetime||0));
+
+            if (auds.length === 0) { prep.innerHTML = ''; return; }
+
+            let ultima = auds[0];
+            let score = Math.round(ultima.notaFinal || ultima.finalScore || 0);
+            let scoreColor = score <= 70 ? '#C62828' : score <= 90 ? '#F9A825' : '#43A047';
+            let clasificacion = score <= 70 ? 'Alto Riesgo' : score <= 90 ? 'Se requiere mejorar' : 'Sobresaliente';
+
+            // Obs pendientes de última visita
+            let obsAlerta = '';
+            if (visitas.length > 0 && visitas[0].comentario) {
+                obsAlerta = `
+                <div class="prep-alerta-card">
+                    <div class="prep-card-label">⚠️ Obs. de última visita</div>
+                    <div class="prep-alerta-text">${visitas[0].comentario}</div>
+                </div>`;
+            }
+
+            // Obs con NO de la última auditoría
+            let nosGraves = [];
+            if (ultima.respuestas) {
+                Object.entries(ultima.respuestas).forEach(([pid, r]) => {
+                    if (r.valor === 'NO' && r.obs) nosGraves.push(`• ${r.obs}`);
+                });
+            }
+            let obsAuditoria = nosGraves.length > 0 ? `
+                <div class="prep-alerta-card">
+                    <div class="prep-card-label">🔴 Observaciones pendientes</div>
+                    <div class="prep-alerta-text">${nosGraves.slice(0,3).join('<br>')}</div>
+                </div>` : '';
+
+            // Semáforo por grupos
+            let grupos = {
+                1: 'CUSTOMER JOURNEY',
+                2: 'CONTROL DE CALIDAD',
+                3: 'EQUIPOS Y UTENSILIOS',
+                4: 'MONITOREO DE EQUIPOS',
+                5: 'CONTROL DOCUMENTARIO'
+            };
+            let rgHtml = '';
+            if (ultima.resultadoGrupos) {
+                rgHtml = Object.entries(grupos).map(([k, nombre]) => {
+                    let v = ultima.resultadoGrupos[k] || 0;
+                    let c = v >= 90 ? '#43A047' : v >= 70 ? '#F9A825' : '#C62828';
+                    return `
+                    <div class="diag-group-bar">
+                        <div class="diag-group-header">
+                            <span class="diag-group-name">${nombre}</span>
+                            <span class="diag-group-pct" style="color:${c};">${v.toFixed(1)}%</span>
+                        </div>
+                        <div class="diag-bar-bg">
+                            <div class="diag-bar-fill" style="width:${v}%;background:${c};"></div>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            // Alertas: preguntas con 0 pts o NO con obs
+            let alertas = [];
+            if (ultima.respuestas && ultima.resultadoGrupos) {
+                window.PREGUNTAS.forEach(p => {
+                    let r = ultima.respuestas[p.id];
+                    if (!r) return;
+                    let pctGrupo = ultima.resultadoGrupos[p.grupo] || 0;
+                    if (r.valor === 'NO' && pctGrupo < 70) {
+                        let grupoNombre = grupos[p.grupo] || `Grupo ${p.grupo}`;
+                        alertas.push({ grupoNombre, pregunta: p.texto, obs: r.obs, critico: pctGrupo < 50 });
+                    }
+                });
+            }
+
+            let alertasHtml = alertas.length > 0
+                ? alertas.slice(0, 5).map(a => `
+                <div class="diag-alerta-item ${a.critico ? 'critico' : ''}">
+                    <div class="diag-alerta-grupo" style="color:${a.critico?'#C62828':'#F9A825'};">⚠️ ${a.grupoNombre}</div>
+                    <div class="diag-alerta-pregunta">${a.pregunta}</div>
+                    ${a.obs ? `<div class="diag-alerta-obs">💬 "${a.obs}"</div>` : ''}
+                </div>`).join('')
+                : `<div style="font-size:12px;color:#aaa;padding:8px 0;">✅ Todos los grupos superaron el 70% en la última auditoría.</div>`;
+
+            prep.innerHTML = `
+                <div class="prep-card">
+                    <div class="prep-card-label">Último estado · ${ultima.fecha} · ${ultima.supervisor}</div>
+                    <div class="prep-score-row" style="margin-bottom:14px;">
+                        <div class="prep-score-num" style="color:${scoreColor};">${score}%</div>
+                        <span class="prep-score-pill" style="background:${scoreColor};">${clasificacion}</span>
+                    </div>
+                    ${rgHtml}
+                </div>
+                <div class="prep-card">
+                    <div class="prep-card-label">🔴 Puntos críticos detectados</div>
+                    ${alertasHtml}
+                </div>
+            `;
         }
 
         function renderDetalleVisita() {
@@ -3526,6 +4566,34 @@
             document.getElementById('vis-det-distrito').textContent = tienda.distrito;
             document.getElementById('vis-det-direccion').textContent = tienda.direccion;
             document.getElementById('vis-det-map').onclick = () => window.open(`https://maps.google.com/?q=${tienda.direccion}`, '_blank');
+
+            // Limpiar textarea
+            let apunteEl = document.getElementById('vis-apunte-hoy');
+            if (apunteEl) apunteEl.value = '';
+
+            // Última bitácora
+            let visitas = JSON.parse(localStorage.getItem('visitas')||'[]')
+                .filter(v => (v.tienda?.nombre||v.tienda) === tienda.nombre)
+                .sort((a,b) => new Date(b.datetime||0) - new Date(a.datetime||0));
+
+            let ultimasCard = document.getElementById('vis-ultimas-card');
+            let ultimasLista = document.getElementById('vis-ultimas-lista');
+            if (visitas.length > 0 && ultimasCard && ultimasLista) {
+                let ultimas = visitas.slice(0, 2);
+                ultimasLista.innerHTML = ultimas.map((v, i) => {
+                    let d = v.datetime ? new Date(v.datetime) : null;
+                    let fechaStr = d ? d.toLocaleDateString('es-PE', {day:'numeric', month:'short', year:'numeric'}) : '—';
+                    let supCorto = (v.supervisor||'').split(' ').slice(0,2).join(' ');
+                    return `
+                    <div style="${i > 0 ? 'border-top:1px solid #f0f0f0;margin-top:10px;padding-top:10px;' : ''}">
+                        <div class="vis-bitacora-meta">${fechaStr} · ${supCorto}</div>
+                        <div class="vis-bitacora-texto">${v.comentario || '<span style="color:#bbb;font-style:italic;">Sin comentario</span>'}</div>
+                    </div>`;
+                }).join('');
+                ultimasCard.style.display = 'block';
+            } else if (ultimasCard) {
+                ultimasCard.style.display = 'none';
+            }
         }
 
         function renderDetalleTienda() {
@@ -3534,36 +4602,111 @@
             document.getElementById('td-det-nombre').textContent = tienda.nombre;
             document.getElementById('td-det-distrito').textContent = tienda.distrito;
             document.getElementById('td-det-direccion').textContent = tienda.direccion;
-            document.getElementById('td-det-map').onclick = () => window.open(`https://maps.google.com/?q=${tienda.direccion}`, '_blank');
+            document.getElementById('td-det-map').onclick = () => window.open(`https://maps.google.com/?q=${encodeURIComponent(tienda.direccion)}`, '_blank');
 
-            // Populate Accordions
+            // Mapa embed (solo desktop)
+            let mapaWrapper = document.getElementById('td-mapa-wrapper');
+            if (mapaWrapper) {
+                let q = encodeURIComponent(tienda.direccion + ', Lima, Peru');
+                mapaWrapper.innerHTML = `<iframe src="https://maps.google.com/maps?q=${q}&output=embed&z=16" loading="lazy"></iframe>`;
+            }
+
+            // KPIs
             const auditorias = JSON.parse(localStorage.getItem('auditorias') || '[]').filter(a => (a.tienda?.nombre || a.tienda) === tienda.nombre);
-            let htmlAud = auditorias.map(a => `
-                <div class="history-item-new" onclick="openModalRoAuditoria(${a.id})">
-                <div class="line1">
-                    <span class="name">${a.tienda?.nombre || a.tienda}</span>
-                    <span class="pill-res" style="background:${a.color}; color:white; padding:4px 12px; border-radius:50px; font-size:12px; font-weight:700;">${Math.round(a.notaFinal || a.finalScore)}%</span>
+            const visitas = JSON.parse(localStorage.getItem('visitas') || '[]').filter(v => (v.tienda?.nombre || v.tienda) === tienda.nombre);
+            let promedioScore = auditorias.length > 0
+                ? (auditorias.reduce((s,a) => s + (a.notaFinal||a.finalScore||0), 0) / auditorias.length).toFixed(1)
+                : '—';
+            let promedioColor = auditorias.length > 0 ? (parseFloat(promedioScore) > 90 ? '#43A047' : parseFloat(promedioScore) > 70 ? '#F9A825' : '#C62828') : '#1B1B1B';
+            // Ranking supervisores con donut
+            let rankingEl = document.getElementById('td-ranking-card');
+            if (rankingEl) {
+                let supMap = {};
+                auditorias.forEach(a => {
+                    let s = a.supervisor || 'Desconocido';
+                    if (!supMap[s]) supMap[s] = { auds: 0, vis: 0 };
+                    supMap[s].auds++;
+                });
+                visitas.forEach(v => {
+                    let s = v.supervisor || 'Desconocido';
+                    if (!supMap[s]) supMap[s] = { auds: 0, vis: 0 };
+                    supMap[s].vis++;
+                });
+                let ranking = Object.entries(supMap).sort((a,b) => (b[1].auds+b[1].vis) - (a[1].auds+a[1].vis));
+                let totalGlobal = ranking.reduce((s,[,d]) => s + d.auds + d.vis, 0) || 1;
+
+                rankingEl.innerHTML = ranking.length === 0
+                    ? '<div style="color:#bbb;font-size:12px;text-align:center;padding:12px 0;">Sin actividad registrada</div>'
+                    : `
+                    <div class="td-ranking-title">👥 Actividad por Supervisor</div>
+                    ${ranking.map(([nombre, data]) => {
+                        let inis = nombre.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+                        let primer = nombre.split(' ')[0];
+                        let seg = nombre.split(' ')[1] || '';
+                        return `
+                        <div class="td-ranking-item">
+                            <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#FC6E20,#e55a0a);color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${inis}</div>
+                            <div class="td-ranking-info">
+                                <div class="td-ranking-name">${primer} ${seg}</div>
+                                <div class="td-ranking-badges">
+                                    <span class="td-ranking-badge" style="background:#FFF0E6;color:#FC6E20;">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:2px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                                        ${data.auds} auditorías
+                                    </span>
+                                    <span class="td-ranking-badge" style="background:#E8F5E9;color:#43A047;">
+                                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline;vertical-align:middle;margin-right:2px;"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                        ${data.vis} visitas
+                                    </span>
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('')}`;
+            }
+
+            let kpisEl = document.getElementById('td-kpis');
+            if (kpisEl) kpisEl.innerHTML = `
+                <div class="td-kpi-card">
+                    <div class="td-kpi-val">${auditorias.length}</div>
+                    <div class="td-kpi-label">Auditorías</div>
                 </div>
-                <div class="line2">${a.supervisor}</div>
-                <div class="line3">${a.fecha} - ${a.hora}</div>
+                <div class="td-kpi-card">
+                    <div class="td-kpi-val" style="color:${promedioColor};font-size:20px;">${promedioScore}${auditorias.length>0?'%':''}</div>
+                    <div class="td-kpi-label">Prom. Score</div>
                 </div>
-            `).join("") || "<p class='text-gris text-center p-16'>No hay auditorías registradas</p>";
+                <div class="td-kpi-card">
+                    <div class="td-kpi-val">${visitas.length}</div>
+                    <div class="td-kpi-label">Visitas</div>
+                </div>
+            `;
+
+            // Populate Historiales
+            let htmlAud = auditorias.length > 0 ? [...auditorias].sort((a,b) => b.id - a.id).map(a => {
+                let score = Math.round(a.notaFinal || a.finalScore);
+                let badgeColor = score <= 70 ? '#C62828' : score <= 90 ? '#F9A825' : '#43A047';
+                return `
+                <div class="td-hist-item" onclick="openModalRoAuditoria(${a.id})">
+                    <div class="td-hist-item-top">
+                        <span class="td-hist-item-sup">${a.supervisor}</span>
+                        <span style="background:${badgeColor};color:white;border-radius:50px;padding:2px 10px;font-size:11px;font-weight:700;">${score}%</span>
+                    </div>
+                    <div class="td-hist-item-fecha">${a.fecha} · ${a.hora}</div>
+                </div>`;
+            }).join('') : `<div style="text-align:center;padding:20px;color:#bbb;font-size:13px;">No hay auditorías registradas</div>`;
             document.getElementById("td-hist-aud").innerHTML = htmlAud;
 
-            const visitas = JSON.parse(localStorage.getItem('visitas') || '[]').filter(v => (v.tienda?.nombre || v.tienda) === tienda.nombre);
-            let htmlVis = visitas.map(v => `
-                <div class="history-item-new" onclick="openModalRoVisita(${v.id})">
-                <div class="line1" style="color:var(--naranja); font-size:12px;">
-                    ${formatDateFull(v.datetime)}
-                </div>
-                <div class="line2" style="color:#1B1B1B; font-size:14px;">${v.supervisor}</div>
-                <div class="line3 line-trunc">${v.comentario || 'Sin comentario'}</div>
-                </div>
-            `).join("") || "<p class='text-gris text-center p-16'>No hay visitas registradas</p>";
+            let htmlVis = visitas.length > 0 ? [...visitas].sort((a,b) => new Date(b.datetime||0) - new Date(a.datetime||0)).map(v => {
+                let d = v.datetime ? new Date(v.datetime) : null;
+                let fechaStr = d ? d.toLocaleDateString('es-PE', {day:'numeric', month:'short', year:'numeric'}) : '—';
+                return `
+                <div class="td-hist-item" onclick="openModalRoVisita(${v.id})">
+                    <div class="td-hist-item-top">
+                        <span class="td-hist-item-sup">${v.supervisor}</span>
+                        <span class="td-hist-item-fecha">${fechaStr}</span>
+                    </div>
+                    <div class="td-hist-item-comentario">${v.comentario || 'Sin comentario'}</div>
+                </div>`;
+            }).join('') : `<div style="text-align:center;padding:20px;color:#bbb;font-size:13px;">No hay visitas registradas</div>`;
             document.getElementById("td-hist-vis").innerHTML = htmlVis;
-
-            document.getElementById("acc-auditorias").classList.remove("open");
-            document.getElementById("acc-visitas").classList.remove("open");
         }
 
         function toggleAccordion(id) {
@@ -3894,18 +5037,17 @@
         let isDrawing = false;
         let firmaSigned = false;
         let canvasInitialized = false;
+        let modalCanvasInitialized = false;
+        let isDrawingModal = false;
 
-        function getPos(e) {
-            const canvas = document.getElementById('firma-canvas');
+        function getPosCanvas(e, canvas) {
             const rect = canvas.getBoundingClientRect();
             const scaleX = canvas.width / rect.width;
             const scaleY = canvas.height / rect.height;
-            if (e.touches) {
-                return {
-                    x: (e.touches[0].clientX - rect.left) * scaleX,
-                    y: (e.touches[0].clientY - rect.top) * scaleY
-                };
-            }
+            if (e.touches) return {
+                x: (e.touches[0].clientX - rect.left) * scaleX,
+                y: (e.touches[0].clientY - rect.top) * scaleY
+            };
             return {
                 x: (e.clientX - rect.left) * scaleX,
                 y: (e.clientY - rect.top) * scaleY
@@ -3918,41 +5060,78 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             firmaSigned = false;
             document.getElementById("canvas-placeholder").style.display = "block";
+            document.getElementById("firma-status").textContent = "Sin firma";
+        }
 
-            if (canvasInitialized) return;
+        function abrirModalFirma() {
+            document.getElementById('modal-firma').style.display = 'flex';
+            const modal = document.getElementById('firma-canvas-modal');
+            const ctx = modal.getContext('2d');
 
-            canvas.addEventListener('mousedown', e => {
-                isDrawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y);
-                document.getElementById("canvas-placeholder").style.display = "none";
+            // Si ya hay firma, copiarla al modal
+            const preview = document.getElementById('firma-canvas');
+            ctx.clearRect(0, 0, modal.width, modal.height);
+            if (firmaSigned) {
+                ctx.drawImage(preview, 0, 0, modal.width, modal.height);
+                document.getElementById('modal-firma-placeholder').style.display = 'none';
+            } else {
+                document.getElementById('modal-firma-placeholder').style.display = 'block';
+            }
+
+            if (modalCanvasInitialized) return;
+            modal.addEventListener('mousedown', e => {
+                isDrawingModal = true; ctx.beginPath(); const p = getPosCanvas(e, modal); ctx.moveTo(p.x, p.y);
+                document.getElementById('modal-firma-placeholder').style.display = 'none';
             });
-            canvas.addEventListener('mousemove', e => {
-                if (!isDrawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y);
-                ctx.strokeStyle = '#1B1B1B'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.stroke();
-                firmaSigned = true; updateAuditoriaProgress();
+            modal.addEventListener('mousemove', e => {
+                if (!isDrawingModal) return; const p = getPosCanvas(e, modal); ctx.lineTo(p.x, p.y);
+                ctx.strokeStyle = '#1B1B1B'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke();
             });
-            canvas.addEventListener('mouseup', () => isDrawing = false);
-            canvas.addEventListener('mouseleave', () => isDrawing = false);
-
-            canvas.addEventListener('touchstart', e => {
-                e.preventDefault(); isDrawing = true; ctx.beginPath(); const p = getPos(e); ctx.moveTo(p.x, p.y);
-                document.getElementById("canvas-placeholder").style.display = "none";
+            modal.addEventListener('mouseup', () => isDrawingModal = false);
+            modal.addEventListener('mouseleave', () => isDrawingModal = false);
+            modal.addEventListener('touchstart', e => {
+                e.preventDefault(); isDrawingModal = true; ctx.beginPath(); const p = getPosCanvas(e, modal); ctx.moveTo(p.x, p.y);
+                document.getElementById('modal-firma-placeholder').style.display = 'none';
             }, { passive: false });
-            canvas.addEventListener('touchmove', e => {
-                e.preventDefault(); if (!isDrawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y);
-                ctx.strokeStyle = '#1B1B1B'; ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.stroke();
-                firmaSigned = true; updateAuditoriaProgress();
+            modal.addEventListener('touchmove', e => {
+                e.preventDefault(); if (!isDrawingModal) return; const p = getPosCanvas(e, modal); ctx.lineTo(p.x, p.y);
+                ctx.strokeStyle = '#1B1B1B'; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.stroke();
             }, { passive: false });
-            canvas.addEventListener('touchend', () => isDrawing = false);
+            modal.addEventListener('touchend', () => isDrawingModal = false);
+            modalCanvasInitialized = true;
+        }
 
-            canvasInitialized = true;
+        function limpiarFirmaModal() {
+            const modal = document.getElementById('firma-canvas-modal');
+            modal.getContext('2d').clearRect(0, 0, modal.width, modal.height);
+            document.getElementById('modal-firma-placeholder').style.display = 'block';
+        }
+
+        function cerrarModalFirma(confirmar) {
+            if (confirmar) {
+                const modal = document.getElementById('firma-canvas-modal');
+                const preview = document.getElementById('firma-canvas');
+                const ctx = preview.getContext('2d');
+                ctx.clearRect(0, 0, preview.width, preview.height);
+                ctx.drawImage(modal, 0, 0, preview.width, preview.height);
+                // Verificar si hay trazos reales
+                const data = modal.getContext('2d').getImageData(0, 0, modal.width, modal.height).data;
+                const hayTrazo = data.some((v, i) => i % 4 === 3 && v > 0);
+                firmaSigned = hayTrazo;
+                document.getElementById("canvas-placeholder").style.display = hayTrazo ? 'none' : 'block';
+                document.getElementById("firma-status").textContent = hayTrazo ? '✅ Firma registrada' : 'Sin firma';
+                window.auditActual.firma = hayTrazo ? preview.toDataURL() : null;
+                updateAuditoriaProgress();
+            }
+            document.getElementById('modal-firma').style.display = 'none';
         }
 
         function limpiarFirma() {
             const canvas = document.getElementById('firma-canvas');
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
             firmaSigned = false;
             document.getElementById("canvas-placeholder").style.display = "block";
+            document.getElementById("firma-status").textContent = "Sin firma";
             window.auditActual.firma = null;
             updateAuditoriaProgress();
         }
@@ -4561,7 +5740,8 @@
             sups.forEach(s => selHtml += `<option value="${s}">${s}</option>`);
             document.getElementById("form-vis-sup").innerHTML = selHtml;
 
-            document.getElementById("form-vis-comentario").value = "";
+            let apunteHoy = document.getElementById('vis-apunte-hoy')?.value?.trim() || '';
+            document.getElementById("form-vis-comentario").value = apunteHoy;
 
             // Enable fields
             document.getElementById("form-vis-fecha").disabled = false;
@@ -4601,13 +5781,102 @@
         // --- HISTORIAL ---
         window.activeHistorialMode = 'auditoria';
         window.activeHistorialFilters = {
-            auditoria: { sups: [], meses: [] },
-            visita: { sups: [], meses: [] }
+            auditoria: { sups: [], meses: [], orden: 'desc' },
+            visita: { sups: [], meses: [], orden: 'desc' }
         };
 
         function toggleFilterAcc(id) {
             let acc = document.getElementById(id);
             acc.classList.toggle('open');
+        }
+
+        function toggleFiltroAud() {
+            let panel = document.getElementById('panel-filtro-aud');
+            if (panel.style.display === 'none') {
+                // Cargar supervisores (todos los usuarios)
+                let usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+                let supsSel = window.activeHistorialFilters.auditoria.sups;
+                document.getElementById('filtro-aud-sups').innerHTML = usuarios
+                    .filter(u => u.cargo !== 'SOPORTE')
+                    .map(u =>
+                    `<button onclick="toggleChipAud('sup','${u.nombre}',this)"
+                        style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${supsSel.includes(u.nombre)?'var(--naranja)':'#ddd'};background:${supsSel.includes(u.nombre)?'var(--naranja)':'white'};color:${supsSel.includes(u.nombre)?'white':'#555'};">
+                        ${u.nombre.split(' ')[0]}
+                    </button>`
+                ).join('');
+                // Cargar meses disponibles
+                let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
+                let mesesMap = {};
+                auds.forEach(a => {
+                    let p = (a.fecha||'').split('/');
+                    if (p.length===3) {
+                        let clave = `${p[2]}-${p[1]}`;
+                        let label = new Date(parseInt(p[2]), parseInt(p[1])-1, 1).toLocaleString('es', {month:'long', year:'numeric'});
+                        mesesMap[clave] = label;
+                    }
+                });
+                let mesesSel = window.activeHistorialFilters.auditoria.meses;
+                let mesesOrdenados = Object.entries(mesesMap).sort((a,b)=>b[0].localeCompare(a[0]));
+                let porAnio = {};
+                mesesOrdenados.forEach(([k,v]) => {
+                    let anio = k.split('-')[0];
+                    if (!porAnio[anio]) porAnio[anio] = [];
+                    porAnio[anio].push([k,v]);
+                });
+                document.getElementById('filtro-aud-meses').innerHTML = Object.entries(porAnio)
+                    .sort((a,b) => b[0]-a[0])
+                    .map(([anio, items]) => `
+                        <div style="width:100%;font-size:11px;font-weight:800;color:#aaa;letter-spacing:0.5px;margin-bottom:6px;margin-top:4px;">${anio}</div>
+                        ${items.map(([k,v]) => {
+                            let nombreMes = new Date(parseInt(k.split('-')[0]), parseInt(k.split('-')[1])-1, 1).toLocaleString('es',{month:'long'});
+                            return `<button onclick="toggleChipAud('mes','${k}',this)"
+                                style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${mesesSel.includes(k)?'var(--naranja)':'#ddd'};background:${mesesSel.includes(k)?'var(--naranja)':'white'};color:${mesesSel.includes(k)?'white':'#555'};">
+                                ${nombreMes}
+                            </button>`;
+                        }).join('')}
+                    `).join('') || '<span style="font-size:12px;color:#bbb;">Sin registros</span>';
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function toggleChipAud(tipo, valor, btn) {
+            let filtros = window.activeHistorialFilters.auditoria;
+            let arr = tipo === 'sup' ? filtros.sups : filtros.meses;
+            let idx = arr.indexOf(valor);
+            if (idx === -1) {
+                arr.push(valor);
+                btn.style.background = 'var(--naranja)';
+                btn.style.color = 'white';
+                btn.style.borderColor = 'var(--naranja)';
+            } else {
+                arr.splice(idx, 1);
+                btn.style.background = 'white';
+                btn.style.color = '#555';
+                btn.style.borderColor = '#ddd';
+            }
+        }
+
+        function setOrdenAud(orden) {
+            window.activeHistorialFilters.auditoria.orden = orden;
+            document.getElementById('btn-aud-desc').style.background = orden==='desc'?'var(--naranja)':'white';
+            document.getElementById('btn-aud-desc').style.color = orden==='desc'?'white':'#555';
+            document.getElementById('btn-aud-desc').style.borderColor = orden==='desc'?'var(--naranja)':'#ddd';
+            document.getElementById('btn-aud-asc').style.background = orden==='asc'?'var(--naranja)':'white';
+            document.getElementById('btn-aud-asc').style.color = orden==='asc'?'white':'#555';
+            document.getElementById('btn-aud-asc').style.borderColor = orden==='asc'?'var(--naranja)':'#ddd';
+        }
+
+        function limpiarFiltroAud() {
+            window.activeHistorialFilters.auditoria = { sups: [], meses: [], orden: 'desc' };
+            document.getElementById('panel-filtro-aud').style.display = 'none';
+            renderHistorialAuditorias();
+        }
+
+        function aplicarFiltroAud() {
+            document.getElementById('panel-filtro-aud').style.display = 'none';
+            renderHistorialAuditorias();
         }
 
         function openFilterModal(mode) {
@@ -4663,15 +5932,25 @@
             const contenedor = document.getElementById('lista-historial-auditorias');
             if (!contenedor) return;
 
-            const auditorias = JSON.parse(localStorage.getItem('auditorias') || '[]');
+            let auditorias = JSON.parse(localStorage.getItem('auditorias') || '[]');
+            const orden = window.activeHistorialFilters?.auditoria?.orden || 'desc';
+            auditorias.sort((a, b) => orden === 'desc' ? b.id - a.id : a.id - b.id);
+
+            const search = (document.getElementById('hist-aud-search')?.value || '').toLowerCase();
+            const filtros = window.activeHistorialFilters?.auditoria || { sups: [], meses: [] };
+
+            if (search) auditorias = auditorias.filter(a => (a.tienda?.nombre || a.tienda || '').toLowerCase().includes(search));
+            if (filtros.sups.length > 0) auditorias = auditorias.filter(a => filtros.sups.some(s => (a.supervisor||'').includes(s.split(' ')[0])));
+            if (filtros.meses.length > 0) auditorias = auditorias.filter(a => {
+                let partes = (a.fecha || '').split('/');
+                let clave = partes.length === 3 ? `${partes[2]}-${partes[1]}` : '';
+                return filtros.meses.includes(clave);
+            });
 
             if (auditorias.length === 0) {
-                contenedor.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">No hay auditorías registradas aún.</div>';
+                contenedor.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">No se encontraron resultados.</div>';
                 return;
             }
-
-            // Ordenar de más reciente a más antigua
-            auditorias.sort((a, b) => b.id - a.id);
 
             contenedor.innerHTML = auditorias.map(a => {
                 const pct = a.notaFinal || 0;
@@ -4681,7 +5960,7 @@
               <div class="historial-item" onclick="verDetalleAuditoria(${a.id})" style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;">
                 <div style="font-size:12px;color:#FC6E20;font-weight:600;">${a.supervisor || ''}</div>
                 <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-                  <div style="font-size:15px;font-weight:800;color:#1B1B1B;">${a.tienda?.nombre || ''}</div>
+                  <div style="font-size:15px;font-weight:800;color:#1B1B1B;">${a.tienda?.nombre || a.tienda || ''}</div>
                   <span style="background:${colorPast};color:${textColor};border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">${pct.toFixed(0)}%</span>
                 </div>
                 <div style="font-size:12px;color:#888;margin-top:4px;">${a.fecha || ''}, ${a.hora || ''}</div>
@@ -4700,6 +5979,69 @@
             showView('view-auditoria-resultado');
         }
 
+        function renderHomeDashboard() {
+            let u = window.currentUser;
+            if (!u) return;
+            let auditorias = JSON.parse(localStorage.getItem("auditorias") || "[]");
+            let ahora = new Date();
+            let mesActual = ahora.getMonth();
+            let anioActual = ahora.getFullYear();
+
+            function parseFecha(f) {
+                if (!f) return null;
+                let p = f.split('/');
+                if (p.length < 3) return null;
+                return new Date(parseInt(p[2]), parseInt(p[1])-1, parseInt(p[0]));
+            }
+
+            let delMes = auditorias.filter(a => {
+                let d = parseFecha(a.fecha);
+                if (!d || isNaN(d.getTime())) return false;
+                return d.getMonth() === mesActual && d.getFullYear() === anioActual;
+            });
+
+            let misMes = delMes.filter(a => a.supervisor && a.supervisor.includes(u.nombre.split(' ')[0]));
+            let miPromedio = misMes.length > 0
+                ? (misMes.reduce((s,a) => s + (a.notaFinal||a.finalScore||0), 0) / misMes.length).toFixed(1) + '%'
+                : '—';
+            let equipoPromedio = delMes.length > 0
+                ? (delMes.reduce((s,a) => s + (a.notaFinal||a.finalScore||0), 0) / delMes.length).toFixed(1) + '%'
+                : '—';
+
+            let k1 = document.getElementById('kpi-mis-auditorias');
+            let k2 = document.getElementById('kpi-mi-promedio');
+            let k3 = document.getElementById('kpi-promedio-equipo');
+            if (k1) k1.textContent = misMes.length;
+            if (k2) { k2.textContent = miPromedio; k2.style.color = misMes.length > 0 ? (parseFloat(miPromedio) > 90 ? '#43A047' : parseFloat(miPromedio) > 70 ? '#F9A825' : '#C62828') : '#1B1B1B'; }
+            if (k3) { k3.textContent = equipoPromedio; k3.style.color = delMes.length > 0 ? (parseFloat(equipoPromedio) > 90 ? '#43A047' : parseFloat(equipoPromedio) > 70 ? '#F9A825' : '#C62828') : '#1B1B1B'; }
+
+            // Panel últimas auditorías del usuario
+            let panel = document.getElementById('panel-ultimas-auditorias');
+            if (panel) {
+                let misAuds = auditorias.filter(a => a.supervisor && a.supervisor.includes(u.nombre.split(' ')[0]))
+                    .sort((a,b) => b.id - a.id).slice(0, 3);
+                if (misAuds.length === 0) {
+                    panel.innerHTML = '<div style="font-size:12px;color:#bbb;text-align:center;padding:16px 0;">Sin registros aún</div>';
+                } else {
+                    panel.innerHTML = misAuds.map(a => {
+                        let tienda = typeof a.tienda === 'string' ? a.tienda : a.tienda.nombre;
+                        let score = a.notaFinal || a.finalScore || 0;
+                        let badgeColor = score <= 70 ? '#C62828' : score <= 90 ? '#F9A825' : '#43A047';
+                        let badgeLabel = score <= 70 ? 'Alto Riesgo' : score <= 90 ? 'Observado' : 'Aprobado';
+                        let hace = Math.floor((Date.now() - a.id) / 60000);
+                        let tiempoStr = hace < 60 ? `hace ${hace} min` : hace < 1440 ? `hace ${Math.floor(hace/60)}h` : `hace ${Math.floor(hace/1440)}d`;
+                        return `<div class="audit-item-lateral">
+                            <div class="audit-item-tienda">${tienda}</div>
+                            <div class="audit-item-meta">
+                                <span>${tiempoStr}</span>
+                                <span class="audit-badge" style="background:${badgeColor};">${badgeLabel}</span>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+        }
+
         function volverDesdeResultado() {
             if (window.auditDesdeHistorial) {
                 window.auditDesdeHistorial = false;
@@ -4709,33 +6051,150 @@
             }
         }
 
+        function toggleFiltroVis() {
+            let panel = document.getElementById('panel-filtro-vis');
+            if (panel.style.display === 'none') {
+                let usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
+                let supsSel = window.activeHistorialFilters.visita.sups;
+                document.getElementById('filtro-vis-sups').innerHTML = usuarios
+                    .filter(u => u.cargo !== 'SOPORTE')
+                    .map(u => `<button onclick="toggleChipVis('sup','${u.nombre}',this)"
+                        style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${supsSel.includes(u.nombre)?'var(--naranja)':'#ddd'};background:${supsSel.includes(u.nombre)?'var(--naranja)':'white'};color:${supsSel.includes(u.nombre)?'white':'#555'};">
+                        ${u.nombre.split(' ')[0]}
+                    </button>`).join('');
+
+                let visitas = JSON.parse(localStorage.getItem("visitas") || "[]");
+                let mesesMap = {};
+                visitas.forEach(v => {
+                    let raw = v.datetime || v.fechaHora || v.fecha || '';
+                    if (!raw) return;
+                    let d = new Date(raw);
+                    if (isNaN(d.getTime())) return;
+                    let clave = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                    let label = d.toLocaleString('es', {month:'long', year:'numeric'});
+                    mesesMap[clave] = label;
+                });
+                let mesesSel = window.activeHistorialFilters.visita.meses;
+                let mesesOrdenados = Object.entries(mesesMap).sort((a,b)=>b[0].localeCompare(a[0]));
+                let porAnio = {};
+                mesesOrdenados.forEach(([k,v]) => {
+                    let anio = k.split('-')[0];
+                    if (!porAnio[anio]) porAnio[anio] = [];
+                    porAnio[anio].push([k, v]);
+                });
+                document.getElementById('filtro-vis-meses').innerHTML = Object.entries(porAnio)
+                    .sort((a,b)=>b[0]-a[0])
+                    .map(([anio, items]) => `
+                        <div style="width:100%;font-size:11px;font-weight:800;color:#aaa;letter-spacing:0.5px;margin-bottom:6px;margin-top:4px;">${anio}</div>
+                        ${items.map(([k,v]) => {
+                            let nombreMes = new Date(parseInt(k.split('-')[0]), parseInt(k.split('-')[1])-1, 1).toLocaleString('es',{month:'long'});
+                            return `<button onclick="toggleChipVis('mes','${k}',this)"
+                                style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${mesesSel.includes(k)?'var(--naranja)':'#ddd'};background:${mesesSel.includes(k)?'var(--naranja)':'white'};color:${mesesSel.includes(k)?'white':'#555'};">
+                                ${nombreMes}
+                            </button>`;
+                        }).join('')}
+                    `).join('') || '<span style="font-size:12px;color:#bbb;">Sin registros</span>';
+                // Inicializar botones de orden
+                let ordenActual = window.activeHistorialFilters.visita.orden || 'desc';
+                setOrdenVis(ordenActual);
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function toggleChipVis(tipo, valor, btn) {
+            let filtros = window.activeHistorialFilters.visita;
+            let arr = tipo === 'sup' ? filtros.sups : filtros.meses;
+            let idx = arr.indexOf(valor);
+            if (idx === -1) {
+                arr.push(valor);
+                btn.style.background = 'var(--naranja)';
+                btn.style.color = 'white';
+                btn.style.borderColor = 'var(--naranja)';
+            } else {
+                arr.splice(idx, 1);
+                btn.style.background = 'white';
+                btn.style.color = '#555';
+                btn.style.borderColor = '#ddd';
+            }
+        }
+
+        function setOrdenVis(orden) {
+            window.activeHistorialFilters.visita.orden = orden;
+            document.getElementById('btn-vis-desc').style.background = orden==='desc'?'var(--naranja)':'white';
+            document.getElementById('btn-vis-desc').style.color = orden==='desc'?'white':'#555';
+            document.getElementById('btn-vis-desc').style.borderColor = orden==='desc'?'var(--naranja)':'#ddd';
+            document.getElementById('btn-vis-asc').style.background = orden==='asc'?'var(--naranja)':'white';
+            document.getElementById('btn-vis-asc').style.color = orden==='asc'?'white':'#555';
+            document.getElementById('btn-vis-asc').style.borderColor = orden==='asc'?'var(--naranja)':'#ddd';
+        }
+
+        function limpiarFiltroVis() {
+            window.activeHistorialFilters.visita = { sups: [], meses: [], orden: 'desc' };
+            document.getElementById('panel-filtro-vis').style.display = 'none';
+            renderHistorialVisitas();
+        }
+
+        function aplicarFiltroVis() {
+            document.getElementById('panel-filtro-vis').style.display = 'none';
+            renderHistorialVisitas();
+        }
+
         function renderHistorialVisitas() {
             const contenedor = document.getElementById('lista-historial-visitas');
             if (!contenedor) return;
 
-            const visitas = JSON.parse(localStorage.getItem('visitas') || '[]');
+            let visitas = JSON.parse(localStorage.getItem('visitas') || '[]');
+            const search = (document.getElementById('hist-vis-search')?.value || '').toLowerCase();
+            const filtros = window.activeHistorialFilters?.visita || { sups: [], meses: [], orden: 'desc' };
+            const orden = filtros.orden || 'desc';
+
+            if (search) visitas = visitas.filter(v => (v.tienda?.nombre || '').toLowerCase().includes(search));
+            if (filtros.sups.length > 0) visitas = visitas.filter(v => filtros.sups.some(s => (v.supervisor||'').includes(s.split(' ')[0])));
+            if (filtros.meses.length > 0) visitas = visitas.filter(v => {
+                let raw = v.datetime || v.fechaHora || v.fecha || '';
+                if (!raw) return false;
+                let d = new Date(raw);
+                if (isNaN(d.getTime())) return false;
+                let clave = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+                return filtros.meses.includes(clave);
+            });
+
+            visitas.sort((a, b) => {
+                let da = new Date(a.datetime || a.fechaHora || a.fecha || '');
+                let db = new Date(b.datetime || b.fechaHora || b.fecha || '');
+                let va = (!da || isNaN(da.getTime())) ? -Infinity : da.getTime();
+                let vb = (!db || isNaN(db.getTime())) ? -Infinity : db.getTime();
+                if (va === -Infinity && vb === -Infinity) return 0;
+                if (va === -Infinity) return 1;
+                if (vb === -Infinity) return -1;
+                return orden === 'desc' ? vb - va : va - vb;
+            });
 
             if (visitas.length === 0) {
-                contenedor.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">No hay visitas registradas aún.</div>';
+                contenedor.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">No se encontraron resultados.</div>';
                 return;
             }
 
-            visitas.sort((a, b) => new Date(b.fechaHora) - new Date(a.fechaHora));
-
             contenedor.innerHTML = visitas.map(v => {
-                const fechaFormateada = v.fechaHora ? new Date(v.fechaHora).toLocaleDateString('es-PE', {
-                    day: 'numeric', month: 'long', year: 'numeric'
-                }).toUpperCase() + ' A LAS ' + new Date(v.fechaHora).toLocaleTimeString('es-PE', {
-                    hour: '2-digit', minute: '2-digit', hour12: true
-                }).toUpperCase() : v.fecha || '';
-
+                let tiendaNombre = v.tienda?.nombre || v.tienda || '';
+                let raw = v.datetime || v.fechaHora || v.fecha || '';
+                let d = raw ? new Date(raw) : null;
+                let fechaStr = (d && !isNaN(d.getTime())) ? d.toLocaleDateString('es-PE', {day:'numeric', month:'short', year:'numeric'}) : '—';
+                let horaStr = (d && !isNaN(d.getTime())) ? d.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) : '';
+                let tieneComentario = v.comentario && v.comentario.trim().length > 0;
                 return `
-              <div class="historial-item" onclick="verDetalleVisita(${v.id})" style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;">
-                <div style="font-size:12px;color:#FC6E20;font-weight:700;">${fechaFormateada}</div>
-                <div style="font-size:15px;font-weight:800;color:#1B1B1B;margin-top:4px;">${v.tienda?.nombre || ''}</div>
-                <div style="font-size:12px;color:#888;margin-top:2px;">${v.supervisor || ''}</div>
-              </div>
-            `;
+                <div onclick="verDetalleVisita(${v.id})" style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;">
+                    <div style="font-size:12px;color:#FC6E20;font-weight:600;">${v.supervisor || ''}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                        <div style="font-size:15px;font-weight:800;color:#1B1B1B;">${tiendaNombre}</div>
+                        <span style="background:${tieneComentario?'#E8F5E9':'#F5F5F5'};color:${tieneComentario?'#43A047':'#999'};border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">
+                            ${tieneComentario ? '💬 Con nota' : '📋 Sin nota'}
+                        </span>
+                    </div>
+                    <div style="font-size:12px;color:#888;margin-top:4px;">${fechaStr}${horaStr ? ', ' + horaStr : ''}</div>
+                </div>`;
             }).join('');
         }
 
@@ -4845,13 +6304,30 @@
             let html = sups.map((s, i) => `
         <div class="flex justify-between items-center mb-8" style="padding: 12px 0; border-bottom: 1px solid #EEE; position:relative;">
           <span style="font-size: 14px; color:#1B1B1B; font-weight:600;">${s}</span>
-          <button style="background:none; border:none; color:#888; font-weight:bold; cursor:pointer; font-size:18px;" onclick="toggleSupMenu(${i}, event)">⋮</button>
-          <div id="sup-menu-${i}" style="display:none; position:absolute; top:40px; right:0; background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:10; overflow:hidden; width:150px;">
-              <div style="padding:12px 16px; font-size:13px; color:#C62828; cursor:pointer; text-align:left;" onclick="confirmDeleteSup(${i}, '${s}')">🗑️ Eliminar</div>
-          </div>
+          
         </div>
       `).join("");
             document.getElementById("list-supervisores").innerHTML = html;
+        }
+
+        function editarMiPerfil() {
+            let u = window.currentUser;
+            if (!u) return;
+            let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+            let idx = users.findIndex(x => x.email === u.email);
+            if (idx === -1) return;
+            editUser(idx);
+        }
+
+        function editSupervidor(nombreSup, supIdx) {
+            let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+            let idx = users.findIndex(u => u.nombre.includes(nombreSup) || nombreSup.includes(u.nombre.split(' ')[0]));
+            if (idx === -1) {
+                showToast("Usuario no encontrado en el sistema", "error");
+                return;
+            }
+            window.editSupIdxToDelete = supIdx;
+            editUser(idx);
         }
 
         function toggleSupMenu(i, e) {
@@ -4890,11 +6366,16 @@
 
         // --- EDITOR CHECKLIST ---
         function openEditorChecklist() {
-            document.getElementById("edit-g1").value = window.PESOS[1];
-            document.getElementById("edit-g2").value = window.PESOS[2];
-            document.getElementById("edit-g3").value = window.PESOS[3];
-            document.getElementById("edit-g4").value = window.PESOS[4];
-            document.getElementById("edit-g5").value = window.PESOS[5];
+            let p = window.PESOS;
+            if (!p || (p[1]+p[2]+p[3]+p[4]+p[5]) <= 0.01) {
+                p = { 1:0.55, 2:0.20, 3:0.05, 4:0.10, 5:0.10 };
+                window.PESOS = p;
+            }
+            document.getElementById("edit-g1").value = p[1];
+            document.getElementById("edit-g2").value = p[2];
+            document.getElementById("edit-g3").value = p[3];
+            document.getElementById("edit-g4").value = p[4];
+            document.getElementById("edit-g5").value = p[5];
 
             let html = window.PREGUNTAS.map(p => `
         <div style="background:white; border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,0.07); padding:16px; margin-bottom:10px;">
@@ -5073,6 +6554,24 @@
             <div id="ortografia-lista" style="margin-bottom:20px;"></div>
             <button onclick="document.getElementById('modal-ortografia').style.display='none'" style="background:#FC6E20;color:white;border:none;border-radius:50px;padding:14px;width:100%;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">✏️ Corregir</button>
             <button onclick="document.getElementById('modal-ortografia').style.display='none'; finalizarAuditoriaConfirmado();" style="background:#EEE;color:#1B1B1B;border:none;border-radius:50px;padding:14px;width:100%;font-size:14px;font-weight:700;cursor:pointer;">Finalizar igual</button>
+        </div>
+    </div>
+
+<!-- MODAL FIRMA -->
+    <div id="modal-firma" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:white; border-radius:20px; padding:20px; width:100%; max-width:520px; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                <div style="font-size:15px; font-weight:800;">✍️ Firma del encargado</div>
+                <button onclick="cerrarModalFirma(false)" style="background:#EEE; border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:16px;">✕</button>
+            </div>
+            <div style="background:#F5F5F5; border-radius:12px; border:2px dashed #DDD; position:relative; overflow:hidden; margin-bottom:12px;">
+                <div id="modal-firma-placeholder" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#AAA; font-size:14px; pointer-events:none; white-space:nowrap;">Firma aquí</div>
+                <canvas id="firma-canvas-modal" width="800" height="250" style="width:100%; height:220px; display:block; touch-action:none;"></canvas>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <button onclick="limpiarFirmaModal()" style="flex:1; padding:12px; border-radius:50px; background:#EEE; border:none; color:#555; font-size:13px; font-weight:700; cursor:pointer;">🗑️ Limpiar</button>
+                <button onclick="cerrarModalFirma(true)" style="flex:1; padding:12px; border-radius:50px; background:var(--naranja); border:none; color:white; font-size:13px; font-weight:700; cursor:pointer;">✅ Confirmar firma</button>
+            </div>
         </div>
     </div>
 
