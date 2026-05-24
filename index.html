@@ -3947,6 +3947,15 @@
                     </div>
                     <span class="ajustes-item-arrow">›</span>
                 </div>
+                <div style="height:1px; background:#F0F0F0; margin:0 16px;"></div>
+                <div class="ajustes-item" onclick="solicitarPasswordAdmin('usuarios')">
+                    <div class="ajustes-item-icon" style="background:#FFF0E6;">👥</div>
+                    <div class="ajustes-item-text">
+                        <div class="ajustes-item-label">🔒 Editor de Usuarios</div>
+                        <div class="ajustes-item-desc">Agrega o elimina supervisoras del sistema</div>
+                    </div>
+                    <span class="ajustes-item-arrow">›</span>
+                </div>
             </div>
 
             <!-- CERRAR SESIÓN -->
@@ -3978,6 +3987,51 @@
             </div>
         </div>
 
+    </div>
+
+    <!-- EDITOR USUARIOS SUBVIEW -->
+    <div id="view-editor-usuarios" class="view fade-in" style="background:#F9F9F9; min-height:100vh;">
+        <div class="header-dark" style="background:var(--naranja);">
+            <button onclick="showView('view-ajustes')" style="color:white;">←</button>
+            <span class="bold" style="color:white; font-size:16px;">EDITOR DE USUARIOS</span>
+        </div>
+        <div class="p-16">
+            <button onclick="openModalNuevoUsuario()" style="width:100%; padding:14px; border-radius:50px; background:var(--naranja); border:none; color:white; font-size:14px; font-weight:700; cursor:pointer; margin-bottom:20px;">+ Agregar nueva supervisora</button>
+            <div id="editor-usuarios-lista"></div>
+        </div>
+
+        <!-- MODAL NUEVO USUARIO -->
+        <div id="modal-nuevo-usuario" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+            <div style="background:white; border-radius:24px; padding:24px; width:100%; max-width:380px; box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+                <div style="font-size:16px; font-weight:800; margin-bottom:20px;">👤 Nueva supervisora</div>
+                <div style="display:flex; flex-direction:column; gap:12px;">
+                    <div>
+                        <label style="font-size:12px; font-weight:700; color:#888; margin-bottom:4px; display:block;">NOMBRE COMPLETO *</label>
+                        <input id="nu-nombre" type="text" placeholder="Ej. María García López" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid #EEE; font-size:14px; box-sizing:border-box; outline:none; font-family:inherit;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; color:#888; margin-bottom:4px; display:block;">CORREO ELECTRÓNICO *</label>
+                        <input id="nu-email" type="email" placeholder="correo@gmail.com" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid #EEE; font-size:14px; box-sizing:border-box; outline:none; font-family:inherit;">
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; color:#888; margin-bottom:4px; display:block;">ROL *</label>
+                        <select id="nu-cargo" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid #EEE; font-size:14px; box-sizing:border-box; outline:none; font-family:inherit; background:white;">
+                            <option value="SUPERVISORA FAST FOOD">SUPERVISORA FAST FOOD</option>
+                            <option value="JEFA COMERCIAL FAST FOOD">JEFA COMERCIAL FAST FOOD</option>
+                            <option value="SOPORTE">SOPORTE</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="font-size:12px; font-weight:700; color:#888; margin-bottom:4px; display:block;">CELULAR <span style="font-weight:400;">(opcional)</span></label>
+                        <input id="nu-tel" type="tel" placeholder="Ej. 999 888 777" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid #EEE; font-size:14px; box-sizing:border-box; outline:none; font-family:inherit;">
+                    </div>
+                </div>
+                <div style="display:flex; gap:10px; margin-top:20px;">
+                    <button onclick="document.getElementById('modal-nuevo-usuario').style.display='none'" style="flex:1; padding:13px; border-radius:50px; background:#EEE; border:none; font-size:13px; font-weight:700; cursor:pointer;">Cancelar</button>
+                    <button onclick="saveNuevoUsuario()" style="flex:1; padding:13px; border-radius:50px; background:var(--naranja); border:none; color:white; font-size:13px; font-weight:700; cursor:pointer;">Agregar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- EDITOR CHECKLIST SUBVIEW -->
@@ -4509,10 +4563,78 @@
                 document.getElementById('modal-admin-pass').style.display = 'none';
                 if (window.adminDestino === 'editor') openEditorChecklist();
                 else if (window.adminDestino === 'pesos') openEditorChecklist();
+                else if (window.adminDestino === 'usuarios') openEditorUsuarios();
             } else {
                 document.getElementById('admin-pass-error').style.display = 'block';
                 document.getElementById('admin-pass-input').value = '';
             }
+        }
+
+        function openEditorUsuarios() {
+            renderEditorUsuarios();
+            showView('view-editor-usuarios');
+        }
+
+        function renderEditorUsuarios() {
+            let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+            let html = users.map((u, i) => {
+                let inis = u.nombre.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+                let protegido = u.cargo === 'SOPORTE' || u.cargo === 'JEFA COMERCIAL FAST FOOD';
+                return `
+                <div style="background:white; border-radius:16px; padding:16px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; align-items:center; gap:14px; position:relative;">
+                    <div style="width:44px; height:44px; border-radius:50%; background:var(--naranja); color:white; font-weight:800; font-size:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${inis}</div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-size:14px; font-weight:700; color:#1B1B1B;">${u.nombre}</div>
+                        <div style="font-size:11px; color:#FC6E20; font-weight:600;">${u.cargo}</div>
+                        <div style="font-size:11px; color:#aaa;">${u.email}${u.telefono ? ' · ' + u.telefono : ''}</div>
+                    </div>
+                    ${protegido
+                        ? `<span style="font-size:10px; color:#aaa; font-weight:600; padding:4px 10px; background:#F5F5F5; border-radius:50px;">Protegido</span>`
+                        : `<button onclick="confirmDeleteUserAdmin(${i}, '${u.nombre}')" style="background:#FFF0F0; border:none; border-radius:50%; width:34px; height:34px; cursor:pointer; font-size:16px; color:#C62828; flex-shrink:0;">🗑️</button>`
+                    }
+                </div>`;
+            }).join('');
+            document.getElementById('editor-usuarios-lista').innerHTML = html || '<div style="text-align:center;color:#bbb;padding:20px;">Sin usuarios registrados</div>';
+        }
+
+        function confirmDeleteUserAdmin(i, name) {
+            if (confirm(`¿Eliminar a ${name}? Sus auditorías y visitas anteriores se conservarán.`)) {
+                let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+                users.splice(i, 1);
+                localStorage.setItem("usuarios", JSON.stringify(users));
+                renderEditorUsuarios();
+                renderUsuarios();
+                showToast("Usuario eliminado", "success");
+            }
+        }
+
+        function openModalNuevoUsuario() {
+            document.getElementById('nu-nombre').value = '';
+            document.getElementById('nu-email').value = '';
+            document.getElementById('nu-cargo').value = 'SUPERVISORA FAST FOOD';
+            document.getElementById('nu-tel').value = '';
+            document.getElementById('modal-nuevo-usuario').style.display = 'flex';
+            setTimeout(() => document.getElementById('nu-nombre').focus(), 100);
+        }
+
+        function saveNuevoUsuario() {
+            let nombre = document.getElementById('nu-nombre').value.trim();
+            let email = document.getElementById('nu-email').value.trim();
+            let cargo = document.getElementById('nu-cargo').value.trim();
+            let tel = document.getElementById('nu-tel').value.trim();
+
+            if (!nombre || !email || !cargo) { showToast("Completa los campos obligatorios", "error"); return; }
+
+            let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+            let existe = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+            if (existe) { showToast("Ya existe un usuario con ese correo", "error"); return; }
+
+            users.push({ nombre, email, cargo, telefono: tel });
+            localStorage.setItem("usuarios", JSON.stringify(users));
+            document.getElementById('modal-nuevo-usuario').style.display = 'none';
+            renderEditorUsuarios();
+            renderUsuarios();
+            showToast("✓ Usuario agregado correctamente", "success");
         }
 
         function logout() {
@@ -6432,8 +6554,7 @@
           <div class="user-card" style="position:relative;">
             <button class="user-menu-btn" onclick="toggleUserMenu(${i}, event)" style="background:none; border:none; font-size:18px; color:#888; font-weight:bold; cursor:pointer; position:absolute; top:8px; right:8px;">⋮</button>
             <div id="user-menu-${i}" style="display:none; position:absolute; top:30px; right:10px; background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:10; overflow:hidden; width:170px;">
-                <div style="padding:12px 16px; font-size:13px; color:#1B1B1B; cursor:pointer; border-bottom:1px solid #EEE; text-align:left;" onclick="editUser(${i})">✏️ Editar información</div>
-                <div style="padding:12px 16px; font-size:13px; color:#C62828; cursor:pointer; text-align:left;" onclick="confirmDeleteUser(${i}, '${u.nombre}')">🗑️ Eliminar usuario</div>
+                <div style="padding:12px 16px; font-size:13px; color:#1B1B1B; cursor:pointer; text-align:left;" onclick="editUser(${i})">👤 Ver información</div>
             </div>
             <div class="user-avatar" style="margin-top:16px;">${inis}</div>
             <div class="bold text-center" style="font-size:13px; line-height:1.2;">${u.nombre}</div>
