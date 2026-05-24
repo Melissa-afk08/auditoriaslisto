@@ -5140,25 +5140,9 @@
                 if (!resp) return;
                 let obsHtml = resp.obs ? `<div class="ro-obs">📝 ${resp.obs}</div>` : "";
                 let fotos = resp.fotos || [];
-                let fotosHtml = "";
-                if (fotos.length === 1) {
-                    fotosHtml = `<div style="text-align:center;margin-top:10px;"><img src="${fotos[0]}" style="width:70%;border-radius:10px;object-fit:cover;"></div>`;
-                } else if (fotos.length > 1) {
-                    let slides = fotos.map((f, idx) =>
-                        `<div class="ro-slide-${p.id}" style="display:${idx===0?'block':'none'};text-align:center;">
-                            <img src="${f}" style="width:70%;border-radius:10px;object-fit:cover;">
-                         </div>`
-                    ).join("");
-                    fotosHtml = `
-                        <div style="margin-top:10px;position:relative;">
-                            ${slides}
-                            <div style="display:flex;justify-content:center;align-items:center;gap:16px;margin-top:8px;">
-                                <button onclick="roCarouselNav(${p.id},${fotos.length},-1)" style="background:var(--naranja);color:white;border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
-                                <span id="ro-counter-${p.id}" style="font-size:12px;color:#888;font-weight:600;">1 / ${fotos.length}</span>
-                                <button onclick="roCarouselNav(${p.id},${fotos.length},1)" style="background:var(--naranja);color:white;border:none;border-radius:50%;width:28px;height:28px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
-                            </div>
-                        </div>`;
-                }
+                let lbKeyRo = `lb_ro_${p.id}`;
+                window[lbKeyRo] = fotos;
+                let fotosHtml = fotos.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${fotos.map((f, fi) => `<img src="${f}" onclick="abrirLightbox(window['${lbKeyRo}'],${fi})" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #EEE;cursor:pointer;">`).join('')}</div>` : '';
                 resHtml += `
                     <div class="ro-question">
                         <div class="ro-question-text">${p.id}. ${p.texto}</div>
@@ -5780,7 +5764,9 @@
 
                 let fotosHtml = "";
                 if (r.fotos && r.fotos.length > 0) {
-                    fotosHtml = `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${r.fotos.map((f, fi) => `<img src="${f}" onclick="abrirLightbox(${JSON.stringify(r.fotos)},${fi})" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #EEE;cursor:pointer;">`).join('')}</div>`;
+                    let lbKeyRes = `lb_res_${p.id}`;
+                    window[lbKeyRes] = r.fotos;
+                    fotosHtml = `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${r.fotos.map((f, fi) => `<img src="${f}" onclick="abrirLightbox(window['${lbKeyRes}'],${fi})" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #EEE;cursor:pointer;">`).join('')}</div>`;
                 }
 
                 detHtml += `
