@@ -6130,9 +6130,57 @@
         // --- HISTORIAL ---
         window.activeHistorialMode = 'auditoria';
         window.activeHistorialFilters = {
-            auditoria: { sups: [], meses: [], orden: 'desc' },
-            visita: { sups: [], meses: [], orden: 'desc' }
+            auditoria: { sups: [], meses: [], dias: [], orden: 'desc' },
+            visita: { sups: [], meses: [], dias: [], orden: 'desc' }
         };
+
+        function toggleSubDias(mesKey, tipo) {
+            let sub = document.getElementById(`sub-dias-${tipo}-${mesKey}`);
+            let arrow = document.getElementById(`arrow-dias-${tipo}-${mesKey}`);
+            if (!sub) return;
+            let visible = sub.style.display !== 'none';
+            sub.style.display = visible ? 'none' : 'flex';
+            if (arrow) arrow.textContent = visible ? '›' : '⌄';
+        }
+
+        function renderDiasChips(mesKey, tipo) {
+            let records = JSON.parse(localStorage.getItem(tipo === 'aud' ? 'auditorias' : 'visitas') || '[]');
+            let filtros = window.activeHistorialFilters[tipo === 'aud' ? 'auditoria' : 'visita'];
+            let diasDisponibles = new Set();
+
+            records.forEach(r => {
+                let fecha = '';
+                if (tipo === 'aud') {
+                    let p = (r.fecha || '').split('/');
+                    if (p.length === 3) fecha = `${p[2]}-${p[1]}-${p[0].padStart(2,'0')}`;
+                } else {
+                    let raw = r.datetime || r.fechaHora || r.fecha || '';
+                    if (raw) { let d = new Date(raw); if (!isNaN(d)) fecha = d.toISOString().substring(0,10); }
+                }
+                if (fecha && fecha.startsWith(mesKey)) diasDisponibles.add(fecha);
+            });
+
+            let diasSel = filtros.dias || [];
+            let diasArr = [...diasDisponibles].sort();
+            return diasArr.map(d => {
+                let label = new Date(d + 'T12:00:00').toLocaleDateString('es', { weekday:'short', day:'numeric' });
+                let sel = diasSel.includes(d);
+                return `<button onclick="toggleChipDia('${d}','${tipo}',this)" style="padding:5px 12px;border-radius:50px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid ${sel?'var(--naranja)':'#ddd'};background:${sel?'var(--naranja)':'white'};color:${sel?'white':'#555'};">${label}</button>`;
+            }).join('');
+        }
+
+        function toggleChipDia(dia, tipo, btn) {
+            let filtros = window.activeHistorialFilters[tipo === 'aud' ? 'auditoria' : 'visita'];
+            if (!filtros.dias) filtros.dias = [];
+            let idx = filtros.dias.indexOf(dia);
+            if (idx === -1) {
+                filtros.dias.push(dia);
+                btn.style.background = 'var(--naranja)'; btn.style.color = 'white'; btn.style.borderColor = 'var(--naranja)';
+            } else {
+                filtros.dias.splice(idx, 1);
+                btn.style.background = 'white'; btn.style.color = '#555'; btn.style.borderColor = '#ddd';
+            }
+        }
 
         function toggleFilterAcc(id) {
             let acc = document.getElementById(id);
@@ -6178,10 +6226,15 @@
                         <div style="width:100%;font-size:11px;font-weight:800;color:#aaa;letter-spacing:0.5px;margin-bottom:6px;margin-top:4px;">${anio}</div>
                         ${items.map(([k,v]) => {
                             let nombreMes = new Date(parseInt(k.split('-')[0]), parseInt(k.split('-')[1])-1, 1).toLocaleString('es',{month:'long'});
-                            return `<button onclick="toggleChipAud('mes','${k}',this)"
-                                style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${mesesSel.includes(k)?'var(--naranja)':'#ddd'};background:${mesesSel.includes(k)?'var(--naranja)':'white'};color:${mesesSel.includes(k)?'white':'#555'};">
-                                ${nombreMes}
-                            </button>`;
+                            let sel = mesesSel.includes(k);
+                            return `
+                            <div style="width:100%;margin-bottom:6px;">
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <button onclick="toggleChipAud('mes','${k}',this)" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${sel?'var(--naranja)':'#ddd'};background:${sel?'var(--naranja)':'white'};color:${sel?'white':'#555'};">${nombreMes}</button>
+                                    <button onclick="toggleSubDias('${k}','aud')" style="background:none;border:none;cursor:pointer;font-size:14px;color:#aaa;padding:4px;" id="arrow-dias-aud-${k}">›</button>
+                                </div>
+                                <div id="sub-dias-aud-${k}" style="display:none;flex-wrap:wrap;gap:6px;padding:8px 0 4px 8px;">${renderDiasChips('${k}','aud')}</div>
+                            </div>`;
                         }).join('')}
                     `).join('') || '<span style="font-size:12px;color:#bbb;">Sin registros</span>';
                 panel.style.display = 'block';
@@ -6218,7 +6271,7 @@
         }
 
         function limpiarFiltroAud() {
-            window.activeHistorialFilters.auditoria = { sups: [], meses: [], orden: 'desc' };
+            window.activeHistorialFilters.auditoria = { sups: [], meses: [], dias: [], orden: 'desc' };
             document.getElementById('panel-filtro-aud').style.display = 'none';
             renderHistorialAuditorias();
         }
@@ -6294,6 +6347,11 @@
                 let partes = (a.fecha || '').split('/');
                 let clave = partes.length === 3 ? `${partes[2]}-${partes[1]}` : '';
                 return filtros.meses.includes(clave);
+            });
+            if (filtros.dias && filtros.dias.length > 0) auditorias = auditorias.filter(a => {
+                let partes = (a.fecha || '').split('/');
+                let clave = partes.length === 3 ? `${partes[2]}-${partes[1]}-${partes[0].padStart(2,'0')}` : '';
+                return filtros.dias.includes(clave);
             });
 
             if (auditorias.length === 0) {
@@ -6437,10 +6495,15 @@
                         <div style="width:100%;font-size:11px;font-weight:800;color:#aaa;letter-spacing:0.5px;margin-bottom:6px;margin-top:4px;">${anio}</div>
                         ${items.map(([k,v]) => {
                             let nombreMes = new Date(parseInt(k.split('-')[0]), parseInt(k.split('-')[1])-1, 1).toLocaleString('es',{month:'long'});
-                            return `<button onclick="toggleChipVis('mes','${k}',this)"
-                                style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${mesesSel.includes(k)?'var(--naranja)':'#ddd'};background:${mesesSel.includes(k)?'var(--naranja)':'white'};color:${mesesSel.includes(k)?'white':'#555'};">
-                                ${nombreMes}
-                            </button>`;
+                            let sel = mesesSel.includes(k);
+                            return `
+                            <div style="width:100%;margin-bottom:6px;">
+                                <div style="display:flex;align-items:center;gap:6px;">
+                                    <button onclick="toggleChipVis('mes','${k}',this)" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${sel?'var(--naranja)':'#ddd'};background:${sel?'var(--naranja)':'white'};color:${sel?'white':'#555'};">${nombreMes}</button>
+                                    <button onclick="toggleSubDias('${k}','vis')" style="background:none;border:none;cursor:pointer;font-size:14px;color:#aaa;padding:4px;" id="arrow-dias-vis-${k}">›</button>
+                                </div>
+                                <div id="sub-dias-vis-${k}" style="display:none;flex-wrap:wrap;gap:6px;padding:8px 0 4px 8px;">${renderDiasChips('${k}','vis')}</div>
+                            </div>`;
                         }).join('')}
                     `).join('') || '<span style="font-size:12px;color:#bbb;">Sin registros</span>';
                 // Inicializar botones de orden
@@ -6480,7 +6543,7 @@
         }
 
         function limpiarFiltroVis() {
-            window.activeHistorialFilters.visita = { sups: [], meses: [], orden: 'desc' };
+            window.activeHistorialFilters.visita = { sups: [], meses: [], dias: [], orden: 'desc' };
             document.getElementById('panel-filtro-vis').style.display = 'none';
             renderHistorialVisitas();
         }
@@ -6508,6 +6571,14 @@
                 if (isNaN(d.getTime())) return false;
                 let clave = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
                 return filtros.meses.includes(clave);
+            });
+            if (filtros.dias && filtros.dias.length > 0) visitas = visitas.filter(v => {
+                let raw = v.datetime || v.fechaHora || v.fecha || '';
+                if (!raw) return false;
+                let d = new Date(raw);
+                if (isNaN(d.getTime())) return false;
+                let clave = d.toISOString().substring(0,10);
+                return filtros.dias.includes(clave);
             });
 
             visitas.sort((a, b) => {
