@@ -4127,6 +4127,17 @@
         </div>
     </div>
 
+    <!-- MODAL VER USUARIO (solo lectura) -->
+    <div id="modal-ver-usuario" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:white; border-radius:24px; padding:24px; width:100%; max-width:340px; box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <div style="font-size:15px; font-weight:800;">Información</div>
+                <button onclick="document.getElementById('modal-ver-usuario').style.display='none'" style="background:#EEE; border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:16px;">✕</button>
+            </div>
+            <div id="modal-ver-usuario-content"></div>
+        </div>
+    </div>
+
     <div id="modal-user" class="modal-overlay" style="display:none; z-index:9999;">
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal('modal-user')">✕</button>
@@ -6578,14 +6589,25 @@
         function editUser(i) {
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
             let u = users[i];
-            document.getElementById("add-user-name").value = u.nombre;
-            document.getElementById("add-user-email").value = u.email;
-            document.getElementById("add-user-cargo").value = u.cargo;
-            document.getElementById("add-user-tel").value = u.telefono || "";
-            document.getElementById("add-user-idx").value = i;
-            document.getElementById("mu-title").innerText = "Editar Usuario";
-            document.getElementById("mu-btn").innerText = "Guardar";
-            document.getElementById("modal-user").style.display = "flex";
+            let inis = u.nombre.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+            document.getElementById("modal-ver-usuario-content").innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:20px;">
+                    <div style="width:64px; height:64px; border-radius:50%; background:var(--naranja); color:white; font-weight:800; font-size:22px; display:flex; align-items:center; justify-content:center;">${inis}</div>
+                    <div style="font-size:17px; font-weight:800; color:#1B1B1B; text-align:center;">${u.nombre}</div>
+                    <span style="background:#FFF0E6; color:var(--naranja); font-size:11px; font-weight:700; padding:4px 12px; border-radius:50px;">${u.cargo}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="background:#F9F9F9; border-radius:12px; padding:12px 16px;">
+                        <div style="font-size:10px; font-weight:700; color:#aaa; text-transform:uppercase; margin-bottom:2px;">Correo electrónico</div>
+                        <div style="font-size:14px; color:#1B1B1B;">${u.email}</div>
+                    </div>
+                    <div style="background:#F9F9F9; border-radius:12px; padding:12px 16px;">
+                        <div style="font-size:10px; font-weight:700; color:#aaa; text-transform:uppercase; margin-bottom:2px;">Celular</div>
+                        <div style="font-size:14px; color:#1B1B1B;">${u.telefono || '—'}</div>
+                    </div>
+                </div>
+            `;
+            document.getElementById("modal-ver-usuario").style.display = "flex";
         }
 
         function confirmDeleteUser(i, name) {
