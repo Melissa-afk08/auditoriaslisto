@@ -2015,23 +2015,23 @@
             color: white;
         }
 
-        /* Mapa embed — solo desktop */
+        /* Mapa embed — todos los dispositivos */
         .td-mapa-wrapper {
-            display: none;
+            display: block;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-top: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+        .td-mapa-wrapper iframe {
+            width: 100%;
+            height: 200px;
+            border: none;
+            display: block;
         }
         @media (min-width: 1024px) {
-            .td-mapa-wrapper {
-                display: block;
-                border-radius: 12px;
-                overflow: hidden;
-                margin-top: 16px;
-                box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            }
             .td-mapa-wrapper iframe {
-                width: 100%;
                 height: 220px;
-                border: none;
-                display: block;
             }
         }
 
@@ -3349,13 +3349,13 @@
                     <div class="info-val" id="vis-det-direccion"></div>
                 </div>
             </div>
+            <button class="btn-main-visita" onclick="iniciarVisita()">REGISTRAR VISITA</button>
+
             <!-- ÚLTIMAS VISITAS -->
             <div id="vis-ultimas-card" style="display:none; margin:16px 0;" class="vis-bitacora-card">
                 <div class="vis-bitacora-label">📍 Últimas visitas registradas</div>
                 <div id="vis-ultimas-lista"></div>
             </div>
-
-            <button class="btn-main-visita" onclick="iniciarVisita()">REGISTRAR VISITA</button>
         </div>
     </div>
 
