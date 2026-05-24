@@ -5236,7 +5236,7 @@
             let titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS Y UTENSILIOS", 4: "MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
             let grpHtml = "";
             for (let i = 1; i <= 5; i++) {
-                let v = data.resultadoGrupos[i];
+                let v = (data.resultadoGrupos || {})[i] || 0;
                 let c = v <= 70 ? "var(--rojo)" : (v <= 90 ? "var(--amarillo)" : "var(--verde)");
                 grpHtml += `
                     <div class="ro-group-bar">
@@ -5270,7 +5270,7 @@
                 `;
             });
 
-            document.getElementById("content-ro-auditoria").innerHTML = `
+            let htmlRoAuditoria = `
                 <div style="background:#FC6E20;border-radius:16px;padding:16px;color:white;margin-bottom:20px;margin-top:8px;">
                     <div style="font-size:15px;font-weight:800;margin-bottom:6px;">${tiendaNombre}</div>
                     <div style="font-size:12px;opacity:0.9;">${data.fecha} ${data.hora}</div>
