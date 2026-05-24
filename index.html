@@ -7254,6 +7254,9 @@
             closeModalRo('modal-ro-auditoria');
             showToast("✓ Auditoría movida a la papelera", "success");
             renderHistorialAuditorias();
+            if (document.getElementById('view-auditoria-resultado').style.display !== 'none') {
+                showView('view-historial-auditorias');
+            }
         }
 
         function confirmarBorrarVisita(id) {
