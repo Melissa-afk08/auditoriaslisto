@@ -779,17 +779,173 @@
             }
         }
 
-        /* Ocultar sidebar y títulos desktop en móvil */
+        /* ── RESPONSIVE MOBILE ── */
         @media (max-width: 1023px) {
+            body {
+                max-width: 100%;
+            }
+
             #home-sidebar {
                 display: none;
             }
+
             #home-main {
                 display: block;
+                padding: 0 16px 32px 16px;
             }
+
             #home-main-title,
             #home-main-subtitle {
                 display: none;
+            }
+
+            /* Header mobile */
+            .home-header-mobile {
+                display: flex !important;
+                justify-content: space-between;
+                align-items: center;
+                background: linear-gradient(135deg, #FC6E20 0%, #e8550a 60%, #c94400 100%);
+                padding: 20px 20px 24px 20px;
+                margin: 0 -16px 20px -16px;
+            }
+
+            .home-header-mobile h2 {
+                font-size: 22px;
+                font-weight: 800;
+                color: white;
+                margin-bottom: 2px;
+            }
+
+            .home-header-mobile .home-subtitle {
+                font-size: 13px;
+                color: rgba(255,255,255,0.8);
+            }
+
+            .home-header-mobile .avatar {
+                background: white;
+                color: var(--naranja);
+                width: 44px;
+                height: 44px;
+                font-size: 17px;
+                font-weight: 800;
+                flex-shrink: 0;
+            }
+
+            /* Search bar mobile */
+            .search-bar-mobile {
+                display: flex !important;
+                margin-bottom: 20px;
+            }
+
+            /* KPI cards mobile */
+            #home-kpi-section {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+                margin-bottom: 20px;
+            }
+
+            .kpi-card {
+                background: white;
+                border-radius: 14px;
+                padding: 14px 10px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+                border-top: 3px solid var(--naranja);
+            }
+
+            .kpi-label {
+                font-size: 9px;
+                font-weight: 700;
+                color: #999;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                margin-bottom: 6px;
+            }
+
+            .kpi-value {
+                font-size: 22px;
+                font-weight: 800;
+                color: #1B1B1B;
+                line-height: 1;
+                margin-bottom: 3px;
+            }
+
+            .kpi-sub {
+                font-size: 9px;
+                color: #aaa;
+            }
+
+            /* Action grid mobile */
+            .action-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .action-card {
+                border-radius: 16px;
+                padding: 18px 14px;
+                height: auto;
+                min-height: 100px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+                border-left: none;
+                border-bottom: 3px solid transparent;
+                transition: all 0.2s ease;
+                cursor: pointer;
+                background: white;
+            }
+
+            .action-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+                margin-bottom: 0;
+            }
+
+            .action-label {
+                font-size: 13px;
+                font-weight: 700;
+                text-align: center;
+                color: #1B1B1B;
+            }
+
+            .action-desc {
+                font-size: 10px;
+                color: #aaa;
+                text-align: center;
+            }
+
+            /* Panel lateral oculto en mobile */
+            #home-panel-lateral {
+                display: none !important;
+            }
+        }
+
+        /* Pantallas medianas (tablet) */
+        @media (min-width: 480px) and (max-width: 1023px) {
+            #home-kpi-section {
+                gap: 14px;
+            }
+
+            .kpi-card {
+                padding: 16px 14px;
+            }
+
+            .kpi-value {
+                font-size: 26px;
+            }
+
+            .kpi-label {
+                font-size: 10px;
+            }
+
+            .kpi-sub {
+                font-size: 10px;
             }
         }
 
