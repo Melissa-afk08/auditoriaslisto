@@ -6931,75 +6931,6 @@
             }
         }
 
-        async function cargarResultadoPublico(id) {
-            let vista = document.getElementById('view-resultado-publico');
-            let contenido = document.getElementById('res-pub-contenido');
-            vista.style.display = 'block';
-            contenido.innerHTML = '<div style="text-align:center;padding:60px 20px;color:#aaa;">Cargando auditoría...</div>';
-
-            try {
-                let { data, error } = await sbClient.from('auditorias').select('*').eq('id', id).single();
-                if (error || !data) throw new Error('No encontrada');
-
-                const titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS HERRAMIENTAS Y UTENSILIOS", 4: "CONTROL Y MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
-                let score = data.nota_final || 0;
-                let mainColor = score <= 70 ? "#FF3B30" : score <= 90 ? "#FFCC00" : "#34C759";
-                let clasificacion = score <= 70 ? "Alto Riesgo" : score <= 90 ? "Observado" : "Aprobado";
-                let semR = score <= 70 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#3a0000';
-                let semA = score > 70 && score <= 90 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#3a2e00';
-                let semV = score > 90 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#003a00';
-
-                let grupos = data.resultado_grupos || {};
-                let grpHtml = Object.keys(titulosGrupo).map(i => {
-                    let v = grupos[i] || 0;
-                    let c = v < 70 ? "#FF3B30" : v <= 90 ? "#FFCC00" : "#34C759";
-                    return `<div style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                            <span style="font-size:13px;font-weight:700;color:#1B1B1B;">${titulosGrupo[i]}</span>
-                            <span style="font-size:14px;font-weight:700;color:${c};">${v.toFixed(1)}%</span>
-                        </div>
-                        <div style="background:#F0F0F0;border-radius:50px;height:10px;overflow:hidden;">
-                            <div style="width:${v}%;background:${c};height:100%;border-radius:50px;transition:width 0.8s ease;"></div>
-                        </div>
-                    </div>`;
-                }).join('');
-
-                let tienda = data.tienda_nombre || '';
-                contenido.innerHTML = `
-                    <div style="background:#FC6E20;border-radius:16px;padding:16px 20px;margin-bottom:16px;">
-                        <div style="font-size:10px;color:white;opacity:0.8;text-transform:uppercase;margin-bottom:4px;">Tienda</div>
-                        <div style="font-size:15px;color:white;font-weight:800;margin-bottom:12px;">${tienda}</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Fecha</div><div style="font-size:13px;color:white;font-weight:700;">${data.fecha||'—'}</div></div>
-                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Hora</div><div style="font-size:13px;color:white;font-weight:700;">${data.hora||'—'}</div></div>
-                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Supervisor</div><div style="font-size:13px;color:white;font-weight:700;">${data.supervisor||'—'}</div></div>
-                            <div><div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;">Encargado</div><div style="font-size:13px;color:white;font-weight:700;">${data.encargado||'—'}</div></div>
-                        </div>
-                    </div>
-                    <div style="background:white;border-radius:20px;box-shadow:0 4px 16px rgba(0,0,0,0.08);padding:24px 20px;margin-bottom:16px;text-align:center;">
-                        <div style="font-size:16px;font-weight:900;color:#1B1B1B;letter-spacing:1px;margin-bottom:20px;">RESULTADOS DE CHECKLIST</div>
-                        <div style="background:#1B1B1B;border-radius:20px;padding:8px;width:52px;height:110px;margin:0 auto 16px;box-shadow:0 8px 24px rgba(0,0,0,0.4);display:flex;flex-direction:column;justify-content:space-around;align-items:center;">
-                            <div style="width:28px;height:28px;border-radius:50%;${semR};"></div>
-                            <div style="width:28px;height:28px;border-radius:50%;${semA};"></div>
-                            <div style="width:28px;height:28px;border-radius:50%;${semV};"></div>
-                        </div>
-                        <div style="font-size:52px;font-weight:800;color:${mainColor};">${score.toFixed(1)}%</div>
-                        <span style="background:${mainColor};color:white;font-weight:700;border-radius:50px;padding:8px 28px;font-size:15px;display:inline-block;margin-top:12px;">${clasificacion}</span>
-                    </div>
-                    <div style="margin-bottom:16px;">
-                        <div style="font-size:13px;font-weight:700;color:#1B1B1B;letter-spacing:1px;margin-bottom:12px;">RESULTADOS POR GRUPO</div>
-                        ${grpHtml}
-                    </div>
-                    <div style="background:#FFF8F3;border:1px solid rgba(252,110,32,0.2);border-radius:16px;padding:16px;text-align:center;">
-                        <div style="font-size:11px;color:#aaa;">Auditoría generada con</div>
-                        <div style="font-size:14px;font-weight:800;color:#FC6E20;">Auditorías Listo! 🍊</div>
-                    </div>
-                `;
-            } catch(e) {
-                contenido.innerHTML = '<div style="text-align:center;padding:60px 20px;"><div style="font-size:40px;margin-bottom:12px;">🔍</div><div style="font-size:16px;font-weight:700;color:#1B1B1B;">Auditoría no encontrada</div><div style="font-size:13px;color:#aaa;margin-top:8px;">El enlace puede haber expirado o ser incorrecto.</div></div>';
-            }
-        }
-
         function compartirEnlaceAuditoria() {
             let data = window.auditoriaActualData || window.auditActual;
             if (!data || !data.id) { showToast("No hay auditoría activa", "error"); return; }
@@ -7027,14 +6958,23 @@
                 let { data, error } = await sbClient.from('auditorias').select('*').eq('id', id).single();
                 if (error || !data) throw new Error('No encontrada');
 
+                // Fotos
+                let { data: fotosData } = await sbClient.from('fotos_auditoria').select('*').eq('auditoria_id', id);
+                let fotosMap = {};
+                (fotosData || []).forEach(f => {
+                    if (!fotosMap[f.pregunta_id]) fotosMap[f.pregunta_id] = [];
+                    fotosMap[f.pregunta_id].push(f.storage_url);
+                });
+
                 const titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS HERRAMIENTAS Y UTENSILIOS", 4: "CONTROL Y MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
                 let score = data.nota_final || 0;
                 let mainColor = score <= 70 ? "#FF3B30" : score <= 90 ? "#FFCC00" : "#34C759";
-                let clasificacion = score <= 70 ? "Alto Riesgo" : score <= 90 ? "Observado" : "Aprobado";
+                let clasificacion = data.clasificacion || (score <= 70 ? "ALTO RIESGO" : score <= 90 ? "SE REQUIERE MEJORAR" : "SOBRESALIENTE");
                 let semR = score <= 70 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#3a0000';
                 let semA = score > 70 && score <= 90 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#3a2e00';
                 let semV = score > 90 ? `background:${mainColor};box-shadow:0 0 20px ${mainColor}` : 'background:#003a00';
 
+                // Grupos
                 let grupos = data.resultado_grupos || {};
                 let grpHtml = Object.keys(titulosGrupo).map(i => {
                     let v = grupos[i] || 0;
@@ -7045,10 +6985,43 @@
                             <span style="font-size:14px;font-weight:700;color:${c};">${v.toFixed(1)}%</span>
                         </div>
                         <div style="background:#F0F0F0;border-radius:50px;height:10px;overflow:hidden;">
-                            <div style="width:${v}%;background:${c};height:100%;border-radius:50px;transition:width 0.8s ease;"></div>
+                            <div style="width:${v}%;background:${c};height:100%;border-radius:50px;"></div>
                         </div>
                     </div>`;
                 }).join('');
+
+                // Preguntas con respuestas, observaciones y fotos
+                let respuestas = data.respuestas || {};
+                let preguntasHtml = '';
+                let preguntasPorGrupo = {};
+                window.PREGUNTAS.forEach(p => {
+                    if (!preguntasPorGrupo[p.grupo]) preguntasPorGrupo[p.grupo] = [];
+                    preguntasPorGrupo[p.grupo].push(p);
+                });
+
+                Object.keys(titulosGrupo).forEach(g => {
+                    let pregs = preguntasPorGrupo[g] || [];
+                    if (!pregs.length) return;
+                    preguntasHtml += `<div style="font-size:12px;font-weight:800;color:#FC6E20;letter-spacing:1px;margin:20px 0 10px;">${titulosGrupo[g]}</div>`;
+                    pregs.forEach(p => {
+                        let r = respuestas[p.id] || {};
+                        let val = r.valor || 'NA';
+                        let obs = r.obs || '';
+                        let fotos = fotosMap[p.id] || r.fotos || [];
+                        let valColor = val === 'SI' ? '#34C759' : val === 'NO' ? '#FF3B30' : '#aaa';
+                        let valLabel = val === 'SI' ? '✓ SÍ' : val === 'NO' ? '✗ NO' : 'N/A';
+                        let fotosHtml = fotos.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;">${fotos.map(url => `<img src="${url}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:1px solid #EEE;">`).join('')}</div>` : '';
+                        let obsHtml = obs ? `<div style="margin-top:8px;background:#F5F5F5;border-radius:10px;padding:8px 12px;font-size:12px;color:#555;">${obs}</div>` : '';
+                        preguntasHtml += `
+                        <div style="background:white;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);padding:14px;margin-bottom:8px;">
+                            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+                                <div style="font-size:12px;color:#1B1B1B;flex:1;line-height:1.4;">${p.texto}</div>
+                                <span style="background:${valColor};color:white;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;flex-shrink:0;">${valLabel}</span>
+                            </div>
+                            ${obsHtml}${fotosHtml}
+                        </div>`;
+                    });
+                });
 
                 let tienda = data.tienda_nombre || '';
                 contenido.innerHTML = `
@@ -7075,6 +7048,10 @@
                     <div style="margin-bottom:16px;">
                         <div style="font-size:13px;font-weight:700;color:#1B1B1B;letter-spacing:1px;margin-bottom:12px;">RESULTADOS POR GRUPO</div>
                         ${grpHtml}
+                    </div>
+                    <div style="margin-bottom:16px;">
+                        <div style="font-size:13px;font-weight:700;color:#1B1B1B;letter-spacing:1px;margin-bottom:12px;">DETALLE DE RESPUESTAS</div>
+                        ${preguntasHtml}
                     </div>
                     <div style="background:#FFF8F3;border:1px solid rgba(252,110,32,0.2);border-radius:16px;padding:16px;text-align:center;">
                         <div style="font-size:11px;color:#aaa;">Auditoría generada con</div>
