@@ -5780,20 +5780,7 @@
 
                 let fotosHtml = "";
                 if (r.fotos && r.fotos.length > 0) {
-                    const pid = p.id;
-                    if (r.fotos.length === 1) {
-                        fotosHtml = `<img src="${r.fotos[0]}" style="width:70%; display:block; margin:10px auto 0; border-radius:12px; object-fit:cover; box-shadow:0 4px 12px rgba(0,0,0,0.15);">`;
-                    } else {
-                        const slides = r.fotos.map((f, i) => `<div class="carousel-slide" style="display:${i===0?'block':'none'};"><img src="${f}" style="width:70%; display:block; margin:0 auto; border-radius:12px; object-fit:cover; box-shadow:0 4px 12px rgba(0,0,0,0.15);"></div>`).join("");
-                        fotosHtml = `<div class="foto-carousel" id="carousel-${pid}" style="margin-top:10px; position:relative; text-align:center;">
-                            ${slides}
-                            <div style="display:flex; justify-content:center; align-items:center; gap:16px; margin-top:8px;">
-                                <button onclick="carouselNav('${pid}',-1)" style="background:#FC6E20;color:white;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;font-weight:700;">‹</button>
-                                <span id="carousel-counter-${pid}" style="font-size:12px;color:#888;">1 / ${r.fotos.length}</span>
-                                <button onclick="carouselNav('${pid}',1)" style="background:#FC6E20;color:white;border:none;border-radius:50%;width:28px;height:28px;font-size:14px;cursor:pointer;font-weight:700;">›</button>
-                            </div>
-                        </div>`;
-                    }
+                    fotosHtml = `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${r.fotos.map((f, fi) => `<img src="${f}" onclick="abrirLightbox(${JSON.stringify(r.fotos)},${fi})" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #EEE;cursor:pointer;">`).join('')}</div>`;
                 }
 
                 detHtml += `
@@ -7059,7 +7046,9 @@
                         let fotos = fotosMap[p.id] || r.fotos || [];
                         let valColor = val === 'SI' ? '#34C759' : val === 'NO' ? '#FF3B30' : '#aaa';
                         let valLabel = val === 'SI' ? '✓ SÍ' : val === 'NO' ? '✗ NO' : 'N/A';
-                        let fotosHtml = fotos.length ? `<div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;">${fotos.map((url, fi) => `<img src="${url}" onclick="abrirLightbox(${JSON.stringify(fotos)},${fi})" style="width:100px;height:100px;object-fit:cover;border-radius:12px;border:1px solid #EEE;cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">`).join('')}</div>` : '';
+                        let lbKey = `lb_${p.id}`;
+                        window[lbKey] = fotos;
+                        let fotosHtml = fotos.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${fotos.map((url, fi) => `<img src="${url}" onclick="abrirLightbox(window['${lbKey}'],${fi})" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #EEE;cursor:pointer;">`).join('')}</div>` : '';
                         let obsHtml = obs ? `<div style="margin-top:8px;background:#F5F5F5;border-radius:10px;padding:8px 12px;font-size:12px;color:#555;">${obs}</div>` : '';
                         preguntasHtml += `
                         <div style="background:white;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);padding:14px;margin-bottom:8px;">
