@@ -5055,7 +5055,10 @@
 
             const mapsQ = encodeURIComponent(tienda.direccion + ', Lima, Peru');
             const mapsEmbed = `https://maps.google.com/maps?q=${mapsQ}&output=embed&z=16`;
-            document.getElementById('aud-det-map').onclick = () => window.open(`https://maps.google.com/?q=${mapsQ}`, '_blank');
+            const btnMap = document.getElementById('aud-det-map');
+            btnMap.onclick = null;
+            btnMap.setAttribute('data-href', `https://maps.google.com/?q=${mapsQ}`);
+            btnMap.onclick = function() { window.location.href = this.getAttribute('data-href'); };
 
             prep.innerHTML = `
                 <div class="prep-card" style="padding:0;overflow:hidden;">
