@@ -668,7 +668,12 @@
                 border-left: none;
             }
 
-            #view-home .action-icon {
+            #view-home .action-card .action-label { color: white !important; }
+        .action-card .action-desc { color: rgba(255,255,255,0.75) !important; }
+        .action-card .action-icon { background: rgba(255,255,255,0.2) !important; color: white !important; }
+        .action-card .action-icon svg { stroke: white !important; }
+
+        .action-icon {
                 width: 40px;
                 height: 40px;
                 font-size: 18px;
@@ -900,7 +905,12 @@
                 background: white;
             }
 
-            .action-icon {
+            .action-card .action-label { color: white !important; }
+        .action-card .action-desc { color: rgba(255,255,255,0.75) !important; }
+        .action-card .action-icon { background: rgba(255,255,255,0.2) !important; color: white !important; }
+        .action-card .action-icon svg { stroke: white !important; }
+
+        .action-icon {
                 width: 38px;
                 height: 38px;
                 font-size: 16px;
@@ -1054,7 +1064,6 @@
         }
 
         .action-card {
-            background: white;
             border-radius: 20px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             padding: 20px;
@@ -1066,14 +1075,26 @@
             cursor: pointer;
             transition: all 0.2s ease;
             position: relative;
-            border-left: 3px solid transparent;
+            border: none;
         }
 
         .action-card:hover {
-            transform: scale(1.03);
-            border-left: 3px solid var(--naranja);
-            box-shadow: 0 4px 16px rgba(252, 110, 32, 0.2);
+            transform: scale(1.04);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            filter: brightness(1.05);
         }
+
+        .action-card:nth-child(1) { background: linear-gradient(135deg, #7B2D00, #B84A1A); }
+        .action-card:nth-child(2) { background: linear-gradient(135deg, #1E3A4A, #2E6B8A); }
+        .action-card:nth-child(3) { background: linear-gradient(135deg, #4A5240, #7A8A6A); }
+        .action-card:nth-child(4) { background: linear-gradient(135deg, #6B2737, #A0435A); }
+        .action-card:nth-child(5) { background: linear-gradient(135deg, #78350F, #C4732A); }
+        .action-card:nth-child(6) { background: linear-gradient(135deg, #1A3A2A, #2E6B4A); }
+
+        .action-card .action-label { color: white !important; }
+        .action-card .action-desc { color: rgba(255,255,255,0.75) !important; }
+        .action-card .action-icon { background: rgba(255,255,255,0.2) !important; color: white !important; }
+        .action-card .action-icon svg { stroke: white !important; }
 
         .action-icon {
             width: 44px;
