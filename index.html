@@ -5653,8 +5653,13 @@
         }
 
         function deleteFoto(pId, i) {
-            window.auditActual.respuestas[pId].fotos.splice(i, 1);
-            renderFotosGrid(pId);
+            document.getElementById("mc-desc").innerText = "¿Eliminar esta foto? Esta acción no se puede deshacer.";
+            document.getElementById("mc-btn").onclick = function() {
+                window.auditActual.respuestas[pId].fotos.splice(i, 1);
+                closeModal('modal-confirm');
+                renderFotosGrid(pId);
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         // Canvas Signature
@@ -7802,8 +7807,9 @@
                 let fotosHtml = fotos.map((f, fi) => `
                     <div style="position:relative;display:inline-block;margin-right:6px;">
                         <img src="${f}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid #EEE;">
-                        <button onclick="editAudDeleteFoto(${p.id},${fi})" style="position:absolute;top:-6px;right:-6px;background:#C62828;color:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;line-height:18px;text-align:center;">✕</button>
+                        <button onclick="editAudConfirmDeleteFoto(${p.id},${fi})" style="position:absolute;top:-6px;right:-6px;background:#C62828;color:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;line-height:18px;text-align:center;">✕</button>
                     </div>`).join('');
+                fotosHtml += `<label style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:8px;border:2px dashed #FC6E20;cursor:pointer;color:#FC6E20;font-size:22px;vertical-align:top;">+<input type="file" accept="image/*" style="display:none;" onchange="editAudAddFoto(${p.id}, this)"></label>`;
                 resHtml += `
                 <div style="background:white;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 1px 6px rgba(0,0,0,0.05);">
                     <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:#1B1B1B;">${p.id}. ${p.texto}</div>
@@ -7834,16 +7840,44 @@
             if (btnNA) { btnNA.style.borderColor = val==='N/A'?'#888':'#EEE'; btnNA.style.background = val==='N/A'?'#EEE':'white'; }
         }
 
-        function editAudDeleteFoto(pid, fi) {
-            if (!window.editorAuditoriaActual.respuestas[pid]) return;
-            window.editorAuditoriaActual.respuestas[pid].fotos.splice(fi, 1);
-            let fotos = window.editorAuditoriaActual.respuestas[pid].fotos || [];
+        function editAudRenderFotos(pid) {
+            let fotos = window.editorAuditoriaActual.respuestas[pid]?.fotos || [];
             let el = document.getElementById(`ea-fotos-${pid}`);
-            if (el) el.innerHTML = fotos.map((f, fi2) => `
+            if (!el) return;
+            el.innerHTML = fotos.map((f, fi2) => `
                 <div style="position:relative;display:inline-block;margin-right:6px;">
                     <img src="${f}" style="width:72px;height:72px;object-fit:cover;border-radius:8px;border:1px solid #EEE;">
-                    <button onclick="editAudDeleteFoto(${pid},${fi2})" style="position:absolute;top:-6px;right:-6px;background:#C62828;color:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;line-height:18px;text-align:center;">✕</button>
-                </div>`).join('');
+                    <button onclick="editAudConfirmDeleteFoto(${pid},${fi2})" style="position:absolute;top:-6px;right:-6px;background:#C62828;color:white;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;line-height:18px;text-align:center;">✕</button>
+                </div>`).join('') +
+                `<label style="display:inline-flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:8px;border:2px dashed #FC6E20;cursor:pointer;color:#FC6E20;font-size:22px;vertical-align:top;">+<input type="file" accept="image/*" style="display:none;" onchange="editAudAddFoto(${pid}, this)"></label>`;
+        }
+
+        function editAudConfirmDeleteFoto(pid, fi) {
+            document.getElementById("mc-desc").innerText = "¿Eliminar esta foto? Esta acción no se puede deshacer.";
+            document.getElementById("mc-btn").onclick = function() {
+                if (!window.editorAuditoriaActual.respuestas[pid]) return;
+                window.editorAuditoriaActual.respuestas[pid].fotos.splice(fi, 1);
+                closeModal('modal-confirm');
+                editAudRenderFotos(pid);
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
+        }
+
+        function editAudDeleteFoto(pid, fi) {
+            editAudConfirmDeleteFoto(pid, fi);
+        }
+
+        function editAudAddFoto(pid, input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                if (!window.editorAuditoriaActual.respuestas[pid]) window.editorAuditoriaActual.respuestas[pid] = { valor: null, obs: '', fotos: [] };
+                if (!window.editorAuditoriaActual.respuestas[pid].fotos) window.editorAuditoriaActual.respuestas[pid].fotos = [];
+                window.editorAuditoriaActual.respuestas[pid].fotos.push(e.target.result);
+                editAudRenderFotos(pid);
+            };
+            reader.readAsDataURL(file);
         }
 
         function guardarEdicionAuditoria() {
