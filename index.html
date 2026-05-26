@@ -4690,9 +4690,16 @@
         }
 
         // Login Logic
-        function handleLogin() {
+        async function handleLogin() {
             const email = document.getElementById("login-email").value.trim();
             const err = document.getElementById("login-error");
+
+            try {
+                const { data, error } = await sbClient.from('usuarios').select('*');
+                if (!error && data && data.length > 0) {
+                    localStorage.setItem("usuarios", JSON.stringify(data));
+                }
+            } catch(e) { /* usa localStorage si falla */ }
 
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
             let found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -6555,9 +6562,29 @@
             else renderHistorialVisitas();
         }
 
-        function renderHistorialAuditorias() {
+        async function renderHistorialAuditorias() {
             const contenedor = document.getElementById('lista-historial-auditorias');
             if (!contenedor) return;
+
+            try {
+                const { data, error } = await sbClient.from('auditorias').select('*').order('id', { ascending: false });
+                if (!error && data && data.length > 0) {
+                    const mapped = data.map(r => ({
+                        id: r.id,
+                        tienda: { nombre: r.tienda_nombre, distrito: r.tienda_distrito, direccion: r.tienda_direccion },
+                        supervisor: r.supervisor,
+                        encargado: r.encargado,
+                        fecha: r.fecha,
+                        hora: r.hora,
+                        respuestas: r.respuestas,
+                        resultadoGrupos: r.resultado_grupos,
+                        notaFinal: r.nota_final,
+                        clasificacion: r.clasificacion,
+                        firma_url: r.firma_url
+                    }));
+                    localStorage.setItem('auditorias', JSON.stringify(mapped));
+                }
+            } catch(e) { /* usa localStorage si falla */ }
 
             let auditorias = JSON.parse(localStorage.getItem('auditorias') || '[]');
             let borradores = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
@@ -6600,21 +6627,84 @@
                 return;
             }
 
-            contenedor.innerHTML = borradoresHtml + auditorias.map(a => {
+            window._selModeAud = window._selModeAud || false;
+            window._selAud = window._selAud || new Set();
+
+            const enterSelModeAud = () => {
+                window._selModeAud = true;
+                renderHistorialAuditorias();
+            };
+
+            const toggleSelAud = (id) => {
+                if (window._selAud.has(id)) window._selAud.delete(id);
+                else window._selAud.add(id);
+                renderHistorialAuditorias();
+            };
+
+            const barraAud = window._selModeAud ? `
+                <div style="position:sticky;top:0;z-index:99;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+                    <button onclick="window._selAud.size==auditorias_sel_count?window._selAud.clear():auditorias_sel_ids.forEach(id=>window._selAud.add(id));renderHistorialAuditorias();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
+                    <span style="font-size:13px;color:#888;">${window._selAud.size} seleccionados</span>
+                    <div style="display:flex;gap:8px;">
+                        <button onclick="window._selModeAud=false;window._selAud=new Set();renderHistorialAuditorias();" style="background:#F5F5F5;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Cancelar</button>
+                        <button onclick="eliminarSeleccionAud()" style="background:#FF3B30;border:none;color:white;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">🗑 Eliminar</button>
+                    </div>
+                </div>` : '';
+
+            const auditorias_sel_ids = auditorias.map(a => a.id);
+            const auditorias_sel_count = auditorias_sel_ids.length;
+
+            contenedor.innerHTML = barraAud + borradoresHtml + auditorias.map(a => {
                 const pct = a.notaFinal || 0;
                 const colorPast = pct <= 70 ? '#FF3B30' : pct <= 90 ? '#FFCC00' : '#34C759';
                 const textColor = pct <= 90 && pct > 70 ? '#1B1B1B' : '#fff';
+                const seleccionado = window._selAud.has(a.id);
                 return `
-              <div class="historial-item" onclick="verDetalleAuditoria(${a.id})" style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;">
-                <div style="font-size:12px;color:#FC6E20;font-weight:600;">${a.supervisor || ''}</div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-                  <div style="font-size:15px;font-weight:800;color:#1B1B1B;">${a.tienda?.nombre || a.tienda || ''}</div>
-                  <span style="background:${colorPast};color:${textColor};border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">${pct.toFixed(0)}%</span>
+              <div class="historial-item"
+                id="aud-item-${a.id}"
+                onclick="window._selModeAud ? (()=>{if(window._selAud.has(${a.id}))window._selAud.delete(${a.id});else window._selAud.add(${a.id});renderHistorialAuditorias();})() : verDetalleAuditoria(${a.id})"
+                onmousedown="window._lpAud=setTimeout(()=>{window._selModeAud=true;window._selAud.add(${a.id});renderHistorialAuditorias();},700)"
+                ontouchstart="window._lpAud=setTimeout(()=>{window._selModeAud=true;window._selAud.add(${a.id});renderHistorialAuditorias();},700)"
+                onmouseup="clearTimeout(window._lpAud)" onmouseleave="clearTimeout(window._lpAud)"
+                ontouchend="clearTimeout(window._lpAud)" ontouchcancel="clearTimeout(window._lpAud)"
+                style="background:${seleccionado?'#FFF0E6':'white'};border:2px solid ${seleccionado?'#FC6E20':'transparent'};border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.15s;">
+                ${window._selModeAud ? `<div style="width:22px;height:22px;border-radius:50%;border:2px solid ${seleccionado?'#FC6E20':'#ccc'};background:${seleccionado?'#FC6E20':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${seleccionado?'<span style="color:white;font-size:13px;">✓</span>':''}</div>` : ''}
+                <div style="flex:1;">
+                  <div style="font-size:12px;color:#FC6E20;font-weight:600;">${a.supervisor || ''}</div>
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                    <div style="font-size:15px;font-weight:800;color:#1B1B1B;">${a.tienda?.nombre || a.tienda || ''}</div>
+                    <span style="background:${colorPast};color:${textColor};border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">${pct.toFixed(0)}%</span>
+                  </div>
+                  <div style="font-size:12px;color:#888;margin-top:4px;">${a.fecha || ''}, ${a.hora || ''}</div>
                 </div>
-                <div style="font-size:12px;color:#888;margin-top:4px;">${a.fecha || ''}, ${a.hora || ''}</div>
-              </div>
-            `;
+              </div>`;
             }).join('');
+        }
+
+        async function eliminarSeleccionAud() {
+            if (window._selAud.size === 0) return;
+            const n = window._selAud.size;
+            document.getElementById("mc-desc").innerText = `¿Mover ${n} auditoría${n>1?'s':''} a la papelera? Esta acción se puede deshacer desde Ajustes.`;
+            document.getElementById("mc-btn").onclick = async function() {
+                let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
+                let papelera = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
+                const user = window.currentUser?.nombre || '';
+                window._selAud.forEach(id => {
+                    const idx = auds.findIndex(a => a.id === id);
+                    if (idx !== -1) {
+                        papelera.push({ ...auds[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: user });
+                        auds.splice(idx, 1);
+                    }
+                });
+                localStorage.setItem("auditorias", JSON.stringify(auds));
+                localStorage.setItem("papelera_auditorias", JSON.stringify(papelera));
+                window._selModeAud = false;
+                window._selAud = new Set();
+                closeModal('modal-confirm');
+                renderHistorialAuditorias();
+                showToast(`${n} registro${n>1?'s':''} enviado${n>1?'s':''} a papelera`, 'success');
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         function continuarBorradorDesdeHistorial(borradorId) {
@@ -6750,9 +6840,23 @@
             renderHistorialVisitas();
         }
 
-        function renderHistorialVisitas() {
+        async function renderHistorialVisitas() {
             const contenedor = document.getElementById('lista-historial-visitas');
             if (!contenedor) return;
+
+            try {
+                const { data, error } = await sbClient.from('visitas').select('*').order('id', { ascending: false });
+                if (!error && data && data.length > 0) {
+                    const mapped = data.map(r => ({
+                        id: r.id,
+                        tienda: r.tienda,
+                        datetime: r.datetime,
+                        supervisor: r.supervisor,
+                        comentario: r.comentario
+                    }));
+                    localStorage.setItem('visitas', JSON.stringify(mapped));
+                }
+            } catch(e) { /* usa localStorage si falla */ }
 
             let visitas = JSON.parse(localStorage.getItem('visitas') || '[]');
             const search = (document.getElementById('hist-vis-search')?.value || '').toLowerCase();
@@ -6793,25 +6897,77 @@
                 return;
             }
 
-            contenedor.innerHTML = visitas.map(v => {
+            window._selModeVis = window._selModeVis || false;
+            window._selVis = window._selVis || new Set();
+
+            const visitas_sel_ids = visitas.map(v => v.id);
+            const visitas_sel_count = visitas_sel_ids.length;
+
+            const barraVis = window._selModeVis ? `
+                <div style="position:sticky;top:0;z-index:99;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+                    <button onclick="window._selVis.size==visitas_sel_count?window._selVis.clear():visitas_sel_ids.forEach(id=>window._selVis.add(id));renderHistorialVisitas();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
+                    <span style="font-size:13px;color:#888;">${window._selVis.size} seleccionados</span>
+                    <div style="display:flex;gap:8px;">
+                        <button onclick="window._selModeVis=false;window._selVis=new Set();renderHistorialVisitas();" style="background:#F5F5F5;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Cancelar</button>
+                        <button onclick="eliminarSeleccionVis()" style="background:#FF3B30;border:none;color:white;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">🗑 Eliminar</button>
+                    </div>
+                </div>` : '';
+
+            contenedor.innerHTML = barraVis + visitas.map(v => {
                 let tiendaNombre = v.tienda?.nombre || v.tienda || '';
                 let raw = v.datetime || v.fechaHora || v.fecha || '';
                 let d = raw ? new Date(raw) : null;
                 let fechaStr = (d && !isNaN(d.getTime())) ? d.toLocaleDateString('es-PE', {day:'numeric', month:'short', year:'numeric'}) : '—';
                 let horaStr = (d && !isNaN(d.getTime())) ? d.toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit', hour12:true}) : '';
                 let tieneComentario = v.comentario && v.comentario.trim().length > 0;
+                const seleccionado = window._selVis.has(v.id);
                 return `
-                <div onclick="verDetalleVisita(${v.id})" style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;">
-                    <div style="font-size:12px;color:#FC6E20;font-weight:600;">${v.supervisor || ''}</div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-                        <div style="font-size:15px;font-weight:800;color:#1B1B1B;">${tiendaNombre}</div>
-                        <span style="background:${tieneComentario?'#E8F5E9':'#F5F5F5'};color:${tieneComentario?'#43A047':'#999'};border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">
-                            ${tieneComentario ? '💬 Con nota' : '📋 Sin nota'}
-                        </span>
+                <div
+                    onclick="window._selModeVis ? (()=>{if(window._selVis.has(${v.id}))window._selVis.delete(${v.id});else window._selVis.add(${v.id});renderHistorialVisitas();})() : verDetalleVisita(${v.id})"
+                    onmousedown="window._lpVis=setTimeout(()=>{window._selModeVis=true;window._selVis.add(${v.id});renderHistorialVisitas();},700)"
+                    ontouchstart="window._lpVis=setTimeout(()=>{window._selModeVis=true;window._selVis.add(${v.id});renderHistorialVisitas();},700)"
+                    onmouseup="clearTimeout(window._lpVis)" onmouseleave="clearTimeout(window._lpVis)"
+                    ontouchend="clearTimeout(window._lpVis)" ontouchcancel="clearTimeout(window._lpVis)"
+                    style="background:${seleccionado?'#FFF0E6':'white'};border:2px solid ${seleccionado?'#FC6E20':'transparent'};border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.15s;">
+                    ${window._selModeVis ? `<div style="width:22px;height:22px;border-radius:50%;border:2px solid ${seleccionado?'#FC6E20':'#ccc'};background:${seleccionado?'#FC6E20':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${seleccionado?'<span style="color:white;font-size:13px;">✓</span>':''}</div>` : ''}
+                    <div style="flex:1;">
+                        <div style="font-size:12px;color:#FC6E20;font-weight:600;">${v.supervisor || ''}</div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                            <div style="font-size:15px;font-weight:800;color:#1B1B1B;">${tiendaNombre}</div>
+                            <span style="background:${tieneComentario?'#E8F5E9':'#F5F5F5'};color:${tieneComentario?'#43A047':'#999'};border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">
+                                ${tieneComentario ? '💬 Con nota' : '📋 Sin nota'}
+                            </span>
+                        </div>
+                        <div style="font-size:12px;color:#888;margin-top:4px;">${fechaStr}${horaStr ? ', ' + horaStr : ''}</div>
                     </div>
-                    <div style="font-size:12px;color:#888;margin-top:4px;">${fechaStr}${horaStr ? ', ' + horaStr : ''}</div>
                 </div>`;
             }).join('');
+        }
+
+        async function eliminarSeleccionVis() {
+            if (window._selVis.size === 0) return;
+            const n = window._selVis.size;
+            document.getElementById("mc-desc").innerText = `¿Mover ${n} visita${n>1?'s':''} a la papelera? Esta acción se puede deshacer desde Ajustes.`;
+            document.getElementById("mc-btn").onclick = async function() {
+                let viss = JSON.parse(localStorage.getItem("visitas") || "[]");
+                let papelera = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
+                const user = window.currentUser?.nombre || '';
+                window._selVis.forEach(id => {
+                    const idx = viss.findIndex(v => v.id === id);
+                    if (idx !== -1) {
+                        papelera.push({ ...viss[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: user });
+                        viss.splice(idx, 1);
+                    }
+                });
+                localStorage.setItem("visitas", JSON.stringify(viss));
+                localStorage.setItem("papelera_visitas", JSON.stringify(papelera));
+                window._selModeVis = false;
+                window._selVis = new Set();
+                closeModal('modal-confirm');
+                renderHistorialVisitas();
+                showToast(`${n} registro${n>1?'s':''} enviado${n>1?'s':''} a papelera`, 'success');
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         function verDetalleVisita(id) {
@@ -6878,10 +7034,12 @@
             document.getElementById("modal-confirm").style.display = "flex";
         }
 
-        function deleteUserFinal(idx) {
+        async function deleteUserFinal(idx) {
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+            const email = users[idx]?.email;
             users.splice(idx, 1);
             localStorage.setItem("usuarios", JSON.stringify(users));
+            if (email) await sbClient.from('usuarios').delete().eq('email', email);
             closeModal('modal-confirm');
             renderUsuarios();
         }
@@ -6901,7 +7059,7 @@
             document.getElementById(id).style.display = "none";
         }
 
-        function saveUser() {
+        async function saveUser() {
             let n = document.getElementById("add-user-name").value.trim();
             let e = document.getElementById("add-user-email").value.trim();
             let c = document.getElementById("add-user-cargo").value.trim();
@@ -6913,9 +7071,11 @@
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
             if (idx >= 0) {
                 users[idx] = { nombre: n, email: e, cargo: c, telefono: t };
+                await sbClient.from('usuarios').update({ nombre: n, cargo: c, telefono: t }).eq('email', e);
                 showToast("Usuario actualizado", "success");
             } else {
                 users.push({ nombre: n, email: e, cargo: c, telefono: t });
+                await sbClient.from('usuarios').insert({ nombre: n, email: e, cargo: c, telefono: t });
                 showToast("Usuario añadido", "success");
             }
 
