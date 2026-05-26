@@ -3196,9 +3196,11 @@
                     </svg>
                 </button>
             </div>
-            <select id="select-dist-view-auditoria-tiendas" onchange="selectDistrict('view-auditoria-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;margin-bottom:12px;">
-                <option value="">Todos los distritos</option>
-            </select>
+            <div id="dropdown-dist-view-auditoria-tiendas" style="display:none;background:white;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:8px;margin-bottom:12px;">
+                <select id="select-dist-view-auditoria-tiendas" onchange="selectDistrict('view-auditoria-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                    <option value="">Todos los distritos</option>
+                </select>
+            </div>
             <div id="list-auditoria-tiendas"></div>
         </div>
     </div>
@@ -3228,9 +3230,11 @@
                     </svg>
                 </button>
             </div>
-            <select id="select-dist-view-visita-tiendas" onchange="selectDistrict('view-visita-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;margin-bottom:12px;">
-                <option value="">Todos los distritos</option>
-            </select>
+            <div id="dropdown-dist-view-visita-tiendas" style="display:none;background:white;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:8px;margin-bottom:12px;">
+                <select id="select-dist-view-visita-tiendas" onchange="selectDistrict('view-visita-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                    <option value="">Todos los distritos</option>
+                </select>
+            </div>
             <div id="list-visita-tiendas"></div>
         </div>
     </div>
@@ -3260,9 +3264,11 @@
                     </svg>
                 </button>
             </div>
-            <select id="select-dist-view-tiendas" onchange="selectDistrict('view-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;margin-bottom:12px;">
-                <option value="">Todos los distritos</option>
-            </select>
+            <div id="dropdown-dist-view-tiendas" style="display:none;background:white;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:8px;margin-bottom:12px;">
+                <select id="select-dist-view-tiendas" onchange="selectDistrict('view-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                    <option value="">Todos los distritos</option>
+                </select>
+            </div>
             <div id="list-tiendas"></div>
         </div>
     </div>
@@ -4872,7 +4878,11 @@
         }
 
         function toggleFilterDropdown(viewId, event) {
-            // Ya no se usa, los selects se manejan directamente
+            if (event) event.stopPropagation();
+            let dropdown = document.getElementById('dropdown-dist-' + viewId);
+            if (!dropdown) return;
+            let visible = dropdown.style.display !== 'none';
+            dropdown.style.display = visible ? 'none' : 'block';
         }
 
         function selectDistrict(viewId, district) {
