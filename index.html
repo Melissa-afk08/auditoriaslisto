@@ -4657,7 +4657,11 @@
 
             // Default Supervisors
             if (!localStorage.getItem("supervisores")) {
-                const sups = ["Kleiddy Cotrina", "Miriam Berna", "Luz Mery Melchor", "Shirley Valenzuela", "Lorena Sanchez"];
+                const sups = ["Kleiddy Cotrina", "Miriam Berna", "Luz Mery Melchor", "Shirley Valenzuela"];
+                localStorage.setItem("supervisores", JSON.stringify(sups));
+            } else {
+                let sups = JSON.parse(localStorage.getItem("supervisores") || "[]");
+                sups = sups.filter(s => !s.toLowerCase().includes("lorena"));
                 localStorage.setItem("supervisores", JSON.stringify(sups));
             }
 
@@ -4778,14 +4782,17 @@
         }
 
         function confirmDeleteUserAdmin(i, name) {
-            if (confirm(`¿Eliminar a ${name}? Sus auditorías y visitas anteriores se conservarán.`)) {
+            document.getElementById("mc-desc").innerText = `¿Eliminar a ${name}? Sus auditorías y visitas anteriores se conservarán.`;
+            document.getElementById("mc-btn").onclick = function() {
                 let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
                 users.splice(i, 1);
                 localStorage.setItem("usuarios", JSON.stringify(users));
+                closeModal('modal-confirm');
                 renderEditorUsuarios();
                 renderUsuarios();
                 showToast("Usuario eliminado", "success");
-            }
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         function openModalNuevoUsuario() {
@@ -5156,7 +5163,7 @@
             document.getElementById('td-det-nombre').textContent = tienda.nombre;
             document.getElementById('td-det-distrito').textContent = tienda.distrito;
             document.getElementById('td-det-direccion').textContent = tienda.direccion;
-            document.getElementById('td-det-map').onclick = () => window.open(`https://maps.google.com/?q=${encodeURIComponent(tienda.direccion)}`, '_blank');
+            document.getElementById('td-det-map').onclick = function() { window.location.href = `https://maps.google.com/?q=${encodeURIComponent(tienda.direccion + ', Lima, Peru')}`; };
 
             // Mapa embed (solo desktop)
             let mapaWrapper = document.getElementById('td-mapa-wrapper');
@@ -7062,16 +7069,27 @@
 
         // --- USUARIOS ---
         function renderUsuarios() {
+            const avatarColors = [
+                { bg: '#1A237E', text: '#FFFFFF' }, // azul marino
+                { bg: '#1B5E20', text: '#FFFFFF' }, // verde oscuro
+                { bg: '#4A148C', text: '#FFFFFF' }, // morado
+                { bg: '#B71C1C', text: '#FFFFFF' }, // rojo oscuro
+                { bg: '#004D40', text: '#FFFFFF' }, // verde azulado
+                { bg: '#E65100', text: '#FFFFFF' }, // naranja oscuro
+                { bg: '#37474F', text: '#FFFFFF' }, // gris azulado
+                { bg: '#880E4F', text: '#FFFFFF' }, // rosa oscuro
+            ];
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
             let html = users.map((u, i) => {
                 let inis = u.nombre.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+                const color = avatarColors[i % avatarColors.length];
                 return `
           <div class="user-card" style="position:relative;">
             <button class="user-menu-btn" onclick="toggleUserMenu(${i}, event)" style="background:none; border:none; font-size:18px; color:#888; font-weight:bold; cursor:pointer; position:absolute; top:8px; right:8px;">⋮</button>
             <div id="user-menu-${i}" style="display:none; position:absolute; top:30px; right:10px; background:white; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:10; overflow:hidden; width:170px;">
                 <div style="padding:12px 16px; font-size:13px; color:#1B1B1B; cursor:pointer; text-align:left;" onclick="editUser(${i})">👤 Ver información</div>
             </div>
-            <div class="user-avatar" style="margin-top:16px;">${inis}</div>
+            <div class="user-avatar" style="margin-top:16px;background:${color.bg};color:${color.text};">${inis}</div>
             <div class="bold text-center" style="font-size:13px; line-height:1.2;">${u.nombre}</div>
             <div class="text-gris text-center mt-8" style="font-size:11px;">${u.cargo}</div>
           </div>
@@ -7249,9 +7267,18 @@
             document.getElementById("edit-g4").value = p[4];
             document.getElementById("edit-g5").value = p[5];
 
+            const gruposNombre = {1:'Customer Journey',2:'Control de Calidad',3:'Equipos y Utensilios',4:'Monitoreo de Equipos',5:'Control Documentario'};
             let html = window.PREGUNTAS.map(p => `
-        <div style="background:white; border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,0.07); padding:16px; margin-bottom:10px;">
-          <div style="display:inline-block; background:var(--naranja); color:white; padding:4px 12px; border-radius:50px; font-size:11px; font-weight:bold; margin-bottom:12px;">Q${p.id} · G${p.grupo}</div>
+        <div style="background:white; border-radius:16px; box-shadow:0 2px 10px rgba(0,0,0,0.07); padding:16px; margin-bottom:10px; position:relative;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+            <div style="display:inline-block; background:var(--naranja); color:white; padding:4px 12px; border-radius:50px; font-size:11px; font-weight:bold;">Q${p.id} · G${p.grupo}</div>
+            <div style="position:relative;">
+                <button onclick="togglePreguntaMenu(${p.id}, event)" style="background:none;border:none;font-size:18px;color:#888;font-weight:bold;cursor:pointer;padding:4px 8px;">⋮</button>
+                <div id="pmenu-${p.id}" style="display:none;position:absolute;right:0;top:28px;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:10;width:150px;">
+                    <div onclick="eliminarPregunta(${p.id})" style="padding:12px 16px;font-size:13px;color:#FF3B30;cursor:pointer;font-weight:600;">🗑 Eliminar</div>
+                </div>
+            </div>
+          </div>
           <textarea id="edit-txt-${p.id}" class="w-100" style="background:#F5F5F5; border-radius:12px; padding:10px; border:none; font-family:inherit; font-size:14px; color:#1B1B1B; resize:none; margin-bottom:12px; min-height:60px;">${p.texto}</textarea>
           <div class="flex items-center justify-between">
             <span style="font-size:12px; color:#888; font-weight:600;">Puntaje máximo</span>
@@ -7259,6 +7286,35 @@
           </div>
         </div>
       `).join("");
+
+            html += `
+        <button onclick="mostrarFormNuevaPregunta()" style="width:100%;padding:14px;border-radius:16px;border:2px dashed #FC6E20;background:white;color:#FC6E20;font-size:14px;font-weight:700;cursor:pointer;margin-top:4px;">+ Agregar pregunta</button>
+        <div id="form-nueva-pregunta" style="display:none;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:20px;margin-top:10px;">
+            <div style="font-size:14px;font-weight:800;color:#1B1B1B;margin-bottom:16px;">Nueva pregunta</div>
+            <div style="margin-bottom:12px;">
+                <div style="font-size:11px;color:#888;font-weight:600;margin-bottom:6px;">GRUPO</div>
+                <select id="np-grupo" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">
+                    <option value="1">G1 — Customer Journey</option>
+                    <option value="2">G2 — Control de Calidad</option>
+                    <option value="3">G3 — Equipos y Utensilios</option>
+                    <option value="4">G4 — Monitoreo de Equipos</option>
+                    <option value="5">G5 — Control Documentario</option>
+                </select>
+            </div>
+            <div style="margin-bottom:12px;">
+                <div style="font-size:11px;color:#888;font-weight:600;margin-bottom:6px;">PREGUNTA</div>
+                <textarea id="np-texto" placeholder="Escribe la pregunta..." style="width:100%;padding:10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;resize:none;min-height:70px;outline:none;box-sizing:border-box;"></textarea>
+            </div>
+            <div style="margin-bottom:16px;">
+                <div style="font-size:11px;color:#888;font-weight:600;margin-bottom:6px;">PUNTAJE MÁXIMO</div>
+                <input type="number" id="np-pmax" value="2" min="1" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
+            </div>
+            <div style="display:flex;gap:10px;">
+                <button onclick="document.getElementById('form-nueva-pregunta').style.display='none'" style="flex:1;padding:12px;border-radius:50px;border:1.5px solid #EEE;background:white;font-size:13px;font-weight:700;cursor:pointer;color:#888;">Cancelar</button>
+                <button onclick="guardarNuevaPregunta()" style="flex:1;padding:12px;border-radius:50px;border:none;background:#FC6E20;color:white;font-size:13px;font-weight:700;cursor:pointer;">Guardar</button>
+            </div>
+        </div>`;
+
             document.getElementById("edit-preguntas-list").innerHTML = html;
 
             showView('view-editor-checklist');
@@ -7269,6 +7325,61 @@
             document.querySelectorAll('[id^="user-menu-"]').forEach(x => x.style.display = 'none');
             document.querySelectorAll('[id^="sup-menu-"]').forEach(x => x.style.display = 'none');
         });
+
+        function togglePreguntaMenu(id, e) {
+            e.stopPropagation();
+            document.querySelectorAll('[id^="pmenu-"]').forEach(x => x.style.display = 'none');
+            let m = document.getElementById(`pmenu-${id}`);
+            if (m) m.style.display = m.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function eliminarPregunta(id) {
+            document.querySelectorAll('[id^="pmenu-"]').forEach(x => x.style.display = 'none');
+            const p = window.PREGUNTAS.find(p => p.id === id);
+            if (!p) return;
+            document.getElementById("mc-desc").innerText = `¿Eliminar la pregunta Q${id}? Los registros anteriores no se verán afectados.`;
+            document.getElementById("mc-btn").onclick = function() {
+                // Guardar estado actual antes de eliminar
+                window.PREGUNTAS.forEach(p => {
+                    const txtEl = document.getElementById(`edit-txt-${p.id}`);
+                    const pmEl = document.getElementById(`edit-pm-${p.id}`);
+                    if (txtEl) p.texto = txtEl.value;
+                    if (pmEl) p.pmax = parseInt(pmEl.value) || p.pmax;
+                });
+                window.PREGUNTAS = window.PREGUNTAS.filter(p => p.id !== id);
+                localStorage.setItem("preguntas_custom", JSON.stringify(window.PREGUNTAS));
+                closeModal('modal-confirm');
+                abrirEditorChecklist();
+                showToast("Pregunta eliminada", "success");
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
+        }
+
+        function mostrarFormNuevaPregunta() {
+            const f = document.getElementById('form-nueva-pregunta');
+            if (f) { f.style.display = 'block'; f.scrollIntoView({ behavior: 'smooth' }); }
+        }
+
+        function guardarNuevaPregunta() {
+            const grupo = parseInt(document.getElementById('np-grupo').value);
+            const texto = document.getElementById('np-texto').value.trim();
+            const pmax = parseInt(document.getElementById('np-pmax').value) || 2;
+            if (!texto) { showToast("Escribe el texto de la pregunta", "error"); return; }
+
+            // Guardar cambios pendientes en preguntas existentes
+            window.PREGUNTAS.forEach(p => {
+                const txtEl = document.getElementById(`edit-txt-${p.id}`);
+                const pmEl = document.getElementById(`edit-pm-${p.id}`);
+                if (txtEl) p.texto = txtEl.value;
+                if (pmEl) p.pmax = parseInt(pmEl.value) || p.pmax;
+            });
+
+            const maxId = window.PREGUNTAS.reduce((m, p) => Math.max(m, p.id), 0);
+            window.PREGUNTAS.push({ id: maxId + 1, grupo, texto, pmax });
+            localStorage.setItem("preguntas_custom", JSON.stringify(window.PREGUNTAS));
+            abrirEditorChecklist();
+            showToast("Pregunta agregada", "success");
+        }
 
         function saveChecklistCustom() {
             let g1 = parseFloat(document.getElementById("edit-g1").value);
@@ -7304,14 +7415,17 @@
         }
 
         function restoreChecklist() {
-            if (confirm("¿Restaurar las preguntas y pesos originales de fábrica? Se borrarán tus personalizaciones.")) {
+            document.getElementById("mc-desc").innerText = "¿Restaurar el checklist original de fábrica? Se perderán todas tus personalizaciones.";
+            document.getElementById("mc-btn").onclick = function() {
                 localStorage.removeItem("pesos_custom");
                 localStorage.removeItem("preguntas_custom");
                 window.PESOS = JSON.parse(JSON.stringify(PESOS_DEFAULT));
                 window.PREGUNTAS = JSON.parse(JSON.stringify(PREGUNTAS_DEFAULT));
+                closeModal('modal-confirm');
                 showToast("Checklist restaurado", "success");
                 showView('view-ajustes');
-            }
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         // --- SUPABASE SYNC ---
@@ -7415,9 +7529,12 @@
 
         function confirmarBorrarAuditoria(id) {
             if (!canDeleteRecords()) return;
-            if (confirm("¿Seguro que quieres eliminar esta auditoría? Se moverá a la papelera y podrás recuperarla desde Ajustes.")) {
+            document.getElementById("mc-desc").innerText = "¿Mover esta auditoría a la papelera? Podrás recuperarla desde Ajustes.";
+            document.getElementById("mc-btn").onclick = function() {
+                closeModal('modal-confirm');
                 borrarAuditoria(id);
-            }
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         function borrarAuditoria(id) {
@@ -7439,9 +7556,12 @@
 
         function confirmarBorrarVisita(id) {
             if (!canDeleteRecords()) return;
-            if (confirm("¿Seguro que quieres eliminar esta visita? Se moverá a la papelera y podrás recuperarla desde Ajustes.")) {
+            document.getElementById("mc-desc").innerText = "¿Mover esta visita a la papelera? Podrás recuperarla desde Ajustes.";
+            document.getElementById("mc-btn").onclick = function() {
+                closeModal('modal-confirm');
                 borrarVisita(id);
-            }
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         function borrarVisita(id) {
@@ -7538,12 +7658,16 @@
         }
 
         function eliminarDefinitivoAuditoria(idx) {
-            if (!confirm("¿Eliminar definitivamente? Esta acción no se puede deshacer.")) return;
-            let pap = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
-            pap.splice(idx, 1);
-            localStorage.setItem("papelera_auditorias", JSON.stringify(pap));
-            showToast("Auditoría eliminada definitivamente", "error");
-            renderPapelera();
+            document.getElementById("mc-desc").innerText = "¿Eliminar definitivamente esta auditoría? Esta acción NO se puede deshacer.";
+            document.getElementById("mc-btn").onclick = function() {
+                let pap = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
+                pap.splice(idx, 1);
+                localStorage.setItem("papelera_auditorias", JSON.stringify(pap));
+                closeModal('modal-confirm');
+                showToast("Auditoría eliminada definitivamente", "error");
+                renderPapelera();
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         function restaurarVisita(idx) {
@@ -7560,12 +7684,16 @@
         }
 
         function eliminarDefinitivoVisita(idx) {
-            if (!confirm("¿Eliminar definitivamente? Esta acción no se puede deshacer.")) return;
-            let pap = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
-            pap.splice(idx, 1);
-            localStorage.setItem("papelera_visitas", JSON.stringify(pap));
-            showToast("Visita eliminada definitivamente", "error");
-            renderPapelera();
+            document.getElementById("mc-desc").innerText = "¿Eliminar definitivamente esta visita? Esta acción NO se puede deshacer.";
+            document.getElementById("mc-btn").onclick = function() {
+                let pap = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
+                pap.splice(idx, 1);
+                localStorage.setItem("papelera_visitas", JSON.stringify(pap));
+                closeModal('modal-confirm');
+                showToast("Visita eliminada definitivamente", "error");
+                renderPapelera();
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         function abrirEditorRegistros() {
