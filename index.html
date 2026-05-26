@@ -5457,11 +5457,27 @@
 
         function getUbicacion() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(pos => {
-                    document.getElementById("form-aud-ubicacion").textContent = `${pos.coords.latitude.toFixed(5)}, ${pos.coords.longitude.toFixed(5)}`;
+                navigator.geolocation.getCurrentPosition(async pos => {
+                    const lat = pos.coords.latitude;
+                    const lon = pos.coords.longitude;
+                    window._audLatLon = { lat, lon };
+                    try {
+                        const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`, {
+                            headers: { 'Accept-Language': 'es' }
+                        });
+                        const json = await res.json();
+                        const addr = json.display_name || `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                        document.getElementById("form-aud-ubicacion").textContent = addr;
+                        window._audDireccionGPS = addr;
+                    } catch(e) {
+                        const coords = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
+                        document.getElementById("form-aud-ubicacion").textContent = coords;
+                        window._audDireccionGPS = coords;
+                    }
                 }, err => {
                     document.getElementById("form-aud-ubicacion").textContent = "Permiso denegado";
-                });
+                    window._audDireccionGPS = null;
+                }, { enableHighAccuracy: true, timeout: 10000 });
             }
         }
 
@@ -5860,8 +5876,9 @@
                 hora: document.getElementById("form-aud-hora").textContent,
                 respuestas: window.auditActual.respuestas,
                 firma: window.auditActual.firma,
+                ubicacionGPS: window._audDireccionGPS || null,
                 resultadoGrupos: result.grupos,
-                finalScore: result.nota_final, // Backwards compatibility
+                finalScore: result.nota_final,
                 notaFinal: result.nota_final,
                 color: result.color,
                 clasificacion: result.etiqueta
@@ -6131,7 +6148,7 @@
                 y += 15;
 
                 // SCORE
-                let finalS = parseFloat(data.finalScore) || 0;
+                let finalS = parseFloat(data.notaFinal || data.finalScore) || 0;
                 let mainColor = finalS <= 70 ? [198, 40, 40] : (finalS <= 90 ? [255, 179, 0] : [52, 199, 89]);
 
                 y += 8;
@@ -6300,6 +6317,16 @@
                     y += 5;
                     addText(data.encargado || '', 9, false, [100, 100, 100], 'center');
                     y += 5;
+                    addText(`${data.fecha} · ${data.hora}`, 8, false, [150, 150, 150], 'center');
+                    if (data.ubicacionGPS) {
+                        y += 5;
+                        let splitAddr = pdf.splitTextToSize(`📍 ${data.ubicacionGPS}`, pageWidth - 2 * margin - 10);
+                        pdf.setFontSize(7); pdf.setFont("helvetica", "normal");
+                        pdf.setTextColor(150, 150, 150);
+                        pdf.text(splitAddr, pageWidth / 2, y, { align: 'center' });
+                        y += splitAddr.length * 4;
+                    }
+                    y += 4;
                     addText(`Generado: ${new Date().toLocaleString('es-PE')}`, 8, false, [180, 180, 180], 'center');
                 }
 
