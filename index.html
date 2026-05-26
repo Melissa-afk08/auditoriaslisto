@@ -5053,12 +5053,21 @@
                 </div>`).join('')
                 : `<div style="font-size:12px;color:#aaa;padding:8px 0;">✅ Todos los grupos superaron el 70% en la última auditoría.</div>`;
 
+            const mapsQ = encodeURIComponent(tienda.direccion + ', Lima, Peru');
+            const mapsEmbed = `https://maps.google.com/maps?q=${mapsQ}&output=embed&z=16`;
+            document.getElementById('aud-det-map').onclick = () => window.open(`https://maps.google.com/?q=${mapsQ}`, '_blank');
+
             prep.innerHTML = `
                 <div class="prep-card">
                     <div class="prep-card-label">Último estado · ${ultima.fecha} · ${ultima.supervisor}</div>
-                    <div class="prep-score-row" style="margin-bottom:14px;">
-                        <div class="prep-score-num" style="color:${scoreColor};">${score}%</div>
-                        <span class="prep-score-pill" style="background:${scoreColor};">${clasificacion}</span>
+                    <div style="display:flex;gap:12px;margin-bottom:14px;">
+                        <div style="flex:1;min-width:0;border-radius:12px;overflow:hidden;height:140px;">
+                            <iframe src="${mapsEmbed}" width="100%" height="140" style="border:0;border-radius:12px;" allowfullscreen="" loading="lazy"></iframe>
+                        </div>
+                        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:8px;">
+                            <div class="prep-score-num" style="color:${scoreColor};font-size:32px;font-weight:900;">${score}%</div>
+                            <span class="prep-score-pill" style="background:${scoreColor};align-self:flex-start;">${clasificacion}</span>
+                        </div>
                     </div>
                     ${rgHtml}
                 </div>
@@ -5067,7 +5076,7 @@
                     ${alertasHtml}
                 </div>
             `;
-        }
+        } 
 
         function renderDetalleVisita() {
             let tienda = window.selectedStore;
