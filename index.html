@@ -6454,7 +6454,7 @@
                 if (supSel) {
                     let current = supSel.value;
                     supSel.innerHTML = '<option value="">Todos los supervisores</option>';
-                    usuarios.filter(u => u.cargo !== 'SOPORTE').forEach(u => {
+                    usuarios.filter(u => u.cargo === 'SUPERVISORA FAST FOOD').forEach(u => {
                         supSel.innerHTML += `<option value="${u.nombre}" ${current===u.nombre?'selected':''}>${u.nombre.split(' ')[0]}</option>`;
                     });
                 }
@@ -6806,7 +6806,7 @@
                 if (supSel) {
                     let current = supSel.value;
                     supSel.innerHTML = '<option value="">Todos los supervisores</option>';
-                    usuarios.filter(u => u.cargo !== 'SOPORTE').forEach(u => {
+                    usuarios.filter(u => u.cargo === 'SUPERVISORA FAST FOOD').forEach(u => {
                         supSel.innerHTML += `<option value="${u.nombre}" ${current===u.nombre?'selected':''}>${u.nombre.split(' ')[0]}</option>`;
                     });
                 }
