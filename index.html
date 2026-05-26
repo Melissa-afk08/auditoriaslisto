@@ -5058,18 +5058,20 @@
             document.getElementById('aud-det-map').onclick = () => window.open(`https://maps.google.com/?q=${mapsQ}`, '_blank');
 
             prep.innerHTML = `
-                <div class="prep-card">
-                    <div class="prep-card-label">Último estado · ${ultima.fecha} · ${ultima.supervisor}</div>
-                    <div style="display:flex;gap:12px;margin-bottom:14px;">
-                        <div style="flex:1;min-width:0;border-radius:12px;overflow:hidden;height:140px;">
-                            <iframe src="${mapsEmbed}" width="100%" height="140" style="border:0;border-radius:12px;" allowfullscreen="" loading="lazy"></iframe>
+                <div class="prep-card" style="padding:0;overflow:hidden;">
+                    <div style="display:flex;min-height:320px;">
+                        <div style="flex:1;min-width:0;">
+                            <iframe src="${mapsEmbed}" width="100%" height="320" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe>
                         </div>
-                        <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;gap:8px;">
-                            <div class="prep-score-num" style="color:${scoreColor};font-size:32px;font-weight:900;">${score}%</div>
-                            <span class="prep-score-pill" style="background:${scoreColor};align-self:flex-start;">${clasificacion}</span>
+                        <div style="flex:1;min-width:0;padding:16px;overflow-y:auto;background:white;">
+                            <div style="font-size:10px;color:#999;font-weight:600;text-transform:uppercase;margin-bottom:4px;">${ultima.fecha} · ${ultima.supervisor}</div>
+                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                                <div class="prep-score-num" style="color:${scoreColor};font-size:30px;font-weight:900;line-height:1;">${score}%</div>
+                                <span class="prep-score-pill" style="background:${scoreColor};font-size:10px;">${clasificacion}</span>
+                            </div>
+                            ${rgHtml}
                         </div>
                     </div>
-                    ${rgHtml}
                 </div>
                 <div class="prep-card">
                     <div class="prep-card-label">🔴 Puntos críticos detectados</div>
