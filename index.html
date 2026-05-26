@@ -6318,16 +6318,21 @@
                     addText(data.encargado || '', 9, false, [100, 100, 100], 'center');
                     y += 5;
                     addText(`${data.fecha} · ${data.hora}`, 8, false, [150, 150, 150], 'center');
-                    if (data.ubicacionGPS) {
-                        y += 5;
-                        let splitAddr = pdf.splitTextToSize(`📍 ${data.ubicacionGPS}`, pageWidth - 2 * margin - 10);
-                        pdf.setFontSize(7); pdf.setFont("helvetica", "normal");
-                        pdf.setTextColor(150, 150, 150);
-                        pdf.text(splitAddr, pageWidth / 2, y, { align: 'center' });
-                        y += splitAddr.length * 4;
-                    }
                     y += 4;
                     addText(`Generado: ${new Date().toLocaleString('es-PE')}`, 8, false, [180, 180, 180], 'center');
+
+                // PIE DE PÁGINA CON UBICACIÓN GPS
+                if (data.ubicacionGPS) {
+                    const footerY = pageHeight - 12;
+                    pdf.setDrawColor(220, 220, 220);
+                    pdf.setLineWidth(0.3);
+                    pdf.line(margin, footerY - 4, pageWidth - margin, footerY - 4);
+                    pdf.setFontSize(7);
+                    pdf.setFont("helvetica", "normal");
+                    pdf.setTextColor(160, 160, 160);
+                    let splitAddr = pdf.splitTextToSize(`Ubicacion registrada: ${data.ubicacionGPS}`, pageWidth - 2 * margin);
+                    pdf.text(splitAddr, pageWidth / 2, footerY, { align: 'center' });
+                }
                 }
 
                 // GUARDAR / COMPARTIR
