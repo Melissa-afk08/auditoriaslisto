@@ -3196,11 +3196,9 @@
                     </svg>
                 </button>
             </div>
-            <div class="filter-dropdown" id="dropdown-view-auditoria-tiendas" style="display:none;"></div>
-            <div id="filter-pill-view-auditoria-tiendas" class="filter-pill" style="display:none;">
-                <span id="filter-pill-text-view-auditoria-tiendas"></span>
-                <span class="close" onclick="clearDistrictFilter('view-auditoria-tiendas')">✕</span>
-            </div>
+            <select id="select-dist-view-auditoria-tiendas" onchange="selectDistrict('view-auditoria-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;margin-bottom:12px;">
+                <option value="">Todos los distritos</option>
+            </select>
             <div id="list-auditoria-tiendas"></div>
         </div>
     </div>
@@ -3230,11 +3228,9 @@
                     </svg>
                 </button>
             </div>
-            <div class="filter-dropdown" id="dropdown-view-visita-tiendas" style="display:none;"></div>
-            <div id="filter-pill-view-visita-tiendas" class="filter-pill" style="display:none;">
-                <span id="filter-pill-text-view-visita-tiendas"></span>
-                <span class="close" onclick="clearDistrictFilter('view-visita-tiendas')">✕</span>
-            </div>
+            <select id="select-dist-view-visita-tiendas" onchange="selectDistrict('view-visita-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;margin-bottom:12px;">
+                <option value="">Todos los distritos</option>
+            </select>
             <div id="list-visita-tiendas"></div>
         </div>
     </div>
@@ -3264,11 +3260,9 @@
                     </svg>
                 </button>
             </div>
-            <div class="filter-dropdown" id="dropdown-view-tiendas" style="display:none;"></div>
-            <div id="filter-pill-view-tiendas" class="filter-pill" style="display:none;">
-                <span id="filter-pill-text-view-tiendas"></span>
-                <span class="close" onclick="clearDistrictFilter('view-tiendas')">✕</span>
-            </div>
+            <select id="select-dist-view-tiendas" onchange="selectDistrict('view-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;margin-bottom:12px;">
+                <option value="">Todos los distritos</option>
+            </select>
             <div id="list-tiendas"></div>
         </div>
     </div>
@@ -3808,18 +3802,28 @@
 
             <!-- PANEL FILTRO AUDITORÍAS -->
             <div id="panel-filtro-aud" style="display:none; background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
-                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">SUPERVISOR</div>
-                <div id="filtro-aud-sups" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
-                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">MES</div>
-                <div id="filtro-aud-meses" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
-                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">ORDEN</div>
-                <div style="display:flex;gap:8px;margin-bottom:16px;">
-                    <button id="btn-aud-desc" onclick="setOrdenAud('desc')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--naranja);background:var(--naranja);color:white;">↓ Más reciente</button>
-                    <button id="btn-aud-asc" onclick="setOrdenAud('asc')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #ddd;background:white;color:#555;">↑ Más antiguo</button>
-                </div>
-                <div style="display:flex;gap:10px;">
-                    <button onclick="limpiarFiltroAud()" style="flex:1;padding:10px;border-radius:50px;background:transparent;border:1.5px solid #ddd;color:#888;font-size:13px;font-weight:700;cursor:pointer;">Borrar</button>
-                    <button onclick="aplicarFiltroAud()" style="flex:1;padding:10px;border-radius:50px;background:var(--naranja);border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;">Aplicar</button>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <select id="filtro-aud-sup-sel" onchange="aplicarFiltroAud()" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                        <option value="">Todos los supervisores</option>
+                    </select>
+                    <select id="filtro-aud-anio-sel" onchange="aplicarFiltroAud()" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                        <option value="">Año</option>
+                    </select>
+                    <div style="display:flex;gap:8px;">
+                        <select id="filtro-aud-mes-sel" onchange="aplicarFiltroAud()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Mes</option>
+                            <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                        </select>
+                        <select id="filtro-aud-dia-sel" onchange="aplicarFiltroAud()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Día</option>
+                            <option value="01">1</option><option value="02">2</option><option value="03">3</option><option value="04">4</option><option value="05">5</option><option value="06">6</option><option value="07">7</option><option value="08">8</option><option value="09">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                        </select>
+                        <select id="filtro-aud-orden-sel" onchange="aplicarFiltroAud()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="desc">Más reciente</option>
+                            <option value="asc">Más antiguo</option>
+                        </select>
+                    </div>
+                    <button onclick="limpiarFiltroAud()" style="width:100%;padding:10px;border-radius:50px;background:transparent;border:1.5px solid #ddd;color:#888;font-size:13px;font-weight:700;cursor:pointer;">Borrar filtros</button>
                 </div>
             </div>
 
@@ -3856,18 +3860,28 @@
 
             <!-- PANEL FILTRO VISITAS -->
             <div id="panel-filtro-vis" style="display:none; background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
-                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">SUPERVISOR</div>
-                <div id="filtro-vis-sups" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
-                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">MES</div>
-                <div id="filtro-vis-meses" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;"></div>
-                <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">ORDEN</div>
-                <div style="display:flex;gap:8px;margin-bottom:16px;">
-                    <button id="btn-vis-desc" onclick="setOrdenVis('desc')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--naranja);background:var(--naranja);color:white;">↓ Más reciente</button>
-                    <button id="btn-vis-asc" onclick="setOrdenVis('asc')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid #ddd;background:white;color:#555;">↑ Más antiguo</button>
-                </div>
-                <div style="display:flex;gap:10px;">
-                    <button onclick="limpiarFiltroVis()" style="flex:1;padding:10px;border-radius:50px;background:transparent;border:1.5px solid #ddd;color:#888;font-size:13px;font-weight:700;cursor:pointer;">Borrar</button>
-                    <button onclick="aplicarFiltroVis()" style="flex:1;padding:10px;border-radius:50px;background:var(--naranja);border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;">Aplicar</button>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <select id="filtro-vis-sup-sel" onchange="aplicarFiltroVis()" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                        <option value="">Todos los supervisores</option>
+                    </select>
+                    <select id="filtro-vis-anio-sel" onchange="aplicarFiltroVis()" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                        <option value="">Año</option>
+                    </select>
+                    <div style="display:flex;gap:8px;">
+                        <select id="filtro-vis-mes-sel" onchange="aplicarFiltroVis()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Mes</option>
+                            <option value="1">Enero</option><option value="2">Febrero</option><option value="3">Marzo</option><option value="4">Abril</option><option value="5">Mayo</option><option value="6">Junio</option><option value="7">Julio</option><option value="8">Agosto</option><option value="9">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                        </select>
+                        <select id="filtro-vis-dia-sel" onchange="aplicarFiltroVis()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Día</option>
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                        </select>
+                        <select id="filtro-vis-orden-sel" onchange="aplicarFiltroVis()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="desc">Más reciente</option>
+                            <option value="asc">Más antiguo</option>
+                        </select>
+                    </div>
+                    <button onclick="limpiarFiltroVis()" style="width:100%;padding:10px;border-radius:50px;background:transparent;border:1.5px solid #ddd;color:#888;font-size:13px;font-weight:700;cursor:pointer;">Borrar filtros</button>
                 </div>
             </div>
 
@@ -4059,10 +4073,29 @@
             <div style="background:white;border-radius:16px;padding:14px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.05);">
                 <div style="font-size:12px;font-weight:700;color:#888;margin-bottom:10px;">FILTROS</div>
                 <div style="display:flex;flex-direction:column;gap:8px;">
-                    <input id="er-filtro-sup" type="text" placeholder="Supervisor..." oninput="renderEditorRegistros()" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;">
+                    <select id="er-filtro-sup" onchange="renderEditorRegistros()" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                        <option value="">Todos los supervisores</option>
+                    </select>
                     <div style="display:flex;gap:8px;">
-                        <input id="er-filtro-mes" type="number" placeholder="Mes (1-12)" min="1" max="12" oninput="renderEditorRegistros()" style="flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;">
-                        <input id="er-filtro-dia" type="number" placeholder="Día (1-31)" min="1" max="31" oninput="renderEditorRegistros()" style="flex:1;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;">
+                        <select id="er-filtro-mes" onchange="renderEditorRegistros()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Mes</option>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                        <select id="er-filtro-dia" onchange="renderEditorRegistros()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Día</option>
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                        </select>
                         <select id="er-filtro-orden" onchange="renderEditorRegistros()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
                             <option value="desc">Más reciente</option>
                             <option value="asc">Más antiguo</option>
@@ -4824,35 +4857,15 @@
 
         function populateFilters() {
             let distritos = [...new Set(TIENDAS.map(t => t.distrito))].sort();
-            let html = `<div class="filter-option" onclick="selectDistrict('VIEW_ID', '')">Todos los distritos</div>`;
-            distritos.forEach(d => {
-                html += `<div class="filter-option" onclick="selectDistrict('VIEW_ID', '${d}')">${d}</div>`;
+            let optionsHtml = '<option value="">Todos los distritos</option>' + distritos.map(d => `<option value="${d}">${d}</option>`).join('');
+            ['view-auditoria-tiendas', 'view-visita-tiendas', 'view-tiendas'].forEach(viewId => {
+                let sel = document.getElementById(`select-dist-${viewId}`);
+                if (sel) sel.innerHTML = optionsHtml;
             });
-
-            document.getElementById('dropdown-view-auditoria-tiendas').innerHTML = html.replace(/VIEW_ID/g, 'view-auditoria-tiendas');
-            document.getElementById('dropdown-view-visita-tiendas').innerHTML = html.replace(/VIEW_ID/g, 'view-visita-tiendas');
-            document.getElementById('dropdown-view-tiendas').innerHTML = html.replace(/VIEW_ID/g, 'view-tiendas');
         }
 
         function toggleFilterDropdown(viewId, event) {
-            event.stopPropagation();
-            let dropdown = document.getElementById('dropdown-' + viewId);
-            let isVisible = dropdown.style.display === 'block';
-            document.querySelectorAll('.filter-dropdown').forEach(d => d.style.display = 'none');
-            if (!isVisible) {
-                // Renderizar chips de distritos
-                let distritos = [...new Set(TIENDAS.map(t => t.distrito))].sort();
-                let activo = window.activeFilters[viewId];
-                let chipsHtml = [`<button onclick="selectDistrict('${viewId}','')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${activo===''?'var(--naranja)':'#ddd'};background:${activo===''?'var(--naranja)':'white'};color:${activo===''?'white':'#555'};">Todos</button>`];
-                distritos.forEach(d => {
-                    chipsHtml.push(`<button onclick="selectDistrict('${viewId}','${d}')" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${activo===d?'var(--naranja)':'#ddd'};background:${activo===d?'var(--naranja)':'white'};color:${activo===d?'white':'#555'};">${d}</button>`);
-                });
-                dropdown.innerHTML = `
-                    <div style="font-size:12px;font-weight:800;color:#888;letter-spacing:0.5px;margin-bottom:10px;">FILTRAR POR DISTRITO</div>
-                    <div style="display:flex;flex-wrap:wrap;gap:8px;">${chipsHtml.join('')}</div>
-                `;
-                dropdown.style.display = 'block';
-            }
+            // Ya no se usa, los selects se manejan directamente
         }
 
         function selectDistrict(viewId, district) {
@@ -6426,54 +6439,27 @@
 
         function toggleFiltroAud() {
             let panel = document.getElementById('panel-filtro-aud');
-            if (panel.style.display === 'none') {
-                // Cargar supervisores (todos los usuarios)
+            let visible = panel.style.display !== 'none';
+            if (!visible) {
+                // Poblar supervisores
                 let usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-                let supsSel = window.activeHistorialFilters.auditoria.sups;
-                document.getElementById('filtro-aud-sups').innerHTML = usuarios
-                    .filter(u => u.cargo !== 'SOPORTE')
-                    .map(u =>
-                    `<button onclick="toggleChipAud('sup','${u.nombre}',this)"
-                        style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${supsSel.includes(u.nombre)?'var(--naranja)':'#ddd'};background:${supsSel.includes(u.nombre)?'var(--naranja)':'white'};color:${supsSel.includes(u.nombre)?'white':'#555'};">
-                        ${u.nombre.split(' ')[0]}
-                    </button>`
-                ).join('');
-                // Cargar meses disponibles
+                let supSel = document.getElementById('filtro-aud-sup-sel');
+                if (supSel) {
+                    let current = supSel.value;
+                    supSel.innerHTML = '<option value="">Todos los supervisores</option>';
+                    usuarios.filter(u => u.cargo !== 'SOPORTE').forEach(u => {
+                        supSel.innerHTML += `<option value="${u.nombre}" ${current===u.nombre?'selected':''}>${u.nombre.split(' ')[0]}</option>`;
+                    });
+                }
+                // Poblar años dinámicamente
                 let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
-                let mesesMap = {};
-                auds.forEach(a => {
-                    let p = (a.fecha||'').split('/');
-                    if (p.length===3) {
-                        let clave = `${p[2]}-${p[1]}`;
-                        let label = new Date(parseInt(p[2]), parseInt(p[1])-1, 1).toLocaleString('es', {month:'long', year:'numeric'});
-                        mesesMap[clave] = label;
-                    }
-                });
-                let mesesSel = window.activeHistorialFilters.auditoria.meses;
-                let mesesOrdenados = Object.entries(mesesMap).sort((a,b)=>b[0].localeCompare(a[0]));
-                let porAnio = {};
-                mesesOrdenados.forEach(([k,v]) => {
-                    let anio = k.split('-')[0];
-                    if (!porAnio[anio]) porAnio[anio] = [];
-                    porAnio[anio].push([k,v]);
-                });
-                document.getElementById('filtro-aud-meses').innerHTML = Object.entries(porAnio)
-                    .sort((a,b) => b[0]-a[0])
-                    .map(([anio, items]) => `
-                        <div style="width:100%;font-size:11px;font-weight:800;color:#aaa;letter-spacing:0.5px;margin-bottom:6px;margin-top:4px;">${anio}</div>
-                        ${items.map(([k,v]) => {
-                            let nombreMes = new Date(parseInt(k.split('-')[0]), parseInt(k.split('-')[1])-1, 1).toLocaleString('es',{month:'long'});
-                            let sel = mesesSel.includes(k);
-                            return `
-                            <div style="width:100%;margin-bottom:8px;">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <button onclick="toggleChipAud('mes','${k}',this)" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${sel?'var(--naranja)':'#ddd'};background:${sel?'var(--naranja)':'white'};color:${sel?'white':'#555'};">${nombreMes}</button>
-                                    <button onclick="toggleSubDias('${k}','aud')" id="arrow-dias-aud-${k}" style="width:26px;height:26px;border-radius:50%;background:#FFF0E6;border:none;cursor:pointer;font-size:13px;color:var(--naranja);font-weight:800;display:flex;align-items:center;justify-content:center;">›</button>
-                                </div>
-                                <div id="sub-dias-aud-${k}" style="display:none;flex-wrap:wrap;gap:6px;padding:8px 0 4px 12px;"></div>
-                            </div>`;
-                        }).join('')}
-                    `).join('') || '<span style="font-size:12px;color:#bbb;">Sin registros</span>';
+                let anios = [...new Set(auds.map(a => (a.fecha||'').split('/')[2]).filter(Boolean))].sort((a,b)=>b-a);
+                let anioSel = document.getElementById('filtro-aud-anio-sel');
+                if (anioSel) {
+                    let current = anioSel.value;
+                    anioSel.innerHTML = '<option value="">Año</option>';
+                    anios.forEach(y => anioSel.innerHTML += `<option value="${y}" ${current===y?'selected':''}>${y}</option>`);
+                }
                 panel.style.display = 'block';
             } else {
                 panel.style.display = 'none';
@@ -6508,13 +6494,15 @@
         }
 
         function limpiarFiltroAud() {
-            window.activeHistorialFilters.auditoria = { sups: [], meses: [], dias: [], orden: 'desc' };
-            document.getElementById('panel-filtro-aud').style.display = 'none';
+            let s = document.getElementById('filtro-aud-sup-sel'); if(s) s.value='';
+            let a = document.getElementById('filtro-aud-anio-sel'); if(a) a.value='';
+            let m = document.getElementById('filtro-aud-mes-sel'); if(m) m.value='';
+            let d = document.getElementById('filtro-aud-dia-sel'); if(d) d.value='';
+            let o = document.getElementById('filtro-aud-orden-sel'); if(o) o.value='desc';
             renderHistorialAuditorias();
         }
 
         function aplicarFiltroAud() {
-            document.getElementById('panel-filtro-aud').style.display = 'none';
             renderHistorialAuditorias();
         }
 
@@ -6573,24 +6561,21 @@
 
             let auditorias = JSON.parse(localStorage.getItem('auditorias') || '[]');
             let borradores = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
-            const orden = window.activeHistorialFilters?.auditoria?.orden || 'desc';
-            auditorias.sort((a, b) => orden === 'desc' ? b.id - a.id : a.id - b.id);
 
             const search = (document.getElementById('hist-aud-search')?.value || '').toLowerCase();
-            const filtros = window.activeHistorialFilters?.auditoria || { sups: [], meses: [] };
+            const fSup = document.getElementById('filtro-aud-sup-sel')?.value || '';
+            const fAnio = document.getElementById('filtro-aud-anio-sel')?.value || '';
+            const fMes = document.getElementById('filtro-aud-mes-sel')?.value || '';
+            const fDia = document.getElementById('filtro-aud-dia-sel')?.value || '';
+            const orden = document.getElementById('filtro-aud-orden-sel')?.value || 'desc';
+
+            auditorias.sort((a, b) => orden === 'desc' ? b.id - a.id : a.id - b.id);
 
             if (search) auditorias = auditorias.filter(a => (a.tienda?.nombre || a.tienda || '').toLowerCase().includes(search));
-            if (filtros.sups.length > 0) auditorias = auditorias.filter(a => filtros.sups.some(s => (a.supervisor||'').includes(s.split(' ')[0])));
-            if (filtros.meses.length > 0) auditorias = auditorias.filter(a => {
-                let partes = (a.fecha || '').split('/');
-                let clave = partes.length === 3 ? `${partes[2]}-${partes[1]}` : '';
-                return filtros.meses.includes(clave);
-            });
-            if (filtros.dias && filtros.dias.length > 0) auditorias = auditorias.filter(a => {
-                let partes = (a.fecha || '').split('/');
-                let clave = partes.length === 3 ? `${partes[2]}-${partes[1]}-${partes[0].padStart(2,'0')}` : '';
-                return filtros.dias.includes(clave);
-            });
+            if (fSup) auditorias = auditorias.filter(a => (a.supervisor||'') === fSup);
+            if (fAnio) auditorias = auditorias.filter(a => (a.fecha||'').split('/')[2] === fAnio);
+            if (fMes) auditorias = auditorias.filter(a => (a.fecha||'').split('/')[1] === fMes);
+            if (fDia) auditorias = auditorias.filter(a => (a.fecha||'').split('/')[0] === fDia);
 
             let borradoresFiltrados = borradores.filter(b => {
                 let nombre = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '';
@@ -6724,96 +6709,44 @@
 
         function toggleFiltroVis() {
             let panel = document.getElementById('panel-filtro-vis');
-            if (panel.style.display === 'none') {
+            let visible = panel.style.display !== 'none';
+            if (!visible) {
                 let usuarios = JSON.parse(localStorage.getItem("usuarios") || "[]");
-                let supsSel = window.activeHistorialFilters.visita.sups;
-                document.getElementById('filtro-vis-sups').innerHTML = usuarios
-                    .filter(u => u.cargo !== 'SOPORTE')
-                    .map(u => `<button onclick="toggleChipVis('sup','${u.nombre}',this)"
-                        style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${supsSel.includes(u.nombre)?'var(--naranja)':'#ddd'};background:${supsSel.includes(u.nombre)?'var(--naranja)':'white'};color:${supsSel.includes(u.nombre)?'white':'#555'};">
-                        ${u.nombre.split(' ')[0]}
-                    </button>`).join('');
-
+                let supSel = document.getElementById('filtro-vis-sup-sel');
+                if (supSel) {
+                    let current = supSel.value;
+                    supSel.innerHTML = '<option value="">Todos los supervisores</option>';
+                    usuarios.filter(u => u.cargo !== 'SOPORTE').forEach(u => {
+                        supSel.innerHTML += `<option value="${u.nombre}" ${current===u.nombre?'selected':''}>${u.nombre.split(' ')[0]}</option>`;
+                    });
+                }
                 let visitas = JSON.parse(localStorage.getItem("visitas") || "[]");
-                let mesesMap = {};
-                visitas.forEach(v => {
-                    let raw = v.datetime || v.fechaHora || v.fecha || '';
-                    if (!raw) return;
-                    let d = new Date(raw);
-                    if (isNaN(d.getTime())) return;
-                    let clave = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-                    let label = d.toLocaleString('es', {month:'long', year:'numeric'});
-                    mesesMap[clave] = label;
-                });
-                let mesesSel = window.activeHistorialFilters.visita.meses;
-                let mesesOrdenados = Object.entries(mesesMap).sort((a,b)=>b[0].localeCompare(a[0]));
-                let porAnio = {};
-                mesesOrdenados.forEach(([k,v]) => {
-                    let anio = k.split('-')[0];
-                    if (!porAnio[anio]) porAnio[anio] = [];
-                    porAnio[anio].push([k, v]);
-                });
-                document.getElementById('filtro-vis-meses').innerHTML = Object.entries(porAnio)
-                    .sort((a,b)=>b[0]-a[0])
-                    .map(([anio, items]) => `
-                        <div style="width:100%;font-size:11px;font-weight:800;color:#aaa;letter-spacing:0.5px;margin-bottom:6px;margin-top:4px;">${anio}</div>
-                        ${items.map(([k,v]) => {
-                            let nombreMes = new Date(parseInt(k.split('-')[0]), parseInt(k.split('-')[1])-1, 1).toLocaleString('es',{month:'long'});
-                            let sel = mesesSel.includes(k);
-                            return `
-                            <div style="width:100%;margin-bottom:8px;">
-                                <div style="display:flex;align-items:center;gap:8px;">
-                                    <button onclick="toggleChipVis('mes','${k}',this)" style="padding:6px 14px;border-radius:50px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid ${sel?'var(--naranja)':'#ddd'};background:${sel?'var(--naranja)':'white'};color:${sel?'white':'#555'};">${nombreMes}</button>
-                                    <button onclick="toggleSubDias('${k}','vis')" id="arrow-dias-vis-${k}" style="width:26px;height:26px;border-radius:50%;background:#FFF0E6;border:none;cursor:pointer;font-size:13px;color:var(--naranja);font-weight:800;display:flex;align-items:center;justify-content:center;">›</button>
-                                </div>
-                                <div id="sub-dias-vis-${k}" style="display:none;flex-wrap:wrap;gap:6px;padding:8px 0 4px 12px;"></div>
-                            </div>`;
-                        }).join('')}
-                    `).join('') || '<span style="font-size:12px;color:#bbb;">Sin registros</span>';
-                // Inicializar botones de orden
-                let ordenActual = window.activeHistorialFilters.visita.orden || 'desc';
-                setOrdenVis(ordenActual);
+                let anios = [...new Set(visitas.map(v => {
+                    let d = v.datetime ? new Date(v.datetime) : null;
+                    return d && !isNaN(d) ? String(d.getFullYear()) : null;
+                }).filter(Boolean))].sort((a,b)=>b-a);
+                let anioSel = document.getElementById('filtro-vis-anio-sel');
+                if (anioSel) {
+                    let current = anioSel.value;
+                    anioSel.innerHTML = '<option value="">Año</option>';
+                    anios.forEach(y => anioSel.innerHTML += `<option value="${y}" ${current===y?'selected':''}>${y}</option>`);
+                }
                 panel.style.display = 'block';
             } else {
                 panel.style.display = 'none';
             }
         }
 
-        function toggleChipVis(tipo, valor, btn) {
-            let filtros = window.activeHistorialFilters.visita;
-            let arr = tipo === 'sup' ? filtros.sups : filtros.meses;
-            let idx = arr.indexOf(valor);
-            if (idx === -1) {
-                arr.push(valor);
-                btn.style.background = 'var(--naranja)';
-                btn.style.color = 'white';
-                btn.style.borderColor = 'var(--naranja)';
-            } else {
-                arr.splice(idx, 1);
-                btn.style.background = 'white';
-                btn.style.color = '#555';
-                btn.style.borderColor = '#ddd';
-            }
-        }
-
-        function setOrdenVis(orden) {
-            window.activeHistorialFilters.visita.orden = orden;
-            document.getElementById('btn-vis-desc').style.background = orden==='desc'?'var(--naranja)':'white';
-            document.getElementById('btn-vis-desc').style.color = orden==='desc'?'white':'#555';
-            document.getElementById('btn-vis-desc').style.borderColor = orden==='desc'?'var(--naranja)':'#ddd';
-            document.getElementById('btn-vis-asc').style.background = orden==='asc'?'var(--naranja)':'white';
-            document.getElementById('btn-vis-asc').style.color = orden==='asc'?'white':'#555';
-            document.getElementById('btn-vis-asc').style.borderColor = orden==='asc'?'var(--naranja)':'#ddd';
-        }
-
         function limpiarFiltroVis() {
-            window.activeHistorialFilters.visita = { sups: [], meses: [], dias: [], orden: 'desc' };
-            document.getElementById('panel-filtro-vis').style.display = 'none';
+            let s = document.getElementById('filtro-vis-sup-sel'); if(s) s.value='';
+            let a = document.getElementById('filtro-vis-anio-sel'); if(a) a.value='';
+            let m = document.getElementById('filtro-vis-mes-sel'); if(m) m.value='';
+            let d = document.getElementById('filtro-vis-dia-sel'); if(d) d.value='';
+            let o = document.getElementById('filtro-vis-orden-sel'); if(o) o.value='desc';
             renderHistorialVisitas();
         }
 
         function aplicarFiltroVis() {
-            document.getElementById('panel-filtro-vis').style.display = 'none';
             renderHistorialVisitas();
         }
 
@@ -6823,26 +6756,25 @@
 
             let visitas = JSON.parse(localStorage.getItem('visitas') || '[]');
             const search = (document.getElementById('hist-vis-search')?.value || '').toLowerCase();
-            const filtros = window.activeHistorialFilters?.visita || { sups: [], meses: [], orden: 'desc' };
-            const orden = filtros.orden || 'desc';
+            const fSup = document.getElementById('filtro-vis-sup-sel')?.value || '';
+            const fAnio = document.getElementById('filtro-vis-anio-sel')?.value || '';
+            const fMes = document.getElementById('filtro-vis-mes-sel')?.value || '';
+            const fDia = document.getElementById('filtro-vis-dia-sel')?.value || '';
+            const orden = document.getElementById('filtro-vis-orden-sel')?.value || 'desc';
 
-            if (search) visitas = visitas.filter(v => (v.tienda?.nombre || '').toLowerCase().includes(search));
-            if (filtros.sups.length > 0) visitas = visitas.filter(v => filtros.sups.some(s => (v.supervisor||'').includes(s.split(' ')[0])));
-            if (filtros.meses.length > 0) visitas = visitas.filter(v => {
-                let raw = v.datetime || v.fechaHora || v.fecha || '';
-                if (!raw) return false;
-                let d = new Date(raw);
-                if (isNaN(d.getTime())) return false;
-                let clave = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-                return filtros.meses.includes(clave);
+            if (search) visitas = visitas.filter(v => (v.tienda?.nombre || v.tienda || '').toLowerCase().includes(search));
+            if (fSup) visitas = visitas.filter(v => (v.supervisor||'') === fSup);
+            if (fAnio) visitas = visitas.filter(v => {
+                let d = v.datetime ? new Date(v.datetime) : null;
+                return d && !isNaN(d) && String(d.getFullYear()) === fAnio;
             });
-            if (filtros.dias && filtros.dias.length > 0) visitas = visitas.filter(v => {
-                let raw = v.datetime || v.fechaHora || v.fecha || '';
-                if (!raw) return false;
-                let d = new Date(raw);
-                if (isNaN(d.getTime())) return false;
-                let clave = d.toISOString().substring(0,10);
-                return filtros.dias.includes(clave);
+            if (fMes) visitas = visitas.filter(v => {
+                let d = v.datetime ? new Date(v.datetime) : null;
+                return d && !isNaN(d) && String(d.getMonth()+1) === fMes;
+            });
+            if (fDia) visitas = visitas.filter(v => {
+                let d = v.datetime ? new Date(v.datetime) : null;
+                return d && !isNaN(d) && String(d.getDate()) === fDia;
             });
 
             visitas.sort((a, b) => {
@@ -7397,8 +7329,15 @@
                 return;
             }
             window.editorRegistrosMode = 'auditoria';
-            renderEditorRegistros();
             showView('view-editor-registros');
+            // Poblar select de supervisores
+            let sups = JSON.parse(localStorage.getItem("supervisores") || "[]");
+            let supSel = document.getElementById('er-filtro-sup');
+            if (supSel) {
+                supSel.innerHTML = '<option value="">Todos los supervisores</option>';
+                sups.forEach(s => supSel.innerHTML += `<option value="${s}">${s}</option>`);
+            }
+            renderEditorRegistros();
         }
 
         function renderEditorRegistros() {
