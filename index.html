@@ -3372,11 +3372,8 @@
             </div>
             <button class="btn-main-visita" onclick="iniciarVisita()">REGISTRAR VISITA</button>
 
-            <!-- ÚLTIMAS VISITAS -->
-            <div id="vis-ultimas-card" style="display:none; margin:16px 0;" class="vis-bitacora-card">
-                <div class="vis-bitacora-label">📍 Últimas visitas registradas</div>
-                <div id="vis-ultimas-lista"></div>
-            </div>
+            <!-- MAPA + HISTORIAL VISITAS -->
+            <div id="vis-mapa-historial" style="display:none;margin-top:16px;"></div>
         </div>
     </div>
 
@@ -5100,23 +5097,37 @@
                 .filter(v => (v.tienda?.nombre||v.tienda) === tienda.nombre)
                 .sort((a,b) => new Date(b.datetime||0) - new Date(a.datetime||0));
 
-            let ultimasCard = document.getElementById('vis-ultimas-card');
-            let ultimasLista = document.getElementById('vis-ultimas-lista');
-            if (visitas.length > 0 && ultimasCard && ultimasLista) {
-                let ultimas = visitas.slice(0, 2);
-                ultimasLista.innerHTML = ultimas.map((v, i) => {
+            const mapsQ = encodeURIComponent(tienda.direccion + ', Lima, Peru');
+            const mapsEmbed = `https://maps.google.com/maps?q=${mapsQ}&output=embed&z=16`;
+            document.getElementById('vis-det-map').onclick = function() { window.location.href = `https://maps.google.com/?q=${mapsQ}`; };
+
+            const visitasHtml = visitas.length > 0
+                ? visitas.map((v, i) => {
                     let d = v.datetime ? new Date(v.datetime) : null;
                     let fechaStr = d ? d.toLocaleDateString('es-PE', {day:'numeric', month:'short', year:'numeric'}) : '—';
                     let supCorto = (v.supervisor||'').split(' ').slice(0,2).join(' ');
-                    return `
-                    <div style="${i > 0 ? 'border-top:1px solid #f0f0f0;margin-top:10px;padding-top:10px;' : ''}">
+                    return `<div style="${i > 0 ? 'border-top:1px solid #f0f0f0;margin-top:10px;padding-top:10px;' : ''}">
                         <div class="vis-bitacora-meta">${fechaStr} · ${supCorto}</div>
                         <div class="vis-bitacora-texto">${v.comentario || '<span style="color:#bbb;font-style:italic;">Sin comentario</span>'}</div>
                     </div>`;
-                }).join('');
-                ultimasCard.style.display = 'block';
-            } else if (ultimasCard) {
-                ultimasCard.style.display = 'none';
+                }).join('')
+                : '<div style="font-size:13px;color:#bbb;text-align:center;padding:20px 0;">No hay visitas registradas</div>';
+
+            const mapaHistorial = document.getElementById('vis-mapa-historial');
+            if (mapaHistorial) {
+                mapaHistorial.style.display = 'block';
+                mapaHistorial.innerHTML = `
+                    <div class="prep-card" style="padding:0;overflow:hidden;">
+                        <div style="display:flex;min-height:280px;">
+                            <div style="flex:1;min-width:0;">
+                                <iframe src="${mapsEmbed}" width="100%" height="280" style="border:0;display:block;" allowfullscreen="" loading="lazy"></iframe>
+                            </div>
+                            <div style="flex:1;min-width:0;padding:16px;overflow-y:auto;background:white;max-height:280px;">
+                                <div style="font-size:11px;color:#FC6E20;font-weight:700;text-transform:uppercase;margin-bottom:12px;">Historial de visitas</div>
+                                ${visitasHtml}
+                            </div>
+                        </div>
+                    </div>`;
             }
         }
 
@@ -6156,7 +6167,7 @@
                 y += 10;
 
                 // SEMÁFORO
-                const semW = 22; const semH = 52;
+                const semW = 27; const semH = 65;
                 const semX = pageWidth / 2 - semW / 2;
                 pdf.setFillColor(27, 27, 27);
                 pdf.roundedRect(semX, y, semW, semH, 5, 5, 'F');
