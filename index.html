@@ -7074,20 +7074,27 @@
 
         // --- USUARIOS ---
         function renderUsuarios() {
-            const avatarColors = [
-                { bg: '#1A237E', text: '#FFFFFF' }, // azul marino
-                { bg: '#1B5E20', text: '#FFFFFF' }, // verde oscuro
-                { bg: '#4A148C', text: '#FFFFFF' }, // morado
-                { bg: '#B71C1C', text: '#FFFFFF' }, // rojo oscuro
-                { bg: '#004D40', text: '#FFFFFF' }, // verde azulado
-                { bg: '#E65100', text: '#FFFFFF' }, // naranja oscuro
-                { bg: '#37474F', text: '#FFFFFF' }, // gris azulado
-                { bg: '#880E4F', text: '#FFFFFF' }, // rosa oscuro
+            const avatarColorMap = {
+                'Kleiddy':  { bg: '#7C3AED', text: '#FFFFFF' }, // morado violeta
+                'Soporte':  { bg: '#1B5E20', text: '#FFFFFF' }, // verde oscuro
+                'Miriam':   { bg: '#5B21B6', text: '#FFFFFF' }, // morado oscuro
+                'Luz':      { bg: '#9F1239', text: '#FFFFFF' }, // rojo oscuro
+                'Shirley':  { bg: '#065F46', text: '#FFFFFF' }, // verde esmeralda
+                'Lorena':   { bg: '#C2410C', text: '#FFFFFF' }, // naranja quemado
+            };
+            const avatarColorsFallback = [
+                { bg: '#1A237E', text: '#FFFFFF' },
+                { bg: '#004D40', text: '#FFFFFF' },
+                { bg: '#37474F', text: '#FFFFFF' },
             ];
+            const getAvatarColor = (nombre) => {
+                const key = Object.keys(avatarColorMap).find(k => nombre.startsWith(k));
+                return key ? avatarColorMap[key] : avatarColorsFallback[0];
+            };
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
             let html = users.map((u, i) => {
                 let inis = u.nombre.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
-                const color = avatarColors[i % avatarColors.length];
+                const color = getAvatarColor(u.nombre);
                 return `
           <div class="user-card" style="position:relative;">
             <button class="user-menu-btn" onclick="toggleUserMenu(${i}, event)" style="background:none; border:none; font-size:18px; color:#888; font-weight:bold; cursor:pointer; position:absolute; top:8px; right:8px;">⋮</button>
