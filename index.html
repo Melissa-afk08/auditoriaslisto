@@ -6643,7 +6643,7 @@
 
             const barraAud = window._selModeAud ? `
                 <div style="position:sticky;top:0;z-index:99;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
-                    <button onclick="window._selAud.size==auditorias_sel_count?window._selAud.clear():auditorias_sel_ids.forEach(id=>window._selAud.add(id));renderHistorialAuditorias();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
+                    <button onclick="window._selAud.size==window._audSelIds.length?window._selAud.clear():window._audSelIds.forEach(id=>window._selAud.add(id));renderHistorialAuditorias();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
                     <span style="font-size:13px;color:#888;">${window._selAud.size} seleccionados</span>
                     <div style="display:flex;gap:8px;">
                         <button onclick="window._selModeAud=false;window._selAud=new Set();renderHistorialAuditorias();" style="background:#F5F5F5;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Cancelar</button>
@@ -6651,8 +6651,8 @@
                     </div>
                 </div>` : '';
 
-            const auditorias_sel_ids = auditorias.map(a => a.id);
-            const auditorias_sel_count = auditorias_sel_ids.length;
+            window._audSelIds = auditorias.map(a => a.id);
+            const auditorias_sel_count = window._audSelIds.length;
 
             contenedor.innerHTML = barraAud + borradoresHtml + auditorias.map(a => {
                 const pct = a.notaFinal || 0;
@@ -6900,12 +6900,12 @@
             window._selModeVis = window._selModeVis || false;
             window._selVis = window._selVis || new Set();
 
-            const visitas_sel_ids = visitas.map(v => v.id);
-            const visitas_sel_count = visitas_sel_ids.length;
+            window._visSelIds = visitas.map(v => v.id);
+            const visitas_sel_count = window._visSelIds.length;
 
             const barraVis = window._selModeVis ? `
                 <div style="position:sticky;top:0;z-index:99;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
-                    <button onclick="window._selVis.size==visitas_sel_count?window._selVis.clear():visitas_sel_ids.forEach(id=>window._selVis.add(id));renderHistorialVisitas();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
+                    <button onclick="window._selVis.size==window._visSelIds.length?window._selVis.clear():window._visSelIds.forEach(id=>window._selVis.add(id));renderHistorialVisitas();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
                     <span style="font-size:13px;color:#888;">${window._selVis.size} seleccionados</span>
                     <div style="display:flex;gap:8px;">
                         <button onclick="window._selModeVis=false;window._selVis=new Set();renderHistorialVisitas();" style="background:#F5F5F5;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Cancelar</button>
