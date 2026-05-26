@@ -6599,7 +6599,7 @@
             auditorias.sort((a, b) => orden === 'desc' ? b.id - a.id : a.id - b.id);
 
             if (search) auditorias = auditorias.filter(a => (a.tienda?.nombre || a.tienda || '').toLowerCase().includes(search));
-            if (fSup) auditorias = auditorias.filter(a => (a.supervisor||'') === fSup);
+            if (fSup) auditorias = auditorias.filter(a => (a.supervisor||'').toLowerCase().includes(fSup.split(' ')[0].toLowerCase()));
             if (fAnio) auditorias = auditorias.filter(a => (a.fecha||'').split('/')[2] === fAnio);
             if (fMes) auditorias = auditorias.filter(a => (a.fecha||'').split('/')[1] === fMes);
             if (fDia) auditorias = auditorias.filter(a => (a.fecha||'').split('/')[0] === fDia);
@@ -6867,7 +6867,7 @@
             const orden = document.getElementById('filtro-vis-orden-sel')?.value || 'desc';
 
             if (search) visitas = visitas.filter(v => (v.tienda?.nombre || v.tienda || '').toLowerCase().includes(search));
-            if (fSup) visitas = visitas.filter(v => (v.supervisor||'') === fSup);
+            if (fSup) visitas = visitas.filter(v => (v.supervisor||'').toLowerCase().includes(fSup.split(' ')[0].toLowerCase()));
             if (fAnio) visitas = visitas.filter(v => {
                 let d = v.datetime ? new Date(v.datetime) : null;
                 return d && !isNaN(d) && String(d.getFullYear()) === fAnio;
