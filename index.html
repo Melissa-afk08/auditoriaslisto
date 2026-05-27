@@ -6777,9 +6777,11 @@
                 id="aud-item-${a.id}"
                 onclick="window._selModeAud ? (()=>{if(window._selAud.has(${a.id}))window._selAud.delete(${a.id});else window._selAud.add(${a.id});renderHistorialAuditorias();})() : verDetalleAuditoria(${a.id})"
                 onmousedown="window._lpAud=setTimeout(()=>{window._lpAudFired=true;window._selModeAud=true;window._selAud.add(${a.id});renderHistorialAuditorias();},600)"
-                ontouchstart="event.preventDefault();window._lpAudFired=false;window._lpAud=setTimeout(()=>{window._lpAudFired=true;window._selModeAud=true;window._selAud.add(${a.id});renderHistorialAuditorias();},600)"
+                onmousedown="window._lpAud=setTimeout(()=>{window._lpAudFired=true;window._selModeAud=true;window._selAud.add(${a.id});renderHistorialAuditorias();},600)"
+                ontouchstart="window._lpAudFired=false;window._touchStartY=event.touches[0].clientY;window._lpAud=setTimeout(()=>{window._lpAudFired=true;window._selModeAud=true;window._selAud.add(${a.id});renderHistorialAuditorias();},600)"
                 onmouseup="clearTimeout(window._lpAud)" onmouseleave="clearTimeout(window._lpAud)"
-                ontouchend="if(window._lpAudFired){event.preventDefault();}clearTimeout(window._lpAud);" ontouchcancel="clearTimeout(window._lpAud)"
+                ontouchmove="if(Math.abs(event.touches[0].clientY-window._touchStartY)>10){clearTimeout(window._lpAud);}"
+                ontouchend="clearTimeout(window._lpAud);" ontouchcancel="clearTimeout(window._lpAud)"
                 style="background:${seleccionado?'#FFF0E6':'white'};border:2px solid ${seleccionado?'#FC6E20':'transparent'};border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.15s;">
                 ${window._selModeAud ? `<div style="width:22px;height:22px;border-radius:50%;border:2px solid ${seleccionado?'#FC6E20':'#ccc'};background:${seleccionado?'#FC6E20':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${seleccionado?'<span style="color:white;font-size:13px;">✓</span>':''}</div>` : ''}
                 <div style="flex:1;">
@@ -7043,9 +7045,11 @@
                 <div
                     onclick="window._selModeVis ? (()=>{if(window._selVis.has(${v.id}))window._selVis.delete(${v.id});else window._selVis.add(${v.id});renderHistorialVisitas();})() : verDetalleVisita(${v.id})"
                     onmousedown="window._lpVis=setTimeout(()=>{window._lpVisFired=true;window._selModeVis=true;window._selVis.add(${v.id});renderHistorialVisitas();},600)"
-                    ontouchstart="event.preventDefault();window._lpVisFired=false;window._lpVis=setTimeout(()=>{window._lpVisFired=true;window._selModeVis=true;window._selVis.add(${v.id});renderHistorialVisitas();},600)"
+                    onmousedown="window._lpVis=setTimeout(()=>{window._lpVisFired=true;window._selModeVis=true;window._selVis.add(${v.id});renderHistorialVisitas();},600)"
+                    ontouchstart="window._lpVisFired=false;window._touchStartYV=event.touches[0].clientY;window._lpVis=setTimeout(()=>{window._lpVisFired=true;window._selModeVis=true;window._selVis.add(${v.id});renderHistorialVisitas();},600)"
                     onmouseup="clearTimeout(window._lpVis)" onmouseleave="clearTimeout(window._lpVis)"
-                    ontouchend="if(window._lpVisFired){event.preventDefault();}clearTimeout(window._lpVis);" ontouchcancel="clearTimeout(window._lpVis)"
+                    ontouchmove="if(Math.abs(event.touches[0].clientY-window._touchStartYV)>10){clearTimeout(window._lpVis);}"
+                    ontouchend="clearTimeout(window._lpVis);" ontouchcancel="clearTimeout(window._lpVis)"
                     style="background:${seleccionado?'#FFF0E6':'white'};border:2px solid ${seleccionado?'#FC6E20':'transparent'};border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.15s;">
                     ${window._selModeVis ? `<div style="width:22px;height:22px;border-radius:50%;border:2px solid ${seleccionado?'#FC6E20':'#ccc'};background:${seleccionado?'#FC6E20':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${seleccionado?'<span style="color:white;font-size:13px;">✓</span>':''}</div>` : ''}
                     <div style="flex:1;">
