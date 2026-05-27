@@ -4769,15 +4769,29 @@
                 const { data, error } = await sbClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
+                        skipBrowserRedirect: true,
                         redirectTo: 'https://auditoriaslisto.vercel.app'
                     }
                 });
-                if (error) {
-                    document.getElementById("login-error").textContent = "Error al conectar con Google. Intenta de nuevo.";
-                    document.getElementById("login-error").style.display = "block";
-                }
+                if (error) throw error;
+
+                // Abrir popup
+                const popup = window.open(data.url, 'google-login', 'width=500,height=600,left=400,top=100');
+
+                // Escuchar cuando el popup cierre o regrese
+                const interval = setInterval(async () => {
+                    if (!popup || popup.closed) {
+                        clearInterval(interval);
+                        await new Promise(r => setTimeout(r, 500));
+                        const ok = await checkGoogleSession();
+                        if (!ok) {
+                            document.getElementById("login-error").textContent = "No se pudo iniciar sesión. Intenta de nuevo.";
+                            document.getElementById("login-error").style.display = "block";
+                        }
+                    }
+                }, 500);
             } catch(e) {
-                document.getElementById("login-error").textContent = "Error inesperado. Intenta de nuevo.";
+                document.getElementById("login-error").textContent = "Error al conectar con Google. Intenta de nuevo.";
                 document.getElementById("login-error").style.display = "block";
             }
         }
