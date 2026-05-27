@@ -6818,11 +6818,13 @@
                 });
                 localStorage.setItem("auditorias", JSON.stringify(auds));
                 localStorage.setItem("papelera_auditorias", JSON.stringify(papelera));
+                const idsToDelete = Array.from(window._selAud);
                 window._selModeAud = false;
                 window._selAud = new Set();
                 closeModal('modal-confirm');
-                renderHistorialAuditorias();
                 showToast(`${n} registro${n>1?'s':''} enviado${n>1?'s':''} a papelera`, 'success');
+                try { await sbClient.from('auditorias').delete().in('id', idsToDelete); } catch(e) {}
+                renderHistorialAuditorias();
             };
             document.getElementById("modal-confirm").style.display = "flex";
         }
@@ -7088,11 +7090,13 @@
                 });
                 localStorage.setItem("visitas", JSON.stringify(viss));
                 localStorage.setItem("papelera_visitas", JSON.stringify(papelera));
+                const idsToDeleteV = Array.from(window._selVis);
                 window._selModeVis = false;
                 window._selVis = new Set();
                 closeModal('modal-confirm');
-                renderHistorialVisitas();
                 showToast(`${n} registro${n>1?'s':''} enviado${n>1?'s':''} a papelera`, 'success');
+                try { await sbClient.from('visitas').delete().in('id', idsToDeleteV); } catch(e) {}
+                renderHistorialVisitas();
             };
             document.getElementById("modal-confirm").style.display = "flex";
         }
