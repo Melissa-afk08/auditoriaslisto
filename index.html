@@ -8313,6 +8313,10 @@
                 cargarResultadoPublico(resultadoId);
             } else {
                 initData();
+                // Esperar a que Supabase procese el hash de OAuth si existe
+                if (window.location.hash.includes('access_token')) {
+                    await new Promise(r => setTimeout(r, 1500));
+                }
                 const googleSession = await checkGoogleSession();
                 if (!googleSession) initApp();
             }
