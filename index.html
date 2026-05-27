@@ -7647,7 +7647,19 @@
         function renderPapelera() {
             let audsPap = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
             let visPap = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
+            window._selPapAud = window._selPapAud || new Set();
+            window._selPapVis = window._selPapVis || new Set();
             let html = '';
+
+            // Barra selección auditorías
+            if (canDeleteRecords() && audsPap.length > 0) {
+                html += `<div style="background:white;border-radius:16px;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                    <button onclick="window._selPapAud.size===window._papAudIds?.length?window._selPapAud.clear():window._papAudIds?.forEach(id=>window._selPapAud.add(id));renderPapelera();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
+                    <span style="font-size:12px;color:#888;">${window._selPapAud.size} seleccionados</span>
+                    <button onclick="eliminarSeleccionPapeleraAud()" style="background:#FF3B30;border:none;color:white;border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">🗑 Eliminar</button>
+                </div>`;
+            }
+            window._papAudIds = [];
 
             html += `<div style="font-size:13px;font-weight:800;color:#888;letter-spacing:1px;margin-bottom:12px;">AUDITORÍAS ELIMINADAS (${audsPap.length})</div>`;
             if (audsPap.length === 0) {
@@ -7655,28 +7667,42 @@
             } else {
                 audsPap.slice().reverse().forEach((a, i) => {
                     let ri = audsPap.length - 1 - i;
+                    window._papAudIds.push(ri);
                     let nombre = typeof a.tienda === 'string' ? a.tienda : a.tienda?.nombre;
                     let score = Math.round(a.notaFinal || a.finalScore || 0);
                     let color = score <= 70 ? '#C62828' : score <= 90 ? '#F9A825' : '#43A047';
+                    let sel = window._selPapAud.has(ri);
                     html += `
-                        <div style="background:white;border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                        <div onclick="if(canDeleteRecords()){window._selPapAud.has(${ri})?window._selPapAud.delete(${ri}):window._selPapAud.add(${ri});renderPapelera();}" style="background:${sel?'#FFF0E6':'white'};border:2px solid ${sel?'#FC6E20':'transparent'};border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;transition:all 0.15s;">
                             <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                                <div>
-                                    <div style="font-size:13px;color:var(--naranja);font-weight:700;">${a.supervisor || ''}</div>
-                                    <div style="font-size:15px;font-weight:800;">${nombre}</div>
-                                    <div style="font-size:12px;color:#888;margin-top:2px;">${a.fecha} ${a.hora}</div>
-                                    <div style="font-size:11px;color:#bbb;margin-top:4px;">Eliminado por ${a.eliminadoPor} · ${new Date(a.eliminadoEn).toLocaleDateString('es-PE')}</div>
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    ${canDeleteRecords() ? `<div style="width:20px;height:20px;border-radius:50%;border:2px solid ${sel?'#FC6E20':'#ccc'};background:${sel?'#FC6E20':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${sel?'<span style="color:white;font-size:11px;">✓</span>':''}</div>` : ''}
+                                    <div>
+                                        <div style="font-size:13px;color:var(--naranja);font-weight:700;">${a.supervisor || ''}</div>
+                                        <div style="font-size:15px;font-weight:800;">${nombre}</div>
+                                        <div style="font-size:12px;color:#888;margin-top:2px;">${a.fecha} ${a.hora}</div>
+                                        <div style="font-size:11px;color:#bbb;margin-top:4px;">Eliminado por ${a.eliminadoPor} · ${new Date(a.eliminadoEn).toLocaleDateString('es-PE')}</div>
+                                    </div>
                                 </div>
                                 <span style="background:${color};color:white;border-radius:50px;padding:4px 10px;font-size:13px;font-weight:700;">${score}%</span>
                             </div>
-                            ${canDeleteRecords() ? `<div style="display:flex;gap:8px;margin-top:12px;">
+                            ${canDeleteRecords() ? `<div style="display:flex;gap:8px;margin-top:12px;" onclick="event.stopPropagation()">
                                 <button onclick="restaurarAuditoria(${ri})" style="flex:1;padding:8px;border-radius:50px;background:#E8F5E9;color:#2E7D32;border:none;font-size:12px;font-weight:700;cursor:pointer;">↩ Restaurar</button>
                                 <button onclick="eliminarDefinitivoAuditoria(${ri})" style="flex:1;padding:8px;border-radius:50px;background:#FFF0F0;color:#C62828;border:none;font-size:12px;font-weight:700;cursor:pointer;">🗑️ Eliminar definitivo</button>
                             </div>` : ''}
-                        </div>
-                    `;
+                        </div>`;
                 });
             }
+
+            // Barra selección visitas
+            if (canDeleteRecords() && visPap.length > 0) {
+                html += `<div style="background:white;border-radius:16px;padding:10px 14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                    <button onclick="window._selPapVis.size===window._papVisIds?.length?window._selPapVis.clear():window._papVisIds?.forEach(id=>window._selPapVis.add(id));renderPapelera();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
+                    <span style="font-size:12px;color:#888;">${window._selPapVis.size} seleccionados</span>
+                    <button onclick="eliminarSeleccionPapeleraVis()" style="background:#FF3B30;border:none;color:white;border-radius:50px;padding:5px 12px;font-size:11px;font-weight:700;cursor:pointer;">🗑 Eliminar</button>
+                </div>`;
+            }
+            window._papVisIds = [];
 
             html += `<div style="font-size:13px;font-weight:800;color:#888;letter-spacing:1px;margin-top:8px;margin-bottom:12px;">VISITAS ELIMINADAS (${visPap.length})</div>`;
             if (visPap.length === 0) {
@@ -7684,25 +7710,63 @@
             } else {
                 visPap.slice().reverse().forEach((v, i) => {
                     let ri = visPap.length - 1 - i;
+                    window._papVisIds.push(ri);
+                    let sel = window._selPapVis.has(ri);
                     html += `
-                        <div style="background:white;border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                        <div onclick="if(canDeleteRecords()){window._selPapVis.has(${ri})?window._selPapVis.delete(${ri}):window._selPapVis.add(${ri});renderPapelera();}" style="background:${sel?'#FFF0E6':'white'};border:2px solid ${sel?'#FC6E20':'transparent'};border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.06);cursor:pointer;transition:all 0.15s;">
                             <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-                                <div>
-                                    <div style="font-size:13px;color:var(--naranja);font-weight:700;">${v.supervisor || ''}</div>
-                                    <div style="font-size:15px;font-weight:800;">${v.tienda}</div>
-                                    <div style="font-size:12px;color:#888;margin-top:2px;">${new Date(v.datetime).toLocaleDateString('es-PE')}</div>
-                                    <div style="font-size:11px;color:#bbb;margin-top:4px;">Eliminado por ${v.eliminadoPor} · ${new Date(v.eliminadoEn).toLocaleDateString('es-PE')}</div>
+                                <div style="display:flex;align-items:center;gap:10px;">
+                                    ${canDeleteRecords() ? `<div style="width:20px;height:20px;border-radius:50%;border:2px solid ${sel?'#FC6E20':'#ccc'};background:${sel?'#FC6E20':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${sel?'<span style="color:white;font-size:11px;">✓</span>':''}</div>` : ''}
+                                    <div>
+                                        <div style="font-size:13px;color:var(--naranja);font-weight:700;">${v.supervisor || ''}</div>
+                                        <div style="font-size:15px;font-weight:800;">${v.tienda}</div>
+                                        <div style="font-size:12px;color:#888;margin-top:2px;">${new Date(v.datetime).toLocaleDateString('es-PE')}</div>
+                                        <div style="font-size:11px;color:#bbb;margin-top:4px;">Eliminado por ${v.eliminadoPor} · ${new Date(v.eliminadoEn).toLocaleDateString('es-PE')}</div>
+                                    </div>
                                 </div>
                             </div>
-                            ${canDeleteRecords() ? `<div style="display:flex;gap:8px;margin-top:12px;">
+                            ${canDeleteRecords() ? `<div style="display:flex;gap:8px;margin-top:12px;" onclick="event.stopPropagation()">
                                 <button onclick="restaurarVisita(${ri})" style="flex:1;padding:8px;border-radius:50px;background:#E8F5E9;color:#2E7D32;border:none;font-size:12px;font-weight:700;cursor:pointer;">↩ Restaurar</button>
                                 <button onclick="eliminarDefinitivoVisita(${ri})" style="flex:1;padding:8px;border-radius:50px;background:#FFF0F0;color:#C62828;border:none;font-size:12px;font-weight:700;cursor:pointer;">🗑️ Eliminar definitivo</button>
                             </div>` : ''}
-                        </div>
-                    `;
+                        </div>`;
                 });
             }
             document.getElementById('papelera-content').innerHTML = html;
+        }
+
+        function eliminarSeleccionPapeleraAud() {
+            if (window._selPapAud.size === 0) return;
+            const n = window._selPapAud.size;
+            document.getElementById("mc-desc").innerText = `¿Eliminar definitivamente ${n} auditoría${n>1?'s':''}? Esta acción NO se puede deshacer.`;
+            document.getElementById("mc-btn").onclick = function() {
+                let pap = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
+                const indices = Array.from(window._selPapAud).sort((a,b) => b-a);
+                indices.forEach(idx => pap.splice(idx, 1));
+                localStorage.setItem("papelera_auditorias", JSON.stringify(pap));
+                window._selPapAud = new Set();
+                closeModal('modal-confirm');
+                showToast(`${n} auditoría${n>1?'s':''} eliminada${n>1?'s':''} definitivamente`, 'error');
+                renderPapelera();
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
+        }
+
+        function eliminarSeleccionPapeleraVis() {
+            if (window._selPapVis.size === 0) return;
+            const n = window._selPapVis.size;
+            document.getElementById("mc-desc").innerText = `¿Eliminar definitivamente ${n} visita${n>1?'s':''}? Esta acción NO se puede deshacer.`;
+            document.getElementById("mc-btn").onclick = function() {
+                let pap = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
+                const indices = Array.from(window._selPapVis).sort((a,b) => b-a);
+                indices.forEach(idx => pap.splice(idx, 1));
+                localStorage.setItem("papelera_visitas", JSON.stringify(pap));
+                window._selPapVis = new Set();
+                closeModal('modal-confirm');
+                showToast(`${n} visita${n>1?'s':''} eliminada${n>1?'s':''} definitivamente`, 'error');
+                renderPapelera();
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         function restaurarAuditoria(idx) {
