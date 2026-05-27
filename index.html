@@ -1077,12 +1077,13 @@
             filter: brightness(1.05);
         }
 
-        .action-card:nth-child(1) { background: linear-gradient(135deg, #7B2D00, #B84A1A); }
-        .action-card:nth-child(2) { background: linear-gradient(135deg, #1E3A4A, #2E6B8A); }
-        .action-card:nth-child(3) { background: linear-gradient(135deg, #4A5240, #7A8A6A); }
-        .action-card:nth-child(4) { background: linear-gradient(135deg, #6B2737, #A0435A); }
-        .action-card:nth-child(5) { background: linear-gradient(135deg, #78350F, #C4732A); }
-        .action-card:nth-child(6) { background: linear-gradient(135deg, #1A3A2A, #2E6B4A); }
+        .action-card:nth-child(1) { background: linear-gradient(145deg, #D96242, #A13A34); border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(169,57,52,0.35); }
+        .action-card:nth-child(2) { background: linear-gradient(145deg, #F9AB47, #D96242); border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(217,98,66,0.35); }
+        .action-card:nth-child(3) { background: linear-gradient(145deg, #A13A34, #7A2828); border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(122,40,40,0.35); }
+        .action-card:nth-child(4) { background: linear-gradient(145deg, #D96242, #F9AB47); border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(249,171,71,0.35); }
+        .action-card:nth-child(5) { background: linear-gradient(145deg, #A13A34, #D96242); border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(169,57,52,0.35); }
+        .action-card:nth-child(6) { background: linear-gradient(145deg, #F9AB47, #A13A34); border: 1.5px solid rgba(255,255,255,0.15); box-shadow: 0 8px 24px rgba(161,58,52,0.35); }
+        .action-card-ajustes { background: linear-gradient(145deg, #F9AB47, #A13A34) !important; border: 1.5px solid rgba(255,255,255,0.15) !important; box-shadow: 0 8px 24px rgba(161,58,52,0.35) !important; }
 
         .action-card .action-label { color: white !important; }
         .action-card .action-desc { color: rgba(255,255,255,0.75) !important; }
@@ -3135,7 +3136,7 @@
                         <div class="action-label">Usuarios</div>
                         <div class="action-desc">Gestión del equipo de supervisores</div>
                     </div>
-                    <div class="action-card" onclick="showView('view-ajustes')">
+                    <div class="action-card action-card-ajustes" onclick="showView('view-ajustes')">
                         <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
                                 <circle cx="12" cy="12" r="3"></circle>
