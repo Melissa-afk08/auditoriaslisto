@@ -4760,37 +4760,37 @@
 
             if (window._loginStep === 'email') {
                 const email = document.getElementById("login-email").value.trim();
-                if (!email) { err.textContent = "Ingresa tu correo."; err.style.display = 'block'; return; }
+                if (!email) { err.textContent = "Selecciona tu correo."; err.style.display = 'block'; return; }
 
-                // Verificar si está en el sistema
+                // Consultar usuario desde Supabase directamente
+                let found = null;
                 try {
-                    const { data } = await sbClient.from('usuarios').select('*');
-                    if (data) localStorage.setItem("usuarios", JSON.stringify(data));
-                } catch(e) {}
+                    const { data } = await sbClient.from('usuarios').select('*').eq('email', email).single();
+                    found = data;
+                    if (data) {
+                        let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+                        const idx = users.findIndex(u => u.email.toLowerCase() === email.toLowerCase());
+                        if (idx >= 0) users[idx] = data; else users.push(data);
+                        localStorage.setItem("usuarios", JSON.stringify(users));
+                    }
+                } catch(e) {
+                    let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+                    found = users.find(u => u.email.toLowerCase() === email.toLowerCase()) || null;
+                }
 
-                let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
-                let found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
-                if (!found) { err.textContent = "Este correo no tiene acceso a la aplicación."; err.style.display = 'block'; return; }
+                if (!found) { err.textContent = "Este correo no tiene acceso a la aplicacion."; err.style.display = 'block'; return; }
 
-                // Verificar si ya tiene cuenta en Supabase Auth
-                const { data: signIn } = await sbClient.auth.signInWithPassword({ email, password: '___check___' });
-                const { data: methods } = await sbClient.auth.signInWithOtp({ email, shouldCreateUser: false }).catch(() => ({ data: null }));
-
-                // Intentar ver si el usuario existe en auth
-                const testSign = await sbClient.auth.signInWithPassword({ email, password: 'test_nonexistent_pwd_12345' });
-
-                if (testSign.error?.message?.includes('Invalid login credentials')) {
-                    // Usuario existe en Auth → pedir contraseña
+                // Deteccion limpia via tiene_password
+                if (found.tiene_password) {
                     window._loginStep = 'password';
                     document.getElementById('login-pass-group').style.display = 'flex';
                     document.getElementById('login-forgot').style.display = 'block';
                     document.getElementById('login-password').focus();
                 } else {
-                    // Usuario no tiene cuenta Auth aún → crear contraseña
                     window._loginStep = 'newpassword';
                     document.getElementById('login-newpass-group').style.display = 'flex';
                     document.getElementById('login-newpassword').focus();
-                    err.textContent = "Primera vez. Crea tu contraseña de acceso.";
+                    err.textContent = "Primera vez. Crea tu contrasena de acceso (min. 8 caracteres).";
                     err.style.color = '#FC6E20';
                     err.style.display = 'block';
                 }
@@ -4798,10 +4798,10 @@
             } else if (window._loginStep === 'password') {
                 const email = document.getElementById("login-email").value.trim();
                 const password = document.getElementById("login-password").value;
-                if (!password) { err.textContent = "Ingresa tu contraseña."; err.style.display = 'block'; return; }
+                if (!password) { err.textContent = "Ingresa tu contrasena."; err.style.display = 'block'; return; }
 
                 const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
-                if (error) { err.textContent = "Contraseña incorrecta."; err.style.color = '#C62828'; err.style.display = 'block'; return; }
+                if (error) { err.textContent = "Contrasena incorrecta."; err.style.color = '#C62828'; err.style.display = 'block'; return; }
 
                 let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
                 let found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
@@ -4811,13 +4811,19 @@
             } else if (window._loginStep === 'newpassword') {
                 const email = document.getElementById("login-email").value.trim();
                 const password = document.getElementById("login-newpassword").value;
-                if (password.length < 8) { err.textContent = "La contraseña debe tener al menos 8 caracteres."; err.style.color = '#C62828'; err.style.display = 'block'; return; }
+                if (password.length < 8) { err.textContent = "La contrasena debe tener al menos 8 caracteres."; err.style.color = '#C62828'; err.style.display = 'block'; return; }
 
                 const { data, error } = await sbClient.auth.signUp({ email, password });
-                if (error) { err.textContent = "Error al crear contraseña: " + error.message; err.style.color = '#C62828'; err.style.display = 'block'; return; }
+                if (error) { err.textContent = "Error al crear contrasena: " + error.message; err.style.color = '#C62828'; err.style.display = 'block'; return; }
 
+                // Marcar tiene_password = true en Supabase
+                await sbClient.from('usuarios').update({ tiene_password: true }).eq('email', email);
+
+                // Actualizar localStorage
                 let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
                 let found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+                if (found) found.tiene_password = true;
+                localStorage.setItem("usuarios", JSON.stringify(users));
                 localStorage.setItem("currentUser", JSON.stringify(found));
                 initApp();
             }
