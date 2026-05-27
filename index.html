@@ -4766,6 +4766,9 @@
 
         async function handleSocialLogin(provider) {
             try {
+                // Abrir popup vacío primero (desde click directo)
+                const popup = window.open('', 'google-login', 'width=500,height=600,left=400,top=100');
+
                 const { data, error } = await sbClient.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
@@ -4775,8 +4778,8 @@
                 });
                 if (error) throw error;
 
-                // Abrir popup
-                const popup = window.open(data.url, 'google-login', 'width=500,height=600,left=400,top=100');
+                // Redirigir el popup a la URL de Google
+                popup.location.href = data.url;
 
                 // Escuchar cuando el popup cierre o regrese
                 const interval = setInterval(async () => {
