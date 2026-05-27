@@ -4715,6 +4715,7 @@
         async function checkGoogleSession() {
             try {
                 const { data: { session } } = await sbClient.auth.getSession();
+                alert('Session: ' + (session ? session.user.email : 'null'));
                 if (session?.user?.email) {
                     const email = session.user.email;
                     // Siempre cargar usuarios frescos desde Supabase
