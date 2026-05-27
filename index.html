@@ -4717,11 +4717,11 @@
                 const { data: { session } } = await sbClient.auth.getSession();
                 if (session?.user?.email) {
                     const email = session.user.email;
-                    let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
-                    if (users.length === 0) {
-                        const { data } = await sbClient.from('usuarios').select('*');
-                        if (data) { users = data; localStorage.setItem("usuarios", JSON.stringify(data)); }
-                    }
+                    // Siempre cargar usuarios frescos desde Supabase
+                    const { data: usuariosData } = await sbClient.from('usuarios').select('*');
+                    const users = usuariosData || JSON.parse(localStorage.getItem("usuarios") || "[]");
+                    if (usuariosData) localStorage.setItem("usuarios", JSON.stringify(usuariosData));
+
                     let found = users.find(u => u.email.toLowerCase() === email.toLowerCase());
                     if (found) {
                         localStorage.setItem("currentUser", JSON.stringify(found));
@@ -4729,13 +4729,15 @@
                         return true;
                     } else {
                         await sbClient.auth.signOut();
-                        document.getElementById("login-error").textContent = "Este correo no tiene acceso a la aplicación.";
-                        document.getElementById("login-error").style.display = "block";
                         showView('view-login');
+                        setTimeout(() => {
+                            document.getElementById("login-error").textContent = `El correo ${email} no tiene acceso a la aplicación.`;
+                            document.getElementById("login-error").style.display = "block";
+                        }, 300);
                         return false;
                     }
                 }
-            } catch(e) {}
+            } catch(e) { console.error('checkGoogleSession error:', e); }
             return false;
         }
 
