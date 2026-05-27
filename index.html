@@ -6725,13 +6725,16 @@
             let borradoresHtml = borradoresFiltrados.map(b => {
                 let nombre = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '';
                 return `
-                <div style="background:#FFF8E1;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;border-left:4px solid #F9A825;" onclick="continuarBorradorDesdeHistorial('${b.id}')">
-                    <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div style="background:#FFF8E1;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;border-left:4px solid #F9A825;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;" onclick="continuarBorradorDesdeHistorial('${b.id}')">
                         <div style="font-size:12px;color:#F9A825;font-weight:700;">⏸ EN PROGRESO · ${b.supervisor || ''}</div>
                         <span style="background:#F9A825;color:#1B1B1B;border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">BORRADOR</span>
                     </div>
-                    <div style="font-size:15px;font-weight:800;color:#1B1B1B;margin-top:4px;">${nombre}</div>
-                    <div style="font-size:12px;color:#888;margin-top:4px;">${b.fecha || ''} ${b.hora || ''} · Toca para continuar</div>
+                    <div style="font-size:15px;font-weight:800;color:#1B1B1B;margin-top:4px;cursor:pointer;" onclick="continuarBorradorDesdeHistorial('${b.id}')">${nombre}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                        <div style="font-size:12px;color:#888;cursor:pointer;" onclick="continuarBorradorDesdeHistorial('${b.id}')">${b.fecha || ''} ${b.hora || ''} · Toca para continuar</div>
+                        <button onclick="eliminarBorrador('${b.id}')" style="background:none;border:none;color:#FF3B30;font-size:12px;font-weight:700;cursor:pointer;padding:4px 8px;">🗑 Eliminar</button>
+                    </div>
                 </div>`;
             }).join('');
 
@@ -6825,6 +6828,19 @@
                 showToast(`${n} registro${n>1?'s':''} enviado${n>1?'s':''} a papelera`, 'success');
                 try { await sbClient.from('auditorias').delete().in('id', idsToDelete); } catch(e) {}
                 renderHistorialAuditorias();
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
+        }
+
+        function eliminarBorrador(borradorId) {
+            document.getElementById("mc-desc").innerText = "¿Eliminar esta auditoría en progreso? Se perderá todo el avance.";
+            document.getElementById("mc-btn").onclick = function() {
+                let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
+                borradores = borradores.filter(b => b.id != borradorId);
+                localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
+                closeModal('modal-confirm');
+                renderHistorialAuditorias();
+                showToast("Borrador eliminado", "success");
             };
             document.getElementById("modal-confirm").style.display = "flex";
         }
