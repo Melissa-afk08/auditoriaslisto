@@ -8381,16 +8381,61 @@
                 cargarResultadoPublico(resultadoId);
             } else {
                 initData();
-                // Esperar a que Supabase procese el hash de OAuth si existe
-                if (window.location.hash.includes('access_token')) {
+                // Detectar recovery token en el hash
+                if (window.location.hash.includes('type=recovery') || window.location.hash.includes('access_token')) {
                     await new Promise(r => setTimeout(r, 1500));
+                    const { data: { session } } = await sbClient.auth.getSession();
+                    if (session && window.location.hash.includes('type=recovery')) {
+                        mostrarModalResetPassword();
+                        return;
+                    }
                 }
                 const googleSession = await checkGoogleSession();
                 if (!googleSession) initApp();
             }
         };
 
+        function mostrarModalResetPassword() {
+            document.getElementById('modal-reset-password').style.display = 'flex';
+        }
+
+        async function confirmarResetPassword() {
+            const p1 = document.getElementById('reset-pass-1').value;
+            const p2 = document.getElementById('reset-pass-2').value;
+            const err = document.getElementById('reset-pass-err');
+            err.style.display = 'none';
+            if (p1.length < 8) { err.textContent = "Minimo 8 caracteres."; err.style.display = 'block'; return; }
+            if (p1 !== p2) { err.textContent = "Las contrasenas no coinciden."; err.style.display = 'block'; return; }
+            const { error } = await sbClient.auth.updateUser({ password: p1 });
+            if (error) { err.textContent = "Error: " + error.message; err.style.display = 'block'; return; }
+            // Obtener email de la sesion activa y marcar tiene_password
+            const { data: { session } } = await sbClient.auth.getSession();
+            if (session?.user?.email) {
+                await sbClient.from('usuarios').update({ tiene_password: true }).eq('email', session.user.email);
+            }
+            document.getElementById('modal-reset-password').style.display = 'none';
+            alert('Contrasena actualizada. Ahora puedes iniciar sesion.');
+            await sbClient.auth.signOut();
+            showView('view-login');
+        }
+
     </script>
+<!-- MODAL RESET PASSWORD -->
+    <div id="modal-reset-password" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;padding:20px;">
+        <div style="background:white;border-radius:20px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+            <div style="font-size:18px;font-weight:800;color:#1B1B1B;margin-bottom:6px;">Nueva contrasena</div>
+            <div style="font-size:13px;color:#888;margin-bottom:20px;">Elige una contrasena segura de al menos 8 caracteres.</div>
+            <div style="background:#F5F5F5;border-radius:14px;padding:12px 16px;margin-bottom:12px;">
+                <input type="password" id="reset-pass-1" placeholder="Nueva contrasena" style="background:transparent;outline:none;border:none;width:100%;font-family:inherit;font-size:14px;">
+            </div>
+            <div style="background:#F5F5F5;border-radius:14px;padding:12px 16px;margin-bottom:16px;">
+                <input type="password" id="reset-pass-2" placeholder="Confirmar contrasena" style="background:transparent;outline:none;border:none;width:100%;font-family:inherit;font-size:14px;">
+            </div>
+            <p id="reset-pass-err" style="display:none;color:#C62828;font-size:12px;margin-bottom:12px;text-align:center;"></p>
+            <button onclick="confirmarResetPassword()" style="background:#FC6E20;color:white;border:none;border-radius:50px;padding:14px;width:100%;font-size:14px;font-weight:700;cursor:pointer;">Guardar contrasena</button>
+        </div>
+    </div>
+
 <!-- MODAL ORTOGRAFÍA -->
     <div id="modal-ortografia" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:flex-end; justify-content:center;">
         <div style="background:white; width:100%; max-width:430px; border-radius:24px 24px 0 0; padding:24px 20px; max-height:80vh; overflow-y:auto; animation:slideUp 0.3s ease-out forwards;">
