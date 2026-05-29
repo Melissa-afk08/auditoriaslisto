@@ -6934,6 +6934,10 @@
                 closeModal('modal-confirm');
                 showToast(`${n} registro${n>1?'s':''} enviado${n>1?'s':''} a papelera`, 'success');
                 try { await sbClient.from('auditorias').delete().in('id', idsToDelete); } catch(e) {}
+                // Limpiar localStorage antes de re-renderizar para que no muestre datos viejos
+                let audsActuales = JSON.parse(localStorage.getItem("auditorias") || "[]");
+                audsActuales = audsActuales.filter(a => !idsToDelete.includes(a.id));
+                localStorage.setItem("auditorias", JSON.stringify(audsActuales));
                 renderHistorialAuditorias();
             };
             document.getElementById("modal-confirm").style.display = "flex";
