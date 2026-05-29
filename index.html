@@ -6325,9 +6325,9 @@
                 let finalS = parseFloat(data.notaFinal || data.finalScore) || 0;
                 let mainColor = finalS <= 70 ? [198, 40, 40] : (finalS <= 90 ? [255, 179, 0] : [52, 199, 89]);
 
-                y += 8;
+                y += 4;
                 addText("RESULTADOS DE CHECKLIST", 13, true, [100, 100, 100], 'center');
-                y += 10;
+                y += 8;
 
                 // SEMÁFORO
                 const semW = 27; const semH = 65;
@@ -6344,7 +6344,7 @@
                     pdf.setFillColor(c[0], c[1], c[2]);
                     pdf.circle(semX + semW / 2, ly, luzR, 'F');
                 });
-                y += semH + 14;
+                y += semH + 6;
 
                 addText(`${finalS.toFixed(1)}%`, 32, true, mainColor, 'center');
                 y += 11;
