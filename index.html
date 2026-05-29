@@ -2958,7 +2958,7 @@
                             <polyline points="22,6 12,13 2,6"></polyline>
                         </svg>
                     </span>
-                    <select id="login-email" style="background:transparent;outline:none;border:none;width:100%;font-family:inherit;font-size:14px;color:#1B1B1B;cursor:pointer;">
+                    <select id="login-email" onchange="resetLoginStep()" style="background:transparent;outline:none;border:none;width:100%;font-family:inherit;font-size:14px;color:#1B1B1B;cursor:pointer;">
                         <option value="" disabled selected>Selecciona tu correo</option>
                     </select>
                 </div>
@@ -4737,6 +4737,16 @@
         }
 
         window._loginStep = 'email'; // 'email' | 'password' | 'newpassword'
+
+        function resetLoginStep() {
+            window._loginStep = 'email';
+            document.getElementById('login-pass-group').style.display = 'none';
+            document.getElementById('login-newpass-group').style.display = 'none';
+            document.getElementById('login-forgot').style.display = 'none';
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('login-password').value = '';
+            document.getElementById('login-newpassword').value = '';
+        }
 
         async function cargarCorreosLogin() {
             const select = document.getElementById('login-email');
