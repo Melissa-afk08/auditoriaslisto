@@ -8372,6 +8372,15 @@
         }
 
         // BOOT
+        // Escuchar eventos de auth antes de que la app cargue
+        sbClient.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY') {
+                // Supabase detectó el token de recovery → mostrar modal
+                initData();
+                mostrarModalResetPassword();
+            }
+        });
+
         window.onload = async () => {
             let params = new URLSearchParams(window.location.search);
             let resultadoId = params.get('resultado');
@@ -8381,15 +8390,6 @@
                 cargarResultadoPublico(resultadoId);
             } else {
                 initData();
-                // Detectar recovery token en el hash
-                if (window.location.hash.includes('type=recovery') || window.location.hash.includes('access_token')) {
-                    await new Promise(r => setTimeout(r, 1500));
-                    const { data: { session } } = await sbClient.auth.getSession();
-                    if (session && window.location.hash.includes('type=recovery')) {
-                        mostrarModalResetPassword();
-                        return;
-                    }
-                }
                 const googleSession = await checkGoogleSession();
                 if (!googleSession) initApp();
             }
