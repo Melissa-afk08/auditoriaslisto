@@ -4977,13 +4977,30 @@ if (viewId === 'view-usuarios') renderUsuarios();
                         <div style="font-size:11px; color:#FC6E20; font-weight:600;">${u.cargo}</div>
                         <div style="font-size:11px; color:#aaa;">${u.email}${u.telefono ? ' · ' + u.telefono : ''}</div>
                     </div>
+                    <div style="display:flex;gap:8px;flex-shrink:0;">
                     ${protegido
                         ? `<span style="font-size:10px; color:#aaa; font-weight:600; padding:4px 10px; background:#F5F5F5; border-radius:50px;">Protegido</span>`
-                        : `<button onclick="confirmDeleteUserAdmin(${i}, '${u.nombre}')" style="background:#FFF0F0; border:none; border-radius:50%; width:34px; height:34px; cursor:pointer; font-size:16px; color:#C62828; flex-shrink:0;">🗑️</button>`
+                        : `<button onclick="editarUsuarioAdmin(${i})" style="background:#FFF0E6; border:none; border-radius:50%; width:34px; height:34px; cursor:pointer; font-size:16px; flex-shrink:0;">✏️</button>
+                           <button onclick="confirmDeleteUserAdmin(${i}, '${u.nombre}')" style="background:#FFF0F0; border:none; border-radius:50%; width:34px; height:34px; cursor:pointer; font-size:16px; color:#C62828; flex-shrink:0;">🗑️</button>`
                     }
+                    </div>
                 </div>`;
             }).join('');
             document.getElementById('editor-usuarios-lista').innerHTML = html || '<div style="text-align:center;color:#bbb;padding:20px;">Sin usuarios registrados</div>';
+        }
+
+        function editarUsuarioAdmin(i) {
+            let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+            let u = users[i];
+            if (!u) return;
+            document.getElementById("add-user-name").value = u.nombre || '';
+            document.getElementById("add-user-email").value = u.email || '';
+            document.getElementById("add-user-cargo").value = u.cargo || '';
+            document.getElementById("add-user-tel").value = u.telefono || '';
+            document.getElementById("add-user-idx").value = i;
+            document.getElementById("mu-title").innerText = "Editar Usuario";
+            document.getElementById("mu-btn").innerText = "Guardar cambios";
+            document.getElementById("modal-user").style.display = "flex";
         }
 
         function confirmDeleteUserAdmin(i, name) {
