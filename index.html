@@ -6628,6 +6628,8 @@ if (viewId === 'view-usuarios') renderUsuarios();
                 }
 
                 // FIRMA
+                let firmaSource = data.firma || data.firma_url || null;
+                if (firmaSource) { data = { ...data, firma: firmaSource }; }
                 if (data.firma) {
                     checkPageBreak(20);
                     y += 10;
@@ -7137,10 +7139,26 @@ if (viewId === 'view-usuarios') renderUsuarios();
             continuarBorradorAuditoria(b);
         }
 
-        function verDetalleAuditoria(id) {
+        async function verDetalleAuditoria(id) {
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
             let data = auds.find(a => a.id === id);
             if (!data) return;
+            // Si no tiene firma local, intentar cargar desde Supabase
+            if (!data.firma) {
+                try {
+                    let { data: sbData } = await sbClient.from('auditorias').select('firma_url,respuestas').eq('id', id).single();
+                    if (sbData?.firma_url) data.firma = sbData.firma_url;
+                    if (sbData?.respuestas) {
+                        // Merge fotos desde Supabase si localmente están vacías
+                        for (let pid in sbData.respuestas) {
+                            if (!data.respuestas[pid]) data.respuestas[pid] = sbData.respuestas[pid];
+                            else if (sbData.respuestas[pid]?.fotos?.length > 0 && (!data.respuestas[pid]?.fotos || data.respuestas[pid].fotos.length === 0)) {
+                                data.respuestas[pid].fotos = sbData.respuestas[pid].fotos;
+                            }
+                        }
+                    }
+                } catch(e) {}
+            }
             window.auditActual = data;
             window.auditDesdeHistorial = true;
             renderAuditoriaResultado(data);
