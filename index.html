@@ -3626,6 +3626,10 @@
                     <div id="res-aud-enc" style="font-size:13px; color:white; font-weight:700;"></div>
                 </div>
             </div>
+            <div id="res-aud-ubicacion-wrap" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.2);">
+                <div style="font-size:10px;color:white;opacity:0.7;text-transform:uppercase;margin-bottom:3px;">📍 Ubicación registrada</div>
+                <div id="res-aud-ubicacion" style="font-size:11px;color:white;opacity:0.9;line-height:1.4;"></div>
+            </div>
 
             <!-- SECCIÓN RESULTADOS DE CHECKLIST -->
             <div
@@ -6289,6 +6293,14 @@ if (viewId === 'view-usuarios') renderUsuarios();
 
             document.getElementById("res-aud-sup").textContent = data.supervisor;
             document.getElementById("res-aud-enc").textContent = data.encargado || '-';
+            let ubicWrap = document.getElementById("res-aud-ubicacion-wrap");
+            let ubicEl = document.getElementById("res-aud-ubicacion");
+            if (data.ubicacionGPS && ubicWrap && ubicEl) {
+                ubicEl.textContent = data.ubicacionGPS;
+                ubicWrap.style.display = 'block';
+            } else if (ubicWrap) {
+                ubicWrap.style.display = 'none';
+            }
 
             let sr = document.getElementById("sem-rojo");
             let sa = document.getElementById("sem-amarillo");
@@ -7145,8 +7157,9 @@ if (viewId === 'view-usuarios') renderUsuarios();
             // Si no tiene firma local, intentar cargar desde Supabase
             if (!data.firma) {
                 try {
-                    let { data: sbData } = await sbClient.from('auditorias').select('firma_url,respuestas').eq('id', id).single();
+                    let { data: sbData } = await sbClient.from('auditorias').select('firma_url,respuestas,ubicacion_gps').eq('id', id).single();
                     if (sbData?.firma_url) data.firma = sbData.firma_url;
+                    if (sbData?.ubicacion_gps) data.ubicacionGPS = sbData.ubicacion_gps;
                     if (sbData?.respuestas) {
                         // Merge fotos desde Supabase si localmente están vacías
                         for (let pid in sbData.respuestas) {
@@ -7850,6 +7863,7 @@ if (viewId === 'view-usuarios') renderUsuarios();
                     nota_final: record.notaFinal,
                     clasificacion: record.clasificacion,
                     firma_url: firmaUrl,
+                    ubicacion_gps: record.ubicacionGPS || null,
                     created_by: window.currentUser?.email || null
                 });
                 if (errAud) throw errAud;
