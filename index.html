@@ -6631,20 +6631,19 @@ if (viewId === 'view-usuarios') renderUsuarios();
                 let firmaSource = data.firma || data.firma_url || null;
                 if (firmaSource && !data.firma) { window.auditActual.firma = firmaSource; }
                 if (firmaSource) {
-                    checkPageBreak(20);
-                    y += 8;
-                    pdf.setFillColor(248, 248, 248);
-                    pdf.roundedRect(margin, y, pageWidth - 2 * margin, 72, 3, 3, 'F');
+                    checkPageBreak(70);
                     y += 8;
                     addText("FIRMA DEL ENCARGADO DE TIENDA", 9, false, [180, 180, 180], 'center');
-                    y += 9;
+                    y += 8;
                     const firmaW = 80;
                     const firmaH = 28;
                     const firmaX = (pageWidth - firmaW) / 2;
+                    pdf.setFillColor(248, 248, 248);
+                    pdf.roundedRect(firmaX - 4, y - 4, firmaW + 8, firmaH + 8, 3, 3, 'F');
                     try {
                         pdf.addImage(firmaSource, 'PNG', firmaX, y, firmaW, firmaH, '', 'NONE');
                     } catch(e) {}
-                    y += firmaH + 5;
+                    y += firmaH + 10;
                     pdf.setDrawColor(200, 200, 200);
                     pdf.setLineWidth(0.3);
                     pdf.line(firmaX, y, firmaX + firmaW, y);
