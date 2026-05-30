@@ -4747,9 +4747,8 @@
         }
 
         window.addEventListener('popstate', (e) => {
-            // Si está en el formulario de auditoría, guardar borrador antes de salir
-            let vistaAud = document.getElementById('view-auditoria-preguntas');
-            if (vistaAud && vistaAud.style.display !== 'none' && window.auditActual && window.selectedStore) {
+            // Guardar borrador siempre que haya una auditoría activa, sin importar qué vista está visible
+            if (window.auditActual && window.selectedStore) {
                 autoGuardarBorradorSiActivo();
                 showToast("💾 Progreso guardado", "success");
             }
@@ -8964,8 +8963,6 @@
         // Auto-guardar borrador al cerrar app o minimizar
         function autoGuardarBorradorSiActivo() {
             if (!window.auditActual || !window.selectedStore) return;
-            let vista = document.getElementById('view-auditoria-preguntas');
-            if (!vista || vista.style.display === 'none') return;
             // Guardar silenciosamente sin toast
             window.PREGUNTAS.forEach(p => {
                 let obsEl = document.getElementById(`obs-${p.id}`);
