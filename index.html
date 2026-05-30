@@ -6214,28 +6214,34 @@
 
             if (observaciones.length > 0) {
                 showToast("Verificando ortografía...", "success");
-                let errores = [];
-                for (let o of observaciones) {
+                const timeout = (ms) => new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms));
+                const checkObs = async (o) => {
                     try {
-                        let res = await fetch(`https://api.languagetool.org/v2/check`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                            body: `text=${encodeURIComponent(o.texto)}&language=es`
-                        });
+                        let res = await Promise.race([
+                            fetch(`https://api.languagetool.org/v2/check`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: `text=${encodeURIComponent(o.texto)}&language=es`
+                            }),
+                            timeout(4000)
+                        ]);
                         let json = await res.json();
                         let faltas = json.matches.filter(m => m.rule.issueType === 'misspelling');
                         if (faltas.length > 0) {
-                            errores.push({
+                            return {
                                 pregunta: o.id,
                                 texto: o.texto,
                                 faltas: faltas.map(f => ({
                                     palabra: o.texto.substring(f.offset, f.offset + f.length),
                                     sugerencia: f.replacements[0]?.value || '—'
                                 }))
-                            });
+                            };
                         }
-                    } catch (e) { /* sin conexión, continuar */ }
-                }
+                    } catch (e) { /* timeout o sin conexión */ }
+                    return null;
+                };
+                let resultados = await Promise.all(observaciones.map(checkObs));
+                let errores = resultados.filter(Boolean);
 
                 if (errores.length > 0) {
                     let listaHtml = errores.map(e => `
