@@ -5993,7 +5993,7 @@
             arr.forEach((f, i) => {
                 html += `
           <div class="foto-thumb-wrap">
-            <img src="${f}" class="foto-thumb">
+            <img src="${f}" class="foto-thumb" onclick="abrirLightbox(window.auditActual.respuestas[${pId}].fotos, ${i})" style="cursor:pointer;">
             <div class="foto-delete" onclick="deleteFoto(${pId}, ${i})">✕</div>
           </div>
         `;
