@@ -3856,6 +3856,10 @@
         <div class="header-dark" style="background:var(--naranja);">
             <button onclick="showView('view-home')" style="color:white;">←</button>
             <span class="bold" style="color:white; font-size:16px;">HISTORIAL VISITAS</span>
+            <button onclick="exportarHistorialVisitasExcel()" style="margin-left:auto;background:white;border:none;border-radius:50px;padding:7px 14px;font-size:12px;font-weight:700;color:var(--naranja);cursor:pointer;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Excel
+            </button>
         </div>
         <div class="p-16">
             <div class="flex gap-8 mb-16">
@@ -8263,6 +8267,25 @@ if (viewId === 'view-usuarios') renderUsuarios();
             document.querySelector('#analitica-ranking').closest('div').querySelector('div').textContent = '🏆 Tiendas más Visitadas';
         }
 
+        function exportarHistorialVisitasExcel() {
+            let viss = JSON.parse(localStorage.getItem("visitas") || "[]");
+            if (viss.length === 0) { showToast("No hay visitas para exportar", "error"); return; }
+            let rows = viss.slice().sort((a,b) => (b.datetime||b.fecha||'').localeCompare(a.datetime||a.fecha||'')).map(v => ({
+                'Fecha': v.datetime ? v.datetime.substring(0,10) : (v.fecha||''),
+                'Hora': v.datetime ? v.datetime.substring(11,16) : '',
+                'Tienda': v.tienda || '',
+                'Supervisor': v.supervisor || '',
+                'Observaciones': v.comentario || ''
+            }));
+            let wb = XLSX.utils.book_new();
+            let ws = XLSX.utils.json_to_sheet(rows);
+            ws['!cols'] = [{ wch:12 },{ wch:8 },{ wch:25 },{ wch:25 },{ wch:50 }];
+            XLSX.utils.book_append_sheet(wb, ws, "Visitas");
+            const fecha = new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `Visitas_Listo_${fecha}.xlsx`);
+            showToast("✓ Excel descargado", "success");
+        }
+
         function exportarHistorialExcel() {
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
             if (auds.length === 0) { showToast("No hay auditorías para exportar", "error"); return; }
@@ -8835,6 +8858,46 @@ if (viewId === 'view-usuarios') renderUsuarios();
         function cerrarLightbox() {
             document.getElementById('lightbox').style.display = 'none';
         }
+
+        // Auto-guardar borrador al cerrar app o minimizar
+        function autoGuardarBorradorSiActivo() {
+            if (!window.auditActual || !window.selectedStore) return;
+            let vista = document.getElementById('view-auditoria-preguntas');
+            if (!vista || vista.style.display === 'none') return;
+            // Guardar silenciosamente sin toast
+            window.PREGUNTAS.forEach(p => {
+                let obsEl = document.getElementById(`obs-${p.id}`);
+                if (obsEl && obsEl.value.trim()) {
+                    if (!window.auditActual.respuestas[p.id]) window.auditActual.respuestas[p.id] = {};
+                    window.auditActual.respuestas[p.id].obs = obsEl.value.trim();
+                }
+            });
+            let borrador = {
+                id: window.auditActual._borradorId || ('borrador_' + Date.now()),
+                esBorrador: true,
+                tienda: window.selectedStore,
+                supervisor: document.getElementById("form-aud-supervisor")?.value || '',
+                encargado: document.getElementById("form-aud-encargado")?.value || '',
+                fecha: document.getElementById("form-aud-fecha")?.textContent || '',
+                hora: document.getElementById("form-aud-hora")?.textContent || '',
+                respuestas: window.auditActual.respuestas,
+                firma: window.auditActual.firma || null,
+                guardadoEn: new Date().toISOString()
+            };
+            window.auditActual._borradorId = borrador.id;
+            let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
+            let existIdx = borradores.findIndex(b => b.id === borrador.id);
+            if (existIdx >= 0) borradores[existIdx] = borrador;
+            else borradores.push(borrador);
+            localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
+        }
+
+        // Cierre de pestaña o navegador
+        window.addEventListener('beforeunload', autoGuardarBorradorSiActivo);
+        // App en segundo plano (móvil)
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'hidden') autoGuardarBorradorSiActivo();
+        });
 
         document.addEventListener('keydown', e => {
             let lb = document.getElementById('lightbox');
