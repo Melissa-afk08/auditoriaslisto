@@ -6629,8 +6629,8 @@ if (viewId === 'view-usuarios') renderUsuarios();
 
                 // FIRMA
                 let firmaSource = data.firma || data.firma_url || null;
-                if (firmaSource) { data = { ...data, firma: firmaSource }; }
-                if (data.firma) {
+                if (firmaSource && !data.firma) { window.auditActual.firma = firmaSource; }
+                if (firmaSource) {
                     checkPageBreak(20);
                     y += 10;
                     pdf.setFillColor(248, 248, 248);
