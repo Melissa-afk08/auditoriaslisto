@@ -4096,6 +4096,19 @@
                 </div>
             </div>
 
+            <!-- RESETEAR DATOS LOCALES -->
+            <div class="ajustes-section-title">Dispositivo</div>
+            <div class="ajustes-card" style="margin-bottom:12px;">
+                <div class="ajustes-item" onclick="solicitarPasswordAdmin('reset-local')" style="cursor:pointer;">
+                    <div class="ajustes-item-icon" style="background:#FFF0F0;">🔄</div>
+                    <div class="ajustes-item-text">
+                        <div class="ajustes-item-label" style="color:#C62828;">🔒 Resetear datos locales</div>
+                        <div class="ajustes-item-desc">Limpia auditorías y visitas de este dispositivo</div>
+                    </div>
+                    <span class="ajustes-item-arrow">›</span>
+                </div>
+            </div>
+
             <!-- CERRAR SESIÓN -->
             <div class="ajustes-logout" onclick="logout()">
                 <div class="ajustes-item-icon" style="background:#FFF0F0;">🚪</div>
@@ -4950,6 +4963,7 @@ if (viewId === 'view-usuarios') renderUsuarios();
                 document.getElementById('modal-admin-pass').style.display = 'none';
                 if (window.adminDestino === 'editor') openEditorChecklist();
                 else if (window.adminDestino === 'pesos') openEditorChecklist();
+                else if (window.adminDestino === 'reset-local') confirmarResetLocal();
                 else if (window.adminDestino === 'usuarios') openEditorUsuarios();
                 else if (window.adminDestino === 'papelera') abrirPapelera();
                 else if (window.adminDestino === 'editor-registros') abrirEditorRegistros();
@@ -4987,6 +5001,20 @@ if (viewId === 'view-usuarios') renderUsuarios();
                 </div>`;
             }).join('');
             document.getElementById('editor-usuarios-lista').innerHTML = html || '<div style="text-align:center;color:#bbb;padding:20px;">Sin usuarios registrados</div>';
+        }
+
+        function confirmarResetLocal() {
+            document.getElementById("mc-desc").innerText = "¿Limpiar todos los datos locales de este dispositivo? Se borrarán auditorías, visitas y borradores guardados en este dispositivo. Los datos en Supabase no se verán afectados.";
+            document.getElementById("mc-btn").onclick = function() {
+                const keysToRemove = ['auditorias','visitas','borradores_auditorias','papelera_auditorias','papelera_visitas'];
+                keysToRemove.forEach(k => localStorage.removeItem(k));
+                // Limpiar claves de cierre mensual
+                Object.keys(localStorage).filter(k => k.startsWith('cierre_')).forEach(k => localStorage.removeItem(k));
+                closeModal('modal-confirm');
+                showToast("✓ Datos locales limpiados", "success");
+                renderHomeDashboard();
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
         }
 
         function editarUsuarioAdmin(i) {
