@@ -8878,7 +8878,7 @@
         // Pinch-to-zoom + pan en lightbox
         (function() {
             let scale = 1, startDist = 0;
-            let tx = 0, ty = 0, startTx = 0, startTy = 0;
+            let tx = 0, ty = 0;
             let panStartX = 0, panStartY = 0;
             let isPanning = false;
 
@@ -8889,12 +8889,22 @@
             function applyTransform() {
                 document.getElementById('lb-img').style.transform = `scale(${scale}) translate(${tx}px, ${ty}px)`;
             }
+            function isButton(el) {
+                return el && (el.tagName === 'BUTTON' || el.closest('button'));
+            }
+
+            window._lbResetZoom = function() {
+                scale = 1; tx = 0; ty = 0;
+                let img = document.getElementById('lb-img');
+                if (img) img.style.transform = 'scale(1) translate(0px, 0px)';
+            };
 
             document.addEventListener('touchstart', function(e) {
                 if (!lbActive()) return;
+                if (isButton(e.target)) return;
                 if (e.touches.length === 2) {
                     startDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                    startTx = tx; startTy = ty;
+                    isPanning = false;
                     e.preventDefault();
                 } else if (e.touches.length === 1 && scale > 1.05) {
                     isPanning = true;
@@ -8906,9 +8916,9 @@
 
             document.addEventListener('touchmove', function(e) {
                 if (!lbActive()) return;
+                if (isButton(e.target)) return;
                 if (e.touches.length === 2) {
                     let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                    scale = Math.min(Math.max((dist / startDist) * Math.sqrt(startTx * 0 + 1), 0.8), 5);
                     scale = Math.min(Math.max(dist / startDist, 0.8), 5);
                     applyTransform();
                     e.preventDefault();
@@ -8937,8 +8947,7 @@
         }
 
         function cerrarLightbox() {
-            let img = document.getElementById('lb-img');
-            if (img) img.style.transform = 'scale(1) translate(0px, 0px)';
+            if (window._lbResetZoom) window._lbResetZoom();
             document.getElementById('lightbox').style.display = 'none';
         }
 
