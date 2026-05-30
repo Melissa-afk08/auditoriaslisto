@@ -4713,15 +4713,22 @@
             setTimeout(() => toast.remove(), 2500);
         }
 
-        function showView(viewId) {
+        let _viewHistory = [];
+
+        function showView(viewId, skipHistory = false) {
             if (viewId === 'view-login') cargarCorreosLogin();
             document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
             document.getElementById(viewId).style.display = 'block';
             window.scrollTo(0, 0);
 
+            if (!skipHistory) {
+                _viewHistory.push(viewId);
+                history.pushState({ view: viewId }, '', '');
+            }
+
             if (viewId === 'view-home') renderHomeDashboard();
-        if (viewId === 'view-analitica') renderAnalitica();
-if (viewId === 'view-usuarios') renderUsuarios();
+            if (viewId === 'view-analitica') renderAnalitica();
+            if (viewId === 'view-usuarios') renderUsuarios();
             if (viewId === 'view-auditoria-tiendas') renderListaTiendas('auditoria');
             if (viewId === 'view-visita-tiendas') renderListaTiendas('visita');
             if (viewId === 'view-tiendas') renderListaTiendas('catalogo');
@@ -4731,6 +4738,16 @@ if (viewId === 'view-usuarios') renderUsuarios();
             if (viewId === 'view-visita-detalle') renderDetalleVisita();
             if (viewId === 'view-tienda-detalle') renderDetalleTienda();
         }
+
+        window.addEventListener('popstate', (e) => {
+            if (_viewHistory.length > 1) {
+                _viewHistory.pop();
+                const anterior = _viewHistory[_viewHistory.length - 1];
+                showView(anterior, true);
+            } else {
+                history.pushState({ view: 'view-home' }, '', '');
+            }
+        });
 
         function renderListaTiendas(type) {
             if (type === 'auditoria') renderTiendasList('view-auditoria-tiendas');
