@@ -4997,7 +4997,7 @@ if (viewId === 'view-usuarios') renderUsuarios();
                 Object.keys(localStorage).filter(k => k.startsWith('cierre_')).forEach(k => localStorage.removeItem(k));
                 closeModal('modal-confirm');
                 showToast("✓ Datos locales limpiados", "success");
-                renderHomeDashboard();
+                setTimeout(() => location.reload(), 800);
             };
             document.getElementById("modal-confirm").style.display = "flex";
         }
@@ -7219,19 +7219,42 @@ if (viewId === 'view-usuarios') renderUsuarios();
             showView('view-auditoria-resultado');
         }
 
-        function renderHomeDashboard() {
+        async function renderHomeDashboard() {
             let u = window.currentUser;
             if (!u) return;
-            let auditorias = JSON.parse(localStorage.getItem("auditorias") || "[]");
+
+            // Leer desde Supabase para consistencia entre dispositivos
+            let auditorias = [];
+            try {
+                let ahora = new Date();
+                let mesStr = String(ahora.getMonth() + 1).padStart(2,'0');
+                let anioStr = String(ahora.getFullYear());
+                const { data, error } = await sbClient.from('auditorias')
+                    .select('id,tienda_nombre,supervisor,fecha,nota_final,clasificacion')
+                    .order('id', { ascending: false });
+                if (!error && data) {
+                    auditorias = data.map(r => ({
+                        id: r.id,
+                        tienda: r.tienda_nombre,
+                        supervisor: r.supervisor,
+                        fecha: r.fecha,
+                        notaFinal: r.nota_final || 0,
+                        finalScore: r.nota_final || 0,
+                        clasificacion: r.clasificacion
+                    }));
+                }
+            } catch(e) {
+                auditorias = JSON.parse(localStorage.getItem("auditorias") || "[]");
+            }
+
             let ahora = new Date();
             let mesActual = ahora.getMonth();
             let anioActual = ahora.getFullYear();
 
             function parseFecha(f) {
                 if (!f) return null;
-                if (f.includes('-')) {
+                if (f.includes('-') && f.indexOf('-') === 4) {
                     let p = f.split('-');
-                    if (p.length < 3) return null;
                     return new Date(parseInt(p[0]), parseInt(p[1])-1, parseInt(p[2]));
                 }
                 let p = f.split('/');
@@ -7247,38 +7270,35 @@ if (viewId === 'view-usuarios') renderUsuarios();
 
             let misMes = delMes.filter(a => a.supervisor && a.supervisor.includes(u.nombre.split(' ')[0]));
             let miPromedio = misMes.length > 0
-                ? (misMes.reduce((s,a) => s + (a.notaFinal||a.finalScore||0), 0) / misMes.length).toFixed(1) + '%'
+                ? (misMes.reduce((s,a) => s + (a.notaFinal||0), 0) / misMes.length).toFixed(1) + '%'
                 : '—';
             let equipoPromedio = delMes.length > 0
-                ? (delMes.reduce((s,a) => s + (a.notaFinal||a.finalScore||0), 0) / delMes.length).toFixed(1) + '%'
+                ? (delMes.reduce((s,a) => s + (a.notaFinal||0), 0) / delMes.length).toFixed(1) + '%'
                 : '—';
 
             let k1 = document.getElementById('kpi-mis-auditorias');
             let k2 = document.getElementById('kpi-mi-promedio');
             let k3 = document.getElementById('kpi-promedio-equipo');
-            if (k1) k1.textContent = misMes.length;
+            if (k1) k1.textContent = misMes.length > 0 ? misMes.length : '—';
             if (k2) { k2.textContent = miPromedio; k2.style.color = misMes.length > 0 ? (parseFloat(miPromedio) > 90 ? '#43A047' : parseFloat(miPromedio) > 70 ? '#F9A825' : '#C62828') : '#1B1B1B'; }
             if (k3) { k3.textContent = equipoPromedio; k3.style.color = delMes.length > 0 ? (parseFloat(equipoPromedio) > 90 ? '#43A047' : parseFloat(equipoPromedio) > 70 ? '#F9A825' : '#C62828') : '#1B1B1B'; }
 
-            // Panel últimas auditorías del usuario
+            // Panel últimas auditorías del usuario (solo del mes)
             let panel = document.getElementById('panel-ultimas-auditorias');
             if (panel) {
-                let misAuds = auditorias.filter(a => a.supervisor && a.supervisor.includes(u.nombre.split(' ')[0]))
-                    .sort((a,b) => b.id - a.id).slice(0, 3);
+                let misAuds = misMes.slice(0, 3);
                 if (misAuds.length === 0) {
-                    panel.innerHTML = '<div style="font-size:12px;color:#bbb;text-align:center;padding:16px 0;">Sin registros aún</div>';
+                    panel.innerHTML = '<div style="font-size:12px;color:#bbb;text-align:center;padding:16px 0;">Sin auditorías este mes</div>';
                 } else {
                     panel.innerHTML = misAuds.map(a => {
-                        let tienda = typeof a.tienda === 'string' ? a.tienda : a.tienda.nombre;
-                        let score = a.notaFinal || a.finalScore || 0;
+                        let tienda = typeof a.tienda === 'string' ? a.tienda : a.tienda?.nombre || '';
+                        let score = a.notaFinal || 0;
                         let badgeColor = score <= 70 ? '#C62828' : score <= 90 ? '#F9A825' : '#43A047';
                         let badgeLabel = score <= 70 ? 'Alto Riesgo' : score <= 90 ? 'Observado' : 'Aprobado';
-                        let hace = Math.floor((Date.now() - a.id) / 60000);
-                        let tiempoStr = hace < 60 ? `hace ${hace} min` : hace < 1440 ? `hace ${Math.floor(hace/60)}h` : `hace ${Math.floor(hace/1440)}d`;
                         return `<div class="audit-item-lateral">
                             <div class="audit-item-tienda">${tienda}</div>
                             <div class="audit-item-meta">
-                                <span>${tiempoStr}</span>
+                                <span>${a.fecha || ''}</span>
                                 <span class="audit-badge" style="background:${badgeColor};">${badgeLabel}</span>
                             </div>
                         </div>`;
