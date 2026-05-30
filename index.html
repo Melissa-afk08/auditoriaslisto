@@ -6632,34 +6632,34 @@ if (viewId === 'view-usuarios') renderUsuarios();
                 if (firmaSource && !data.firma) { window.auditActual.firma = firmaSource; }
                 if (firmaSource) {
                     checkPageBreak(20);
-                    y += 10;
+                    y += 8;
                     pdf.setFillColor(248, 248, 248);
-                    pdf.roundedRect(margin, y, pageWidth - 2 * margin, 68, 3, 3, 'F');
-                    y += 10;
-                    addText("FIRMA DEL ENCARGADO DE TIENDA", 10, true, [150, 150, 150], 'center');
-                    y += 10;
-                    const firmaW = 90;
-                    const firmaH = 32;
+                    pdf.roundedRect(margin, y, pageWidth - 2 * margin, 72, 3, 3, 'F');
+                    y += 8;
+                    addText("FIRMA DEL ENCARGADO DE TIENDA", 9, false, [180, 180, 180], 'center');
+                    y += 9;
+                    const firmaW = 80;
+                    const firmaH = 28;
                     const firmaX = (pageWidth - firmaW) / 2;
                     try {
-                        pdf.addImage(data.firma, 'PNG', firmaX, y, firmaW, firmaH, '', 'NONE');
+                        pdf.addImage(firmaSource, 'PNG', firmaX, y, firmaW, firmaH, '', 'NONE');
                     } catch(e) {}
-                    y += firmaH + 4;
-                    pdf.setDrawColor(180, 180, 180);
-                    pdf.setLineWidth(0.4);
+                    y += firmaH + 5;
+                    pdf.setDrawColor(200, 200, 200);
+                    pdf.setLineWidth(0.3);
                     pdf.line(firmaX, y, firmaX + firmaW, y);
-                    y += 4;
+                    y += 5;
                     addText(data.encargado || '', 9, true, [27, 27, 27], 'center');
                     y += 4;
-                    addText(`${data.fecha}   ${data.hora}`, 8, false, [150, 150, 150], 'center');
-                    y += 4;
+                    addText(`${data.fecha}   ${data.hora}`, 7, false, [160, 160, 160], 'center');
+                    y += 6;
                 }
 
                 // PIE DE PÁGINA CON UBICACIÓN GPS (todas las páginas)
                 const totalPages = pdf.internal.getNumberOfPages();
                 for (let pg = 1; pg <= totalPages; pg++) {
                     pdf.setPage(pg);
-                    const footerY = pageHeight - 10;
+                    const footerY = pageHeight - 6;
                     pdf.setDrawColor(220, 220, 220);
                     pdf.setLineWidth(0.3);
                     pdf.line(margin, footerY - 5, pageWidth - margin, footerY - 5);
