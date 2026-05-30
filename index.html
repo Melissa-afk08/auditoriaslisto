@@ -8869,36 +8869,63 @@
             let idx = window._lbIdx;
             let img = document.getElementById('lb-img');
             img.src = fotos[idx];
-            img.style.transform = 'scale(1)';
+            img.style.transform = 'scale(1) translate(0px, 0px)';
             document.getElementById('lb-counter').textContent = fotos.length > 1 ? `${idx + 1} / ${fotos.length}` : '';
             document.getElementById('lb-prev').style.display = fotos.length > 1 ? 'block' : 'none';
             document.getElementById('lb-next').style.display = fotos.length > 1 ? 'block' : 'none';
         }
 
-        // Pinch-to-zoom en lightbox
+        // Pinch-to-zoom + pan en lightbox
         (function() {
             let scale = 1, startDist = 0;
+            let tx = 0, ty = 0, startTx = 0, startTy = 0;
+            let panStartX = 0, panStartY = 0;
+            let isPanning = false;
+
+            function lbActive() {
+                let lb = document.getElementById('lightbox');
+                return lb && lb.style.display !== 'none';
+            }
+            function applyTransform() {
+                document.getElementById('lb-img').style.transform = `scale(${scale}) translate(${tx}px, ${ty}px)`;
+            }
+
             document.addEventListener('touchstart', function(e) {
-                if (!document.getElementById('lightbox') || document.getElementById('lightbox').style.display === 'none') return;
+                if (!lbActive()) return;
                 if (e.touches.length === 2) {
                     startDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    startTx = tx; startTy = ty;
+                    e.preventDefault();
+                } else if (e.touches.length === 1 && scale > 1.05) {
+                    isPanning = true;
+                    panStartX = e.touches[0].clientX - tx;
+                    panStartY = e.touches[0].clientY - ty;
                     e.preventDefault();
                 }
             }, { passive: false });
+
             document.addEventListener('touchmove', function(e) {
-                if (!document.getElementById('lightbox') || document.getElementById('lightbox').style.display === 'none') return;
+                if (!lbActive()) return;
                 if (e.touches.length === 2) {
                     let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                    scale = Math.min(Math.max(dist / startDist, 0.8), 4);
-                    document.getElementById('lb-img').style.transform = `scale(${scale})`;
+                    scale = Math.min(Math.max((dist / startDist) * Math.sqrt(startTx * 0 + 1), 0.8), 5);
+                    scale = Math.min(Math.max(dist / startDist, 0.8), 5);
+                    applyTransform();
+                    e.preventDefault();
+                } else if (e.touches.length === 1 && isPanning) {
+                    tx = e.touches[0].clientX - panStartX;
+                    ty = e.touches[0].clientY - panStartY;
+                    applyTransform();
                     e.preventDefault();
                 }
             }, { passive: false });
+
             document.addEventListener('touchend', function(e) {
-                if (!document.getElementById('lightbox') || document.getElementById('lightbox').style.display === 'none') return;
-                if (e.touches.length < 2 && scale < 1.05) {
-                    scale = 1;
-                    document.getElementById('lb-img').style.transform = 'scale(1)';
+                if (!lbActive()) return;
+                isPanning = false;
+                if (scale < 1.05) {
+                    scale = 1; tx = 0; ty = 0;
+                    applyTransform();
                 }
             });
         })();
