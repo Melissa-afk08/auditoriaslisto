@@ -1,4 +1,4 @@
-const CACHE_NAME = 'auditorias-listo-v1';
+const CACHE_NAME = 'auditorias-listo-v2';
 
 // Al instalar: no precachear nada pesado, solo el shell básico
 self.addEventListener('install', event => {
