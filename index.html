@@ -7765,8 +7765,8 @@ if (viewId === 'view-usuarios') renderUsuarios();
             const maxId = window.PREGUNTAS.reduce((m, p) => Math.max(m, p.id), 0);
             window.PREGUNTAS.push({ id: maxId + 1, grupo, texto, pmax });
             localStorage.setItem("preguntas_custom", JSON.stringify(window.PREGUNTAS));
-            abrirEditorChecklist();
-            showToast("Pregunta agregada", "success");
+            openEditorChecklist();
+            showToast("✓ Pregunta agregada", "success");
         }
 
         function saveChecklistCustom() {
