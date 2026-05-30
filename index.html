@@ -4761,24 +4761,9 @@ if (viewId === 'view-usuarios') renderUsuarios();
                 localStorage.setItem("supervisores", JSON.stringify(sups));
             }
 
-            // Dummy Audits
-            if (!localStorage.getItem("auditorias")) {
-                let dummyA = [
-                    { id: 1, tienda: "ES ARMENDARIZ", supervisor: "Kleiddy Cotrina", fecha: "2026-05-13", hora: "08:58:45", timestamp: Date.now() - 100000, finalScore: 65, color: "#C62828", clasificacion: "ALTO RIESGO" },
-                    { id: 2, tienda: "LISTO PARDO 1", supervisor: "Miriam Berna", fecha: "2026-05-14", hora: "10:15:00", timestamp: Date.now() - 50000, finalScore: 82, color: "#F9A825", clasificacion: "SE REQUIERE MEJORAR" },
-                    { id: 3, tienda: "ES SAN ISIDRO", supervisor: "Lorena Sanchez", fecha: "2026-05-15", hora: "14:30:00", timestamp: Date.now(), finalScore: 95, color: "#2E7D32", clasificacion: "SOBRESALIENTE" }
-                ];
-                localStorage.setItem("auditorias", JSON.stringify(dummyA));
-            }
-
-            // Dummy Visitas
-            if (!localStorage.getItem("visitas")) {
-                let dummyV = [
-                    { tienda: "LISTO MINKA", supervisor: "Kleiddy Cotrina", datetime: "2026-02-03T11:30", comentario: "Todo ok" },
-                    { tienda: "ES SALAVERRY 2", supervisor: "Lorena Sanchez", datetime: "2026-03-10T09:00", comentario: "Faltan insumos" }
-                ];
-                localStorage.setItem("visitas", JSON.stringify(dummyV));
-            }
+            // Inicializar arrays vacíos si no existen
+            if (!localStorage.getItem("auditorias")) localStorage.setItem("auditorias", JSON.stringify([]));
+            if (!localStorage.getItem("visitas")) localStorage.setItem("visitas", JSON.stringify([]));
         }
 
         function formatDateFull(dtStr) {
