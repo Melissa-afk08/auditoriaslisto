@@ -4747,6 +4747,12 @@
         }
 
         window.addEventListener('popstate', (e) => {
+            // Si está en el formulario de auditoría, guardar borrador antes de salir
+            let vistaAud = document.getElementById('view-auditoria-preguntas');
+            if (vistaAud && vistaAud.style.display !== 'none' && window.auditActual && window.selectedStore) {
+                autoGuardarBorradorSiActivo();
+                showToast("💾 Progreso guardado", "success");
+            }
             if (_viewHistory.length > 1) {
                 _viewHistory.pop();
                 const anterior = _viewHistory[_viewHistory.length - 1];
@@ -6141,11 +6147,9 @@
         }
 
         function confirmExitAuditoria() {
-            if (confirm("¿Deseas guardar el progreso actual como borrador? Podrás continuar después desde la tienda.")) {
-                guardarBorradorAuditoria();
-                if (timerInterval) clearInterval(timerInterval);
-                showView('view-home');
-            } else if (confirm("¿Salir SIN guardar? Se perderá todo el progreso.")) {
+            // Guardar borrador automáticamente antes de cualquier acción
+            autoGuardarBorradorSiActivo();
+            if (confirm("✅ Progreso guardado como borrador.\n\n¿Salir? Podrás continuar desde la tienda.")) {
                 if (timerInterval) clearInterval(timerInterval);
                 showView('view-home');
             }
@@ -8996,6 +9000,14 @@
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') autoGuardarBorradorSiActivo();
         });
+        // Autoguardado periódico cada 60 segundos
+        setInterval(() => {
+            autoGuardarBorradorSiActivo();
+        }, 60000);
+        // Autoguardado periódico cada 60 segundos
+        setInterval(() => {
+            autoGuardarBorradorSiActivo();
+        }, 60000);
 
         document.addEventListener('keydown', e => {
             let lb = document.getElementById('lightbox');
