@@ -3179,9 +3179,9 @@
     <!-- LIGHTBOX FOTOS -->
     <div id="lightbox" onclick="cerrarLightbox()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:99999; align-items:center; justify-content:center; flex-direction:column;">
         <button onclick="event.stopPropagation(); cerrarLightbox()" style="position:absolute; top:16px; right:16px; background:rgba(255,255,255,0.15); border:none; border-radius:50%; width:40px; height:40px; color:white; font-size:20px; cursor:pointer;">✕</button>
-        <div style="position:relative; display:flex; align-items:center; justify-content:center; width:100%; max-width:700px; padding:0 60px;">
+        <div style="position:relative; display:flex; align-items:center; justify-content:center; width:100%; max-width:700px; padding:0 50px;">
             <button id="lb-prev" onclick="event.stopPropagation(); moverLightbox(-1)" style="position:absolute; left:8px; background:rgba(255,255,255,0.15); border:none; border-radius:50%; width:40px; height:40px; color:white; font-size:20px; cursor:pointer;">‹</button>
-            <img id="lb-img" src="" style="max-width:100%; max-height:80vh; border-radius:16px; object-fit:contain; box-shadow:0 8px 40px rgba(0,0,0,0.5);">
+            <img id="lb-img" src="" style="max-width:100%; max-height:90vh; width:100%; border-radius:12px; object-fit:contain; box-shadow:0 8px 40px rgba(0,0,0,0.5); touch-action:none; transform-origin:center; transition:transform 0.1s;">
             <button id="lb-next" onclick="event.stopPropagation(); moverLightbox(1)" style="position:absolute; right:8px; background:rgba(255,255,255,0.15); border:none; border-radius:50%; width:40px; height:40px; color:white; font-size:20px; cursor:pointer;">›</button>
         </div>
         <div id="lb-counter" style="color:rgba(255,255,255,0.6); font-size:13px; margin-top:12px;"></div>
@@ -8867,11 +8867,41 @@
         function actualizarLightbox() {
             let fotos = window._lbFotos;
             let idx = window._lbIdx;
-            document.getElementById('lb-img').src = fotos[idx];
+            let img = document.getElementById('lb-img');
+            img.src = fotos[idx];
+            img.style.transform = 'scale(1)';
             document.getElementById('lb-counter').textContent = fotos.length > 1 ? `${idx + 1} / ${fotos.length}` : '';
             document.getElementById('lb-prev').style.display = fotos.length > 1 ? 'block' : 'none';
             document.getElementById('lb-next').style.display = fotos.length > 1 ? 'block' : 'none';
         }
+
+        // Pinch-to-zoom en lightbox
+        (function() {
+            let scale = 1, startDist = 0;
+            document.addEventListener('touchstart', function(e) {
+                if (!document.getElementById('lightbox') || document.getElementById('lightbox').style.display === 'none') return;
+                if (e.touches.length === 2) {
+                    startDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            document.addEventListener('touchmove', function(e) {
+                if (!document.getElementById('lightbox') || document.getElementById('lightbox').style.display === 'none') return;
+                if (e.touches.length === 2) {
+                    let dist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+                    scale = Math.min(Math.max(dist / startDist, 0.8), 4);
+                    document.getElementById('lb-img').style.transform = `scale(${scale})`;
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            document.addEventListener('touchend', function(e) {
+                if (!document.getElementById('lightbox') || document.getElementById('lightbox').style.display === 'none') return;
+                if (e.touches.length < 2 && scale < 1.05) {
+                    scale = 1;
+                    document.getElementById('lb-img').style.transform = 'scale(1)';
+                }
+            });
+        })();
 
         function moverLightbox(dir) {
             let fotos = window._lbFotos;
