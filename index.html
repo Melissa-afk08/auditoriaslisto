@@ -5918,6 +5918,50 @@
         `;
             });
             document.getElementById("form-aud-preguntas").innerHTML = html;
+
+            // Restaurar respuestas, observaciones y fotos guardadas
+            if (window.auditActual && window.auditActual.respuestas) {
+                Object.entries(window.auditActual.respuestas).forEach(([pId, resp]) => {
+                    pId = parseInt(pId);
+                    if (!resp) return;
+
+                    // Restaurar botón seleccionado
+                    if (resp.valor) {
+                        let block = document.getElementById(`pblock-${pId}`);
+                        if (block) {
+                            let btns = block.querySelectorAll('.btn-opcion');
+                            btns.forEach(b => { b.classList.remove('selected'); b.classList.add('unselected'); });
+                            if (resp.valor === 'SI') { btns[0].classList.add('selected'); btns[0].classList.remove('unselected'); }
+                            if (resp.valor === 'NO') { btns[1].classList.add('selected'); btns[1].classList.remove('unselected'); }
+                            if (resp.valor === 'NA') { btns[2].classList.add('selected'); btns[2].classList.remove('unselected'); }
+
+                            // Mostrar sección obs/fotos
+                            let obsCont = document.getElementById(`obs-cont-${pId}`);
+                            let fotoBtn = document.getElementById(`fotobtn-${pId}`);
+                            let fotosGrid = document.getElementById(`fotos-grid-${pId}`);
+                            if (obsCont) obsCont.style.display = 'block';
+                            if (resp.valor === 'NA') {
+                                if (fotoBtn) fotoBtn.style.display = 'none';
+                                if (fotosGrid) fotosGrid.style.display = 'none';
+                            } else {
+                                if (fotoBtn) fotoBtn.style.display = 'flex';
+                                if (fotosGrid) fotosGrid.style.display = 'flex';
+                            }
+                        }
+                    }
+
+                    // Restaurar observación
+                    if (resp.obs) {
+                        let obsEl = document.getElementById(`obs-${pId}`);
+                        if (obsEl) obsEl.value = resp.obs;
+                    }
+
+                    // Restaurar fotos
+                    if (resp.fotos && resp.fotos.length > 0) {
+                        renderFotosGrid(pId);
+                    }
+                });
+            }
         }
 
         function setRespuesta(pId, val) {
