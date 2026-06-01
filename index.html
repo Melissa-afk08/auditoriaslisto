@@ -6530,10 +6530,27 @@
                 // HEADER
                 pdf.setFillColor(252, 110, 32);
                 pdf.roundedRect(margin, y, pageWidth - 2 * margin, 35, 3, 3, 'F');
+                // Logo en esquina superior izquierda del header
+                try {
+                    const logoB64 = await new Promise((resolve, reject) => {
+                        const img = new Image();
+                        img.crossOrigin = 'anonymous';
+                        img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = img.width; canvas.height = img.height;
+                            canvas.getContext('2d').drawImage(img, 0, 0);
+                            resolve(canvas.toDataURL('image/png'));
+                        };
+                        img.onerror = reject;
+                        img.src = '/logo-primax-listo.png';
+                    });
+                    // Proporcional: ancho 28mm, alto ~18mm aprox
+                    pdf.addImage(logoB64, 'PNG', margin + 2, y - 6, 28, 18);
+                } catch(e) { /* sin logo, continuar */ }
                 y += 8;
-                addText("TIENDA", 8, true, [255, 255, 255], 'left', margin + 5);
+                addText("TIENDA", 8, true, [255, 255, 255], 'left', margin + 35);
                 y += 5;
-                addText(typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || window.selectedStore?.nombre || ''), 12, true, [255, 255, 255], 'left', margin + 5);
+                addText(typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || window.selectedStore?.nombre || ''), 12, true, [255, 255, 255], 'left', margin + 35);
                 y += 8;
                 let startX = margin + 5;
                 const cols = ["FECHA", "HORA", "SUPERVISOR", "ENCARGADO"];
