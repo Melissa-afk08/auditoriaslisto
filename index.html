@@ -7135,8 +7135,24 @@
                     const local = JSON.parse(localStorage.getItem('auditorias') || '[]');
                     // Conservar auditorías locales que no llegaron a Supabase y reintentarlas
                     const soloLocales = local.filter(a => !idsSupabase.has(a.id) && !a.esBorrador);
-                    soloLocales.forEach(a => syncAuditoriaSupabase(a));
-                    const merged = [...mapped, ...soloLocales];
+                    // Solo reintentar sync si no existe ya una auditoría duplicada en Supabase
+                    // (mismo supervisor, tienda y fecha) para evitar duplicados tras finalizar sin señal
+                    soloLocales.forEach(a => {
+                        const yaExiste = mapped.some(m =>
+                            m.supervisor === a.supervisor &&
+                            (m.tienda?.nombre || m.tienda) === (a.tienda?.nombre || a.tienda) &&
+                            m.fecha === a.fecha
+                        );
+                        if (!yaExiste) syncAuditoriaSupabase(a);
+                    });
+                    const soloLocalesSinDuplicados = soloLocales.filter(a =>
+                        !mapped.some(m =>
+                            m.supervisor === a.supervisor &&
+                            (m.tienda?.nombre || m.tienda) === (a.tienda?.nombre || a.tienda) &&
+                            m.fecha === a.fecha
+                        )
+                    );
+                    const merged = [...mapped, ...soloLocalesSinDuplicados];
                     localStorage.setItem('auditorias', JSON.stringify(merged));
                 }
             } catch(e) { /* usa localStorage si falla */ }
