@@ -6334,6 +6334,8 @@
                 let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
                 borradores = borradores.filter(b => b.id !== window.auditActual._borradorId);
                 localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
+                // Eliminar también de Supabase para evitar que aparezca como "en progreso"
+                try { sbClient.from('auditorias').delete().eq('id', window.auditActual._borradorId).then(() => {}); } catch(e) {}
             }
 
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
@@ -7490,7 +7492,7 @@
             try {
                 const { data, error } = await sbClient.from('visitas').select('*').order('id', { ascending: false });
                 if (!error && data && data.length > 0) {
-                    const mapped = data.map(r => ({
+                    const mapped = data.filter(r => r.nota_final !== null).map(r => ({
                         id: r.id,
                         tienda: r.tienda,
                         datetime: r.datetime,
