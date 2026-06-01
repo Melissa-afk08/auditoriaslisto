@@ -4750,7 +4750,6 @@
             // Guardar borrador siempre que haya una auditoría activa, sin importar qué vista está visible
             if (window.auditActual && window.selectedStore) {
                 autoGuardarBorradorSiActivo();
-                showToast("💾 Progreso guardado", "success");
             }
             if (_viewHistory.length > 1) {
                 _viewHistory.pop();
@@ -7317,6 +7316,7 @@
             }
             window.auditActual = data;
             window.auditDesdeHistorial = true;
+            window._auditoriaEnProgreso = false;
             renderAuditoriaResultado(data);
             showView('view-auditoria-resultado');
         }
