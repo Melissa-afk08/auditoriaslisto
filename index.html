@@ -5795,6 +5795,7 @@
             }
 
             window.auditActual = { respuestas: {}, firma: null };
+            window._auditoriaEnProgreso = true;
 
             document.getElementById("form-aud-tienda-name").textContent = window.selectedStore.nombre;
 
@@ -5820,6 +5821,7 @@
 
         function continuarBorradorAuditoria(borrador) {
             window.auditActual = { respuestas: borrador.respuestas || {}, firma: borrador.firma || null, _borradorId: borrador.id };
+            window._auditoriaEnProgreso = true;
 
             document.getElementById("form-aud-tienda-name").textContent = window.selectedStore.nombre;
             document.getElementById("form-aud-fecha").textContent = borrador.fecha;
@@ -6146,9 +6148,9 @@
         }
 
         function confirmExitAuditoria() {
-            // Guardar borrador automáticamente antes de cualquier acción
             autoGuardarBorradorSiActivo();
             if (confirm("✅ Progreso guardado como borrador.\n\n¿Salir? Podrás continuar desde la tienda.")) {
+                window._auditoriaEnProgreso = false;
                 if (timerInterval) clearInterval(timerInterval);
                 showView('view-home');
             }
@@ -8981,7 +8983,7 @@
 
         // Auto-guardar borrador al cerrar app o minimizar
         function autoGuardarBorradorSiActivo() {
-            if (!window.auditActual || !window.selectedStore) return;
+            if (!window._auditoriaEnProgreso || !window.auditActual || !window.selectedStore) return;
             // Guardar silenciosamente sin toast
             window.PREGUNTAS.forEach(p => {
                 let obsEl = document.getElementById(`obs-${p.id}`);
