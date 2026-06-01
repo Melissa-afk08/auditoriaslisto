@@ -5842,8 +5842,23 @@
                 if (obsEl && r.obs) obsEl.value = r.obs;
             });
             initCanvas();
+            // Restaurar firma si existe
+            if (borrador.firma) {
+                const canvas = document.getElementById('firma-canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    firmaSigned = true;
+                    document.getElementById("canvas-placeholder").style.display = "none";
+                    document.getElementById("firma-status").textContent = "Firma cargada";
+                };
+                img.src = borrador.firma;
+            }
             updateAuditoriaProgress();
-            showToast("📂 Borrador cargado", "success");
+            let msg = borrador._pendienteVerificacion ? "📋 Auditoría pendiente — verifica ortografía y finaliza" : "📂 Borrador cargado";
+            showToast(msg, "success");
             showView('view-auditoria-form');
         }
 
@@ -6311,9 +6326,10 @@
 
         function finalizarAuditoriaConfirmado() {
             let result = calcularResultado();
+            const sinSenal = !navigator.onLine;
 
             let auditRecord = {
-                id: Date.now(),
+                id: window.auditActual._borradorId || ('aud_' + Date.now()),
                 tienda: window.selectedStore,
                 supervisor: document.getElementById("form-aud-supervisor").value,
                 encargado: document.getElementById("form-aud-encargado").value,
@@ -6329,12 +6345,27 @@
                 clasificacion: result.etiqueta
             };
 
-            // Limpiar borrador de esta tienda si existía
+            if (sinSenal) {
+                // Sin señal: guardar como borrador pendiente de verificación
+                auditRecord.esBorrador = true;
+                auditRecord._pendienteVerificacion = true;
+                let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
+                let existIdx = borradores.findIndex(b => b.id === auditRecord.id);
+                if (existIdx >= 0) borradores[existIdx] = auditRecord;
+                else borradores.push(auditRecord);
+                localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
+                window._auditoriaEnProgreso = false;
+                if (timerInterval) clearInterval(timerInterval);
+                showToast("⚠ Sin señal — auditoría guardada. Finaliza cuando recuperes conexión.", "error");
+                showView('view-home');
+                return;
+            }
+
+            // Con señal: flujo normal
             if (window.auditActual._borradorId) {
                 let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
                 borradores = borradores.filter(b => b.id !== window.auditActual._borradorId);
                 localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
-                // Eliminar también de Supabase para evitar que aparezca como "en progreso"
                 try { sbClient.from('auditorias').delete().eq('id', window.auditActual._borradorId).then(() => {}); } catch(e) {}
             }
 
@@ -6342,9 +6373,9 @@
             auds.push(auditRecord);
             localStorage.setItem("auditorias", JSON.stringify(auds));
 
-            // Sync a Supabase
             syncAuditoriaSupabase(auditRecord);
 
+            window._auditoriaEnProgreso = false;
             window.auditActual = auditRecord;
             renderAuditoriaResultado(auditRecord);
             showView('view-auditoria-resultado');
@@ -7187,8 +7218,8 @@
                 return `
                 <div style="background:#FFF8E1;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;border-left:4px solid #F9A825;">
                     <div style="display:flex;justify-content:space-between;align-items:center;" onclick="continuarBorradorDesdeHistorial('${b.id}')">
-                        <div style="font-size:12px;color:#F9A825;font-weight:700;">⏸ EN PROGRESO · ${b.supervisor || ''}</div>
-                        <span style="background:#F9A825;color:#1B1B1B;border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">BORRADOR</span>
+                        <div style="font-size:12px;color:${b._pendienteVerificacion ? '#E53935' : '#F9A825'};font-weight:700;">${b._pendienteVerificacion ? '📶 SIN SEÑAL · PENDIENTE' : '⏸ EN PROGRESO'} · ${b.supervisor || ''}</div>
+                        <span style="background:${b._pendienteVerificacion ? '#E53935' : '#F9A825'};color:white;border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">${b._pendienteVerificacion ? 'FINALIZAR' : 'BORRADOR'}</span>
                     </div>
                     <div style="font-size:15px;font-weight:800;color:#1B1B1B;margin-top:4px;cursor:pointer;" onclick="continuarBorradorDesdeHistorial('${b.id}')">${nombre}</div>
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
