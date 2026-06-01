@@ -6529,7 +6529,7 @@
 
                 // HEADER
                 pdf.setFillColor(252, 110, 32);
-                pdf.roundedRect(margin, y, pageWidth - 2 * margin, 35, 3, 3, 'F');
+                pdf.roundedRect(margin + 26, y, pageWidth - 2 * margin - 26, 35, 3, 3, 'F');
                 // Logo en esquina superior izquierda del header
                 try {
                     const logoB64 = await new Promise((resolve, reject) => {
@@ -6545,7 +6545,7 @@
                         img.src = '/logo-primax-listo.png';
                     });
                     // Proporcional: ancho 28mm, alto ~18mm aprox
-                    pdf.addImage(logoB64, 'PNG', margin + 2, y - 6, 28, 18);
+                    pdf.addImage(logoB64, 'PNG', margin + 2, y - 4, 22, 22);
                 } catch(e) { /* sin logo, continuar */ }
                 y += 8;
                 addText("TIENDA", 8, true, [255, 255, 255], 'left', margin + 35);
