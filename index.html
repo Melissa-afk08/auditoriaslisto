@@ -6542,9 +6542,9 @@
                         img.src = '/logo-primax-listo.png';
                     });
                     const logoW = 20, logoH = 20;
-                    pdf.addImage(logoB64, 'PNG', margin, y, logoW, logoH);
+                    pdf.addImage(logoB64, 'PNG', margin, y - 8, logoW, logoH);
                 } catch(e) { /* sin logo */ }
-                y += 26;
+                y += 18;
 
                 // Cuadro naranja con info
                 pdf.setFillColor(252, 110, 32);
