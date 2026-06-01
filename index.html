@@ -7117,7 +7117,7 @@
 
             try {
                 const { data, error } = await sbClient.from('auditorias').select('*').order('id', { ascending: false });
-                if (!error && data && data.length > 0) {
+                if (!error && data) {
                     const mapped = data.map(r => ({
                         id: r.id,
                         tienda: { nombre: r.tienda_nombre, distrito: r.tienda_distrito, direccion: r.tienda_direccion },
@@ -7131,7 +7131,13 @@
                         clasificacion: r.clasificacion,
                         firma_url: r.firma_url
                     }));
-                    localStorage.setItem('auditorias', JSON.stringify(mapped));
+                    const idsSupabase = new Set(mapped.map(r => r.id));
+                    const local = JSON.parse(localStorage.getItem('auditorias') || '[]');
+                    // Conservar auditorías locales que no llegaron a Supabase y reintentarlas
+                    const soloLocales = local.filter(a => !idsSupabase.has(a.id) && !a.esBorrador);
+                    soloLocales.forEach(a => syncAuditoriaSupabase(a));
+                    const merged = [...mapped, ...soloLocales];
+                    localStorage.setItem('auditorias', JSON.stringify(merged));
                 }
             } catch(e) { /* usa localStorage si falla */ }
 
