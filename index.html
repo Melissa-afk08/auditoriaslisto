@@ -9187,6 +9187,7 @@
             if (existIdx >= 0) borradores[existIdx] = borrador;
             else borradores.push(borrador);
             localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
+            syncBorradorSupabase(borrador);
         }
 
         // Cierre de pestaña o navegador
@@ -9195,10 +9196,6 @@
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') autoGuardarBorradorSiActivo();
         });
-        // Autoguardado periódico cada 60 segundos
-        setInterval(() => {
-            autoGuardarBorradorSiActivo();
-        }, 60000);
         // Autoguardado periódico cada 60 segundos
         setInterval(() => {
             autoGuardarBorradorSiActivo();
