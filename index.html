@@ -6396,15 +6396,24 @@
                 return;
             }
 
-            // Con señal: flujo normal
+            // Con señal: eliminar cualquier borrador de esta tienda+supervisor del localStorage y Supabase
+            const tiendaNombre = typeof window.selectedStore === 'string' ? window.selectedStore : window.selectedStore?.nombre || '';
+            const supNombre = document.getElementById("form-aud-supervisor").value;
+            let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
+            const borradoresAEliminar = borradores.filter(b => {
+                const bt = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '';
+                return bt === tiendaNombre && b.supervisor === supNombre;
+            });
+            borradores = borradores.filter(b => {
+                const bt = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '';
+                return !(bt === tiendaNombre && b.supervisor === supNombre);
+            });
+            localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
+            borradoresAEliminar.forEach(b => {
+                try { sbClient.from('auditorias').delete().eq('id', parseInt(b.id) || b.id).then(() => {}); } catch(e) {}
+            });
             if (window.auditActual._borradorId) {
-                let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
-                borradores = borradores.filter(b => String(b.id) !== String(window.auditActual._borradorId));
-                localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
                 try { sbClient.from('auditorias').delete().eq('id', parseInt(window.auditActual._borradorId) || window.auditActual._borradorId).then(() => {}); } catch(e) {}
-                let audsGuardadas = JSON.parse(localStorage.getItem("auditorias_guardadas") || "[]");
-                audsGuardadas = audsGuardadas.filter(b => String(b.id) !== String(window.auditActual._borradorId));
-                localStorage.setItem("auditorias_guardadas", JSON.stringify(audsGuardadas));
             }
 
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
