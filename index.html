@@ -8329,19 +8329,15 @@
             if (_chartTiendas) _chartTiendas.destroy();
             const BAR_WIDTH = 80;
             const canvasTiendas = document.getElementById('chart-tiendas');
-            if (tLabels.length > 8) {
-                canvasTiendas.style.width = (tLabels.length * BAR_WIDTH) + 'px';
-                canvasTiendas.style.minWidth = (tLabels.length * BAR_WIDTH) + 'px';
-                canvasTiendas.style.height = '260px';
-            } else {
-                canvasTiendas.style.width = '100%';
-                canvasTiendas.style.minWidth = '';
-                canvasTiendas.style.height = '260px';
-            }
+            const wrapper = canvasTiendas.parentElement;
+            const wrapperW = wrapper.clientWidth || 300;
+            const chartW = tLabels.length > 8 ? tLabels.length * BAR_WIDTH : wrapperW;
+            canvasTiendas.style.width = chartW + 'px';
+            canvasTiendas.style.height = '260px';
             _chartTiendas = new Chart(canvasTiendas, {
                 type: 'bar',
                 data: { labels: tLabels, datasets: [{ data: tValues, backgroundColor: tColors, borderRadius: 6 }] },
-                options: { responsive: tLabels.length <= 8, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:10}}}} }
+                options: { responsive: false, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:10}}}} }
             });
 
             // --- GRÁFICO SUPERVISORES ---
