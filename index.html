@@ -8348,8 +8348,8 @@
             if (_chartTiendas) _chartTiendas.destroy();
             const BAR_WIDTH = 80;
             const canvasTiendas = document.getElementById('chart-tiendas');
-            const wrapperW = canvasTiendas.parentElement.parentElement.clientWidth || 300;
-            const chartW = tLabels.length > 8 ? tLabels.length * BAR_WIDTH : wrapperW;
+            const isMobile = window.innerWidth < 768;
+            const chartW = tLabels.length > 8 ? tLabels.length * BAR_WIDTH : (isMobile ? window.innerWidth - 64 : canvasTiendas.parentElement.parentElement.clientWidth || 300);
             canvasTiendas.style.width = chartW + 'px';
             canvasTiendas.style.height = '260px';
             _chartTiendas = new Chart(canvasTiendas, {
@@ -8496,8 +8496,8 @@
             const canvasTiendasV = document.getElementById('chart-tiendas');
             const ctxT = canvasTiendasV.getContext('2d');
             ctxT.clearRect(0, 0, canvasTiendasV.width, canvasTiendasV.height);
-            const wrapperWV = canvasTiendasV.parentElement.parentElement.clientWidth || 300;
-            const chartWV = tLabels.length > 8 ? tLabels.length * 80 : wrapperWV;
+            const isMobileV = window.innerWidth < 768;
+            const chartWV = tLabels.length > 8 ? tLabels.length * 80 : (isMobileV ? window.innerWidth - 64 : canvasTiendasV.parentElement.parentElement.clientWidth || 300);
             canvasTiendasV.style.width = chartWV + 'px';
             canvasTiendasV.style.height = '260px';
             _chartTiendas = new Chart(canvasTiendasV, {
