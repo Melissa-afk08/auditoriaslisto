@@ -7218,7 +7218,7 @@
                     .eq('es_borrador', true)
                     .eq('created_by', window.currentUser?.email || '')
                     .order('id', { ascending: false });
-                if (sbBorradores && sbBorradores.length > 0) {
+                if (sbBorradores) {
                     const mapped = sbBorradores.map(r => ({
                         id: r.id,
                         esBorrador: true,
