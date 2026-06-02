@@ -7233,7 +7233,6 @@
                         guardadoEn: r.created_at
                     }));
                     // Merge con borradores locales — locales tienen prioridad
-                    let locales = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
                     const idsRemoto = new Set(mapped.map(b => String(b.id)));
                     const locales = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
                     // Eliminar locales que ya no existen en Supabase (fueron borrados desde otro dispositivo)
