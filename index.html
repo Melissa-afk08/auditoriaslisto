@@ -3047,6 +3047,7 @@
             </div>
 
             <!-- KPI SECTION (solo desktop) -->
+            <p id="home-kpi-mes-label" style="font-size:12px; color:#888; font-weight:600; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;"></p>
             <div id="home-kpi-section">
                 <div class="kpi-card">
                     <div class="kpi-label">📋 Mis Auditorías (Mes)</div>
@@ -7489,6 +7490,10 @@
             let equipoPromedio = delMes.length > 0
                 ? (delMes.reduce((s,a) => s + (a.notaFinal||0), 0) / delMes.length).toFixed(1) + '%'
                 : '—';
+
+            let mesesES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            let labelMes = document.getElementById('home-kpi-mes-label');
+            if (labelMes) labelMes.textContent = `Resumen de ${mesesES[mesActual]} ${anioActual}`;
 
             let k1 = document.getElementById('kpi-mis-auditorias');
             let k2 = document.getElementById('kpi-mi-promedio');
