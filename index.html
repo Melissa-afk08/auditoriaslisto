@@ -7394,6 +7394,11 @@
                 borradores = borradores.filter(b => String(b.id) !== String(borradorId));
                 localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
                 try { await sbClient.from('auditorias').delete().eq('id', parseInt(borradorId) || borradorId); } catch(e) {}
+                // Resetear banderas para que el autoguardado no lo recree
+                if (window.auditActual && String(window.auditActual._borradorId) === String(borradorId)) {
+                    window._auditoriaEnProgreso = false;
+                    window.auditActual = null;
+                }
                 closeModal('modal-confirm');
                 renderHistorialAuditorias();
                 showToast("Borrador eliminado", "success");
