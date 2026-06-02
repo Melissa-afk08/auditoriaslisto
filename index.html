@@ -2203,10 +2203,10 @@
         }
 
         .td-hist-scroll {
-            max-height: 350px;
+            max-height: 480px;
             overflow-y: auto;
             scrollbar-width: thin;
-            scrollbar-color: #ddd transparent;
+            scrollbar-color: #FC6E20 transparent;
         }
 
         .td-hist-item {
@@ -3468,11 +3468,11 @@
                 <div class="td-kpi-grid" id="td-kpis"></div>
 
                 <div class="td-hist-card">
-                    <div class="td-hist-title">📋 Historial de Auditorías</div>
+                    <div class="td-hist-title">📋 Últimas Auditorías Registradas</div>
                     <div class="td-hist-scroll" id="td-hist-aud"></div>
                 </div>
                 <div class="td-hist-card">
-                    <div class="td-hist-title">📍 Historial de Visitas</div>
+                    <div class="td-hist-title">📍 Últimas Visitas Registradas</div>
                     <div class="td-hist-scroll" id="td-hist-vis"></div>
                 </div>
             </div>
@@ -3980,52 +3980,63 @@
             <span class="bold" style="color:white;font-size:16px;">ANALÍTICA</span>
         </div>
         <div style="padding:16px;">
-            <!-- TOGGLE TIPO -->
-            <div style="display:flex;background:white;border-radius:50px;padding:4px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <button id="toggle-analitica-aud" onclick="setAnaliticaTipo('auditoria')" style="flex:1;padding:10px;border:none;border-radius:50px;background:var(--naranja);color:white;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;">📋 Auditorías</button>
-                <button id="toggle-analitica-vis" onclick="setAnaliticaTipo('visita')" style="flex:1;padding:10px;border:none;border-radius:50px;background:transparent;color:#888;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;">👁 Visitas</button>
-            </div>
+        <div style="padding:16px;">
             <!-- FILTROS -->
-            <div style="background:white;border-radius:16px;padding:14px 16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;gap:8px;flex-wrap:wrap;">
-                <select id="analitica-filtro-mes" onchange="renderAnalitica()" style="flex:1;min-width:100px;padding:8px 10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">
+            <div style="background:white;border-radius:16px;padding:12px 16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;gap:8px;flex-wrap:wrap;">
+                <select id="analitica-filtro-mes" onchange="renderAnalitica()" style="flex:1;min-width:90px;padding:8px 10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">
                     <option value="">Todos los meses</option>
                     <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
                 </select>
-                <select id="analitica-filtro-anio" onchange="renderAnalitica()" style="flex:1;min-width:80px;padding:8px 10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">
+                <select id="analitica-filtro-anio" onchange="renderAnalitica()" style="flex:1;min-width:70px;padding:8px 10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">
                     <option value="">Todos los años</option>
                 </select>
                 <select id="analitica-filtro-sup" onchange="renderAnalitica()" style="flex:1;min-width:120px;padding:8px 10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">
                     <option value="">Todos los supervisores</option>
                 </select>
             </div>
-            <!-- KPI CARDS -->
+            <!-- KPI CARDS: 4 en 2x2 -->
             <div id="analitica-kpis" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;"></div>
-            <!-- GRÁFICOS TIENDA + SUPERVISOR (2 columnas en desktop) -->
-            <div id="analitica-charts-row" style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px;">
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                    <div id="chart-tiendas-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📊 Promedio por Tienda</div>
-                    <div id="chart-tiendas-wrapper" style="overflow-x:auto;height:260px;">
-                        <canvas id="chart-tiendas" style="max-height:260px;"></canvas>
+            <!-- GRÁFICO PASTEL -->
+            <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:4px;">📊 Distribución de Resultados</div>
+                <div style="font-size:11px;color:#aaa;margin-bottom:16px;">Clasificación de auditorías del período</div>
+                <div style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;">
+                    <div style="position:relative;width:160px;height:160px;flex-shrink:0;">
+                        <canvas id="chart-pastel" width="160" height="160"></canvas>
+                        <div id="pastel-center" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;">
+                            <div id="pastel-total" style="font-size:22px;font-weight:800;color:#1B1B1B;line-height:1;"></div>
+                            <div style="font-size:10px;color:#aaa;margin-top:2px;">total</div>
+                        </div>
                     </div>
-                </div>
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                    <div id="chart-supervisores-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">👤 Desempeño por Supervisor</div>
-                    <canvas id="chart-supervisores" style="width:100%;height:220px;"></canvas>
+                    <div id="pastel-leyenda" style="display:flex;flex-direction:column;gap:10px;"></div>
                 </div>
             </div>
-            <!-- GRÁFICO TENDENCIA MENSUAL -->
+            <!-- ALERTA TIENDAS CON 3+ BAJOS -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div id="chart-tendencia-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📈 Tendencia Mensual</div>
-                <canvas id="chart-tendencia" style="width:100%;height:220px;"></canvas>
+                <div style="font-size:13px;font-weight:800;color:#C62828;margin-bottom:4px;">🔥 Tiendas en Alerta</div>
+                <div style="font-size:11px;color:#aaa;margin-bottom:12px;">3 o más resultados bajos en el período</div>
+                <div id="analitica-alerta-tiendas"></div>
             </div>
-            <!-- RANKING TIENDAS -->
+            <!-- TOP 5 SEMANAL -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div id="chart-ranking-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">🏆 Ranking de Tiendas</div>
-                <div id="analitica-ranking"></div>
+                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:4px;">🏆 Top 5 Tiendas — Semana Actual</div>
+                <div id="analitica-top10-label" style="font-size:11px;color:#aaa;margin-bottom:12px;"></div>
+                <div id="analitica-top10"></div>
+            </div>
+            <!-- RANKING SUPERVISORAS -->
+            <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:4px;">👤 Ranking de Supervisoras</div>
+                <div style="font-size:11px;color:#aaa;margin-bottom:12px;">Promedio, auditorías y visitas del período</div>
+                <div id="analitica-supervisoras"></div>
+            </div>
+            <!-- TOP 5 PREGUNTAS FALLIDAS -->
+            <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:4px;">❌ Preguntas más Fallidas</div>
+                <div style="font-size:11px;color:#aaa;margin-bottom:12px;">Top 5 ítems con más NO en el período</div>
+                <div id="analitica-fallidas"></div>
             </div>
         </div>
     </div>
-
     <div id="view-usuarios" class="view fade-in">
         <div class="header-dark" style="background:var(--naranja);">
             <button onclick="showView('view-ajustes')" style="color:white;">←</button>
@@ -5276,12 +5287,12 @@
             let pillText = document.getElementById('filter-pill-text-' + viewId);
 
             if (district === "") {
-                btn.classList.remove('active');
-                pill.style.display = 'none';
+                if (btn) btn.classList.remove('active');
+                if (pill) pill.style.display = 'none';
             } else {
-                btn.classList.add('active');
-                pillText.textContent = district;
-                pill.style.display = 'inline-flex';
+                if (btn) btn.classList.add('active');
+                if (pillText) pillText.textContent = district;
+                if (pill) pill.style.display = 'inline-flex';
             }
             renderTiendasList(viewId);
         }
@@ -5433,22 +5444,20 @@
                 }).join('');
             }
 
-            // Alertas: preguntas con 0 pts o NO con obs
+            // Alertas: todas las preguntas respondidas con NO
             let alertas = [];
-            if (ultima.respuestas && ultima.resultadoGrupos) {
+            if (ultima.respuestas) {
                 window.PREGUNTAS.forEach(p => {
                     let r = ultima.respuestas[p.id];
-                    if (!r) return;
-                    let pctGrupo = ultima.resultadoGrupos[p.grupo] || 0;
-                    if (r.valor === 'NO' && pctGrupo < 70) {
-                        let grupoNombre = grupos[p.grupo] || `Grupo ${p.grupo}`;
-                        alertas.push({ grupoNombre, pregunta: p.texto, obs: r.obs, critico: pctGrupo < 50 });
-                    }
+                    if (!r || r.valor !== 'NO') return;
+                    let pctGrupo = (ultima.resultadoGrupos && ultima.resultadoGrupos[p.grupo]) || 0;
+                    let grupoNombre = grupos[p.grupo] || `Grupo ${p.grupo}`;
+                    alertas.push({ grupoNombre, pregunta: p.texto, obs: r.obs, critico: pctGrupo < 70 });
                 });
             }
 
             let alertasHtml = alertas.length > 0
-                ? alertas.slice(0, 5).map(a => `
+                ? alertas.map(a => `
                 <div class="diag-alerta-item ${a.critico ? 'critico' : ''}">
                     <div class="diag-alerta-grupo" style="color:${a.critico?'#C62828':'#F9A825'};">⚠️ ${a.grupoNombre}</div>
                     <div class="diag-alerta-pregunta">${a.pregunta}</div>
@@ -5481,7 +5490,9 @@
                 </div>
                 <div class="prep-card">
                     <div class="prep-card-label">🔴 Puntos críticos detectados</div>
-                    ${alertasHtml}
+                    <div style="max-height:520px;overflow-y:auto;padding-right:4px;">
+                        ${alertasHtml}
+                    </div>
                 </div>
             `;
         } 
@@ -5537,7 +5548,7 @@
             }
         }
 
-        function renderDetalleTienda() {
+        async function renderDetalleTienda() {
             let tienda = window.selectedStore;
             if (!tienda) return;
             document.getElementById('td-det-nombre').textContent = tienda.nombre;
@@ -5552,9 +5563,33 @@
                 mapaWrapper.innerHTML = `<iframe src="https://maps.google.com/maps?q=${q}&output=embed&z=16" loading="lazy"></iframe>`;
             }
 
-            // KPIs
-            const auditorias = JSON.parse(localStorage.getItem('auditorias') || '[]').filter(a => (a.tienda?.nombre || a.tienda) === tienda.nombre);
-            const visitas = JSON.parse(localStorage.getItem('visitas') || '[]').filter(v => (v.tienda?.nombre || v.tienda) === tienda.nombre);
+            // KPIs — leer desde Supabase
+            let auditorias = [], visitas = [];
+            try {
+                const { data: audData } = await sbClient.from('auditorias')
+                    .select('id,supervisor,fecha,hora,nota_final,resultado_grupos,es_borrador')
+                    .eq('tienda_nombre', tienda.nombre)
+                    .eq('es_borrador', false)
+                    .order('id', { ascending: false })
+                    .limit(100);
+                if (audData) auditorias = audData.map(r => ({
+                    id: r.id, supervisor: r.supervisor, fecha: r.fecha, hora: r.hora,
+                    notaFinal: r.nota_final || 0, finalScore: r.nota_final || 0,
+                    resultadoGrupos: r.resultado_grupos
+                }));
+            } catch(e) {
+                auditorias = JSON.parse(localStorage.getItem('auditorias') || '[]').filter(a => (a.tienda?.nombre || a.tienda) === tienda.nombre);
+            }
+            try {
+                const { data: visData } = await sbClient.from('visitas')
+                    .select('id,supervisor,datetime,comentario')
+                    .eq('tienda', tienda.nombre)
+                    .order('id', { ascending: false })
+                    .limit(100);
+                if (visData) visitas = visData;
+            } catch(e) {
+                visitas = JSON.parse(localStorage.getItem('visitas') || '[]').filter(v => (v.tienda?.nombre || v.tienda) === tienda.nombre);
+            }
             let promedioScore = auditorias.length > 0
                 ? (auditorias.reduce((s,a) => s + (a.notaFinal||a.finalScore||0), 0) / auditorias.length).toFixed(1)
                 : '—';
@@ -5624,7 +5659,7 @@
             let borradores = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
             let borradoresTienda = borradores.filter(b => {
                 let bn = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre;
-                return bn === tiendaNombre;
+                return bn === tienda.nombre;
             });
             let borradoresHtmlTd = borradoresTienda.map(b => `
                 <div class="td-hist-item" onclick="continuarBorradorDesdeHistorial('${b.id}')" style="background:#FFF8E1;border-left:3px solid #F9A825;">
@@ -6418,6 +6453,15 @@
             if (window.auditActual._borradorId) {
                 try { sbClient.from('auditorias').delete().eq('id', parseInt(window.auditActual._borradorId) || window.auditActual._borradorId).then(() => {}); } catch(e) {}
             }
+            // Eliminar por tienda+supervisor+es_borrador para limpiar borradores huérfanos de otros dispositivos
+            try {
+                sbClient.from('auditorias')
+                    .delete()
+                    .eq('tienda_nombre', tiendaNombre)
+                    .eq('supervisor', supNombre)
+                    .eq('es_borrador', true)
+                    .then(() => {});
+            } catch(e) {}
 
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
             auds.push(auditRecord);
@@ -8247,318 +8291,235 @@
             document.getElementById("modal-confirm").style.display = "flex";
         }
 
-        let _chartTiendas = null, _chartSups = null, _chartTend = null;
-        window._analiticaTipo = window._analiticaTipo || 'auditoria';
-
-        async function setAnaliticaTipo(tipo) {
-            window._analiticaTipo = tipo;
-            document.getElementById('toggle-analitica-aud').style.background = tipo==='auditoria' ? 'var(--naranja)' : 'transparent';
-            document.getElementById('toggle-analitica-aud').style.color = tipo==='auditoria' ? 'white' : '#888';
-            document.getElementById('toggle-analitica-vis').style.background = tipo==='visita' ? 'var(--naranja)' : 'transparent';
-            document.getElementById('toggle-analitica-vis').style.color = tipo==='visita' ? 'white' : '#888';
-            await renderAnalitica();
-        }
+        let _chartPastel = null;
 
         async function renderAnalitica() {
-            if (window._analiticaTipo === 'visita') { renderAnaliticaVisitas(); return; }
-            document.getElementById('analitica-kpis').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#aaa;font-size:13px;">Cargando datos...</div>';
-            let audsRaw = [];
+            // Cargar auditorías y visitas desde Supabase
+            let data = [], visitas = [];
             try {
-                let { data, error } = await sbClient.from('auditorias').select('id,tienda_nombre,supervisor,fecha,hora,nota_final,clasificacion,resultado_grupos').eq('es_borrador', false).order('id', { ascending: false });
-                if (!error && data) audsRaw = data;
+                let { data: raw } = await sbClient.from('auditorias')
+                    .select('id,tienda_nombre,supervisor,fecha,nota_final,respuestas')
+                    .eq('es_borrador', false)
+                    .order('id', { ascending: false });
+                if (raw) data = raw;
             } catch(e) {}
-            if (audsRaw.length === 0) audsRaw = JSON.parse(localStorage.getItem("auditorias") || "[]");
-            // Normalizar campos Supabase → formato interno
-            let auds = audsRaw.map(a => ({
-                ...a,
-                tienda: a.tienda_nombre || (typeof a.tienda==='string'?a.tienda:a.tienda?.nombre||''),
-                notaFinal: a.nota_final ?? a.notaFinal ?? a.finalScore ?? 0,
-                finalScore: a.nota_final ?? a.notaFinal ?? a.finalScore ?? 0,
-                resultadoGrupos: a.resultado_grupos || a.resultadoGrupos || {}
-            }));
+            try {
+                let { data: rawV } = await sbClient.from('visitas')
+                    .select('supervisor,datetime')
+                    .order('id', { ascending: false });
+                if (rawV) visitas = rawV;
+            } catch(e) {}
 
-            // Poblar filtro años
+            // Poblar filtros
             let anioSel = document.getElementById('analitica-filtro-anio');
-            const getAnioMes = (f) => {
-                if (!f) return { anio: '', mes: '', ym: '' };
-                if (f.includes('-') && f.indexOf('-') === 4) return { anio: f.substring(0,4), mes: f.substring(5,7), ym: f.substring(0,7) };
-                let p = f.split('/'); if (p.length < 3) return { anio:'', mes:'', ym:'' };
-                return { anio: p[2], mes: p[1].padStart(2,'0'), ym: p[2]+'-'+p[1].padStart(2,'0') };
-            };
-            let anios = [...new Set(auds.map(a => getAnioMes(a.fecha).anio).filter(Boolean))].sort().reverse();
-            let anioVal = anioSel.value;
-            anioSel.innerHTML = '<option value="">Todos los años</option>' + anios.map(y => `<option value="${y}" ${y===anioVal?'selected':''}>${y}</option>`).join('');
-
-            // Poblar filtro supervisores
+            if (anioSel && anioSel.options.length <= 1) {
+                let anios = [...new Set(data.map(a => {
+                    let f = a.fecha||'';
+                    return f.includes('-') && f.indexOf('-')===4 ? f.substring(0,4) : (f.split('/')[2]||'');
+                }).filter(Boolean))].sort().reverse();
+                anios.forEach(y => { let o=document.createElement('option'); o.value=y; o.textContent=y; anioSel.appendChild(o); });
+            }
             let supSel = document.getElementById('analitica-filtro-sup');
-            let sups = [...new Set(auds.map(a => a.supervisor).filter(Boolean))].sort();
-            let supVal = supSel.value;
-            supSel.innerHTML = '<option value="">Todos los supervisores</option>' + sups.map(s => `<option value="${s}" ${s===supVal?'selected':''}>${s}</option>`).join('');
+            if (supSel && supSel.options.length <= 1) {
+                let sups = [...new Set(data.map(a => a.supervisor).filter(Boolean))].sort();
+                sups.forEach(s => { let o=document.createElement('option'); o.value=s; o.textContent=s; supSel.appendChild(o); });
+            }
 
-            // Aplicar filtros
-            let mes = document.getElementById('analitica-filtro-mes').value;
-            let anio = anioSel.value;
-            let sup = supSel.value;
-            let data = auds.filter(a => {
-                let { anio: fa, mes: fm } = getAnioMes(a.fecha);
-                if (mes && fm !== mes) return false;
-                if (anio && fa !== anio) return false;
-                if (sup && a.supervisor !== sup) return false;
+            let mesSel = document.getElementById('analitica-filtro-mes')?.value || '';
+            let anioSelVal = anioSel?.value || '';
+            let supSelVal = supSel?.value || '';
+
+            function parseFechaA(f) {
+                if (!f) return null;
+                if (f.includes('-') && f.indexOf('-')===4) { let p=f.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+                let p=f.split('/'); if(p.length<3) return null;
+                return new Date(+p[2],+p[1]-1,+p[0]);
+            }
+
+            let filtered = data.filter(a => {
+                let d = parseFechaA(a.fecha); if (!d) return false;
+                let mes = String(d.getMonth()+1).padStart(2,'0');
+                let anio = String(d.getFullYear());
+                if (mesSel && mes !== mesSel) return false;
+                if (anioSelVal && anio !== anioSelVal) return false;
+                if (supSelVal && a.supervisor !== supSelVal) return false;
                 return true;
             });
 
-            // --- KPI CARDS ---
-            let total = data.length;
-            let promedio = total > 0 ? data.reduce((s,a) => s+(a.notaFinal||a.finalScore||0),0)/total : 0;
-            let sobresalientes = data.filter(a => (a.notaFinal||a.finalScore||0) > 90).length;
-            let altoRiesgo = data.filter(a => (a.notaFinal||a.finalScore||0) <= 70).length;
-            let tiendas = [...new Set(data.map(a => typeof a.tienda==='string'?a.tienda:a.tienda?.nombre).filter(Boolean))];
-            let promedioColor = promedio > 90 ? '#43A047' : promedio > 70 ? '#F9A825' : '#C62828';
+            let hoy = new Date();
+            let totalAuds = filtered.length;
+            let sob = filtered.filter(a=>(a.nota_final||0)>90).length;
+            let req = filtered.filter(a=>(a.nota_final||0)>70 && (a.nota_final||0)<=90).length;
+            let alt = filtered.filter(a=>(a.nota_final||0)<=70).length;
+
+            // KPIs
+            let promGeneral = totalAuds > 0 ? (filtered.reduce((s,a)=>s+(a.nota_final||0),0)/totalAuds).toFixed(1) : '—';
+            let colorProm = totalAuds > 0 ? (parseFloat(promGeneral)>90?'#43A047':parseFloat(promGeneral)>70?'#F9A825':'#C62828') : '#1B1B1B';
+            let tMapKpi = {};
+            filtered.forEach(a => { let t=a.tienda_nombre||''; if(!t) return; if(!tMapKpi[t]) tMapKpi[t]=[]; tMapKpi[t].push(a.nota_final||0); });
+            let mejorTienda = Object.entries(tMapKpi).map(([t,v])=>({ t, prom:v.reduce((s,x)=>s+x,0)/v.length })).sort((a,b)=>b.prom-a.prom)[0];
+            let supMapKpi = {};
+            filtered.forEach(a => { let s=a.supervisor||''; if(!s) return; supMapKpi[s]=(supMapKpi[s]||0)+1; });
+            let masAuds = Object.entries(supMapKpi).sort((a,b)=>b[1]-a[1])[0];
             document.getElementById('analitica-kpis').innerHTML = `
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">
-                    <div style="font-size:11px;color:#aaa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Total Auditorías</div>
-                    <div style="font-size:32px;font-weight:800;color:#1B1B1B;">${total}</div>
+                <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid var(--naranja);">
+                    <div style="font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Total Auditorías</div>
+                    <div style="font-size:28px;font-weight:800;color:#1B1B1B;line-height:1;">${totalAuds}</div>
+                    <div style="font-size:9px;color:#aaa;margin-top:4px;">en el período</div>
                 </div>
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">
-                    <div style="font-size:11px;color:#aaa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Promedio General</div>
-                    <div style="font-size:32px;font-weight:800;color:${promedioColor};">${promedio.toFixed(1)}%</div>
+                <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid ${colorProm};">
+                    <div style="font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Promedio General</div>
+                    <div style="font-size:28px;font-weight:800;color:${colorProm};line-height:1;">${totalAuds>0?promGeneral+'%':'—'}</div>
+                    <div style="font-size:9px;color:#aaa;margin-top:4px;">del equipo</div>
                 </div>
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">
-                    <div style="font-size:11px;color:#aaa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Sobresalientes</div>
-                    <div style="font-size:32px;font-weight:800;color:#43A047;">${sobresalientes}</div>
+                <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid #43A047;">
+                    <div style="font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Mejor Tienda</div>
+                    <div style="font-size:13px;font-weight:800;color:#43A047;line-height:1.2;margin-bottom:2px;">${mejorTienda?mejorTienda.t:'—'}</div>
+                    <div style="font-size:9px;color:#aaa;margin-top:4px;">${mejorTienda?mejorTienda.prom.toFixed(1)+'%':''}</div>
                 </div>
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">
-                    <div style="font-size:11px;color:#aaa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Alto Riesgo</div>
-                    <div style="font-size:32px;font-weight:800;color:#C62828;">${altoRiesgo}</div>
-                </div>
-            `;
-
-            // --- GRÁFICO TIENDAS ---
-            let tMap = {};
-            data.forEach(a => {
-                let t = typeof a.tienda==='string'?a.tienda:a.tienda?.nombre||'';
-                if (!t) return;
-                if (!tMap[t]) tMap[t] = [];
-                tMap[t].push(a.notaFinal||a.finalScore||0);
-            });
-            let tLabels = Object.keys(tMap).sort((a,b) => {
-                let pa = tMap[a].reduce((s,v)=>s+v,0)/tMap[a].length;
-                let pb = tMap[b].reduce((s,v)=>s+v,0)/tMap[b].length;
-                return pb-pa;
-            });
-            let tValues = tLabels.map(t => parseFloat((tMap[t].reduce((s,v)=>s+v,0)/tMap[t].length).toFixed(1)));
-            let tColors = tValues.map(v => v>90?'#43A047':v>70?'#F9A825':'#C62828');
-            if (_chartTiendas) _chartTiendas.destroy();
-            const BAR_WIDTH = 80;
-            const canvasTiendas = document.getElementById('chart-tiendas');
-            const wrapperEl = canvasTiendas.parentElement;
-            const safeW = (wrapperEl.clientWidth > 0 ? wrapperEl.clientWidth : window.innerWidth - 64);
-            const minW = tLabels.length * BAR_WIDTH;
-            const chartW = Math.max(minW, safeW);
-            wrapperEl.style.minWidth = '0';
-            canvasTiendas.style.width = chartW + 'px';
-            canvasTiendas.style.height = '240px';
-            const tLabelsShort = tLabels.map(l => l.length > 12 ? l.substring(0,12)+'...' : l);
-            _chartTiendas = new Chart(canvasTiendas, {
-                type: 'bar',
-                data: { labels: tLabelsShort, datasets: [{ data: tValues, backgroundColor: tColors, borderRadius: 6 }] },
-                options: { responsive: false, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:10}}}} }
-            });
-
-            // --- GRÁFICO SUPERVISORES ---
-            let sMap = {};
-            data.forEach(a => {
-                let s = a.supervisor||'';
-                if (!s) return;
-                if (!sMap[s]) sMap[s] = [];
-                sMap[s].push(a.notaFinal||a.finalScore||0);
-            });
-            let sLabels = Object.keys(sMap);
-            let sValues = sLabels.map(s => parseFloat((sMap[s].reduce((v,c)=>v+c,0)/sMap[s].length).toFixed(1)));
-            let sCounts = sLabels.map(s => sMap[s].length);
-            let sColors = sValues.map(v => v>90?'rgba(67,160,71,0.8)':v>70?'rgba(249,168,37,0.8)':'rgba(198,40,40,0.8)');
-            if (_chartSups) _chartSups.destroy();
-            _chartSups = new Chart(document.getElementById('chart-supervisores'), {
-                type: 'bar',
-                data: { labels: sLabels, datasets: [
-                    { label:'Promedio (%)', data:sValues, backgroundColor:sColors, borderRadius:6, yAxisID:'y' },
-                    { label:'Auditorías', data:sCounts, type:'line', borderColor:'#FC6E20', backgroundColor:'rgba(252,110,32,0.1)', tension:0.3, yAxisID:'y1', pointRadius:5 }
-                ]},
-                options: { responsive:true, maintainAspectRatio:true, aspectRatio:2, plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}, scales:{
-                    y:{min:0,max:100,ticks:{callback:v=>v+'%'},position:'left'},
-                    y1:{min:0,position:'right',grid:{drawOnChartArea:false},ticks:{stepSize:1}}
-                }}
-            });
-
-            // --- GRÁFICO TENDENCIA MENSUAL ---
-            let mMap = {};
-            data.forEach(a => {
-                let { ym } = getAnioMes(a.fecha);
-                if (!ym) return;
-                if (!mMap[ym]) mMap[ym] = [];
-                mMap[ym].push(a.notaFinal||a.finalScore||0);
-            });
-            let mLabels = Object.keys(mMap).sort();
-            let mValues = mLabels.map(m => parseFloat((mMap[m].reduce((s,v)=>s+v,0)/mMap[m].length).toFixed(1)));
-            const meses = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-            let mLabelsF = mLabels.map(m => { let p=m.split('-'); return (meses[parseInt(p[1])-1]||p[1])+' '+p[0]; });
-            if (_chartTend) _chartTend.destroy();
-            _chartTend = new Chart(document.getElementById('chart-tendencia'), {
-                type: 'line',
-                data: { labels: mLabelsF, datasets: [{ label:'Promedio mensual', data:mValues, borderColor:'#FC6E20', backgroundColor:'rgba(252,110,32,0.1)', tension:0.4, pointRadius:5, pointBackgroundColor:'#FC6E20', fill:true }] },
-                options: { responsive:true, maintainAspectRatio:true, aspectRatio:2.5, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}} }
-            });
-
-            // --- RANKING TIENDAS ---
-            let rankHtml = Object.keys(tMap).sort((a,b)=>{
-                let pa=tMap[a].reduce((s,v)=>s+v,0)/tMap[a].length;
-                let pb=tMap[b].reduce((s,v)=>s+v,0)/tMap[b].length;
-                return pb-pa;
-            }).map((t,i) => {
-                let prom = tMap[t].reduce((s,v)=>s+v,0)/tMap[t].length;
-                let c = prom>90?'#43A047':prom>70?'#F9A825':'#C62828';
-                let medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;
-                return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F0F0;">
-                    <span style="font-size:16px;width:24px;text-align:center;">${medal}</span>
-                    <div style="flex:1;font-size:13px;font-weight:700;color:#1B1B1B;">${t}</div>
-                    <div style="font-size:12px;color:#888;">${tMap[t].length} aud.</div>
-                    <span style="background:${c};color:white;font-size:12px;font-weight:700;padding:3px 10px;border-radius:50px;">${prom.toFixed(1)}%</span>
+                <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid #FC6E20;">
+                    <div style="font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Más Activa</div>
+                    <div style="font-size:13px;font-weight:800;color:#FC6E20;line-height:1.2;margin-bottom:2px;">${masAuds?masAuds[0].split(' ')[0]:'—'}</div>
+                    <div style="font-size:9px;color:#aaa;margin-top:4px;">${masAuds?masAuds[1]+' auditorías':''}</div>
                 </div>`;
-            }).join('');
-            const rankEl = document.getElementById('analitica-ranking');
-            rankEl.innerHTML = rankHtml || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos</div>';
-            const rankCount = Object.keys(tMap).length;
-            rankEl.style.maxHeight = rankCount > 8 ? '400px' : 'none';
-            rankEl.style.overflowY = rankCount > 8 ? 'auto' : 'visible';
-        }
 
-        async function renderAnaliticaVisitas() {
-            document.getElementById('analitica-kpis').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#aaa;font-size:13px;">Cargando datos...</div>';
-            let viss = [];
-            try {
-                let { data, error } = await sbClient.from('visitas').select('*').order('id', { ascending: false });
-                if (!error && data) viss = data;
-            } catch(e) {}
-            if (viss.length === 0) viss = JSON.parse(localStorage.getItem("visitas") || "[]");
+            // GRÁFICO PASTEL
+            document.getElementById('pastel-total').textContent = totalAuds;
+            if (_chartPastel) _chartPastel.destroy();
+            const ctxP = document.getElementById('chart-pastel').getContext('2d');
+            if (totalAuds > 0) {
+                _chartPastel = new Chart(ctxP, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Sobresaliente','Se Requiere Mejorar','Alto Riesgo'],
+                        datasets: [{ data: [sob, req, alt], backgroundColor: ['#43A047','#F9A825','#C62828'], borderWidth: 0, hoverOffset: 6 }]
+                    },
+                    options: { responsive: false, cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} (${totalAuds>0?((ctx.raw/totalAuds)*100).toFixed(0):0}%)` } } } }
+                });
+            } else {
+                ctxP.clearRect(0,0,160,160);
+                ctxP.beginPath(); ctxP.arc(80,80,70,0,Math.PI*2);
+                ctxP.fillStyle='#F5F5F5'; ctxP.fill();
+            }
+            document.getElementById('pastel-leyenda').innerHTML = [
+                { label:'Sobresaliente', val:sob, c:'#43A047' },
+                { label:'Se Requiere Mejorar', val:req, c:'#F9A825' },
+                { label:'Alto Riesgo', val:alt, c:'#C62828' }
+            ].map(item => `
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="width:12px;height:12px;border-radius:3px;background:${item.c};flex-shrink:0;"></div>
+                    <div style="font-size:12px;color:#555;">${item.label}</div>
+                    <div style="font-size:12px;font-weight:700;color:#1B1B1B;margin-left:auto;">${item.val}</div>
+                </div>`).join('');
 
-            const getAnioMesV = (f) => {
-                if (!f) return { anio:'', mes:'', ym:'' };
-                let base = f.substring(0,10);
-                if (base.includes('-') && base.indexOf('-')===4) return { anio:base.substring(0,4), mes:base.substring(5,7), ym:base.substring(0,7) };
-                let p = base.split('/'); if (p.length<3) return { anio:'',mes:'',ym:'' };
-                return { anio:p[2], mes:p[1].padStart(2,'0'), ym:p[2]+'-'+p[1].padStart(2,'0') };
-            };
-
-            // Poblar filtro años
-            let anioSel = document.getElementById('analitica-filtro-anio');
-            let anios = [...new Set(viss.map(v => getAnioMesV(v.datetime||v.fecha).anio).filter(Boolean))].sort().reverse();
-            let anioVal = anioSel.value;
-            anioSel.innerHTML = '<option value="">Todos los años</option>' + anios.map(y=>`<option value="${y}" ${y===anioVal?'selected':''}>${y}</option>`).join('');
-
-            let supSel = document.getElementById('analitica-filtro-sup');
-            let sups = [...new Set(viss.map(v=>v.supervisor).filter(Boolean))].sort();
-            let supVal = supSel.value;
-            supSel.innerHTML = '<option value="">Todos los supervisores</option>' + sups.map(s=>`<option value="${s}" ${s===supVal?'selected':''}>${s}</option>`).join('');
-
-            let mes = document.getElementById('analitica-filtro-mes').value;
-            let anio = anioSel.value;
-            let sup = supSel.value;
-            let data = viss.filter(v => {
-                let { anio:fa, mes:fm } = getAnioMesV(v.datetime||v.fecha||'');
-                if (mes && fm!==mes) return false;
-                if (anio && fa!==anio) return false;
-                if (sup && v.supervisor!==sup) return false;
-                return true;
+            // ALERTA TIENDAS CON 3+ BAJOS DEL PERÍODO
+            let tBajos = {};
+            filtered.forEach(a => {
+                let t = a.tienda_nombre||''; if(!t) return;
+                let score = a.nota_final||0;
+                if (score <= 90) {
+                    if (!tBajos[t]) tBajos[t] = { rojo:0, amarillo:0, total:0 };
+                    if (score <= 70) tBajos[t].rojo++;
+                    else tBajos[t].amarillo++;
+                    tBajos[t].total++;
+                }
             });
+            let alertaTiendas = Object.entries(tBajos)
+                .filter(([,d]) => d.total >= 3)
+                .sort((a,b) => b[1].rojo - a[1].rojo);
+            let alertaHtml = alertaTiendas.map(([tienda, d]) => `
+                <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F5F5F5;">
+                    <span style="font-size:18px;">🔥</span>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:13px;font-weight:700;color:#1B1B1B;">${tienda}</div>
+                        <div style="display:flex;gap:6px;margin-top:3px;">
+                            ${d.rojo>0?`<span style="background:#FFEBEE;color:#C62828;font-size:10px;font-weight:700;padding:2px 7px;border-radius:50px;">${d.rojo} rojo${d.rojo>1?'s':''}</span>`:''}
+                            ${d.amarillo>0?`<span style="background:#FFF8E1;color:#F9A825;font-size:10px;font-weight:700;padding:2px 7px;border-radius:50px;">${d.amarillo} amarillo${d.amarillo>1?'s':''}</span>`:''}
+                        </div>
+                    </div>
+                    <span style="font-size:12px;font-weight:700;color:#C62828;">${d.total} resultados</span>
+                </div>`).join('');
+            document.getElementById('analitica-alerta-tiendas').innerHTML = alertaHtml || '<div style="color:#43A047;text-align:center;padding:16px;font-size:13px;">✅ Sin tiendas con 3 o más resultados bajos</div>';
 
-            let total = data.length;
-            let tiendas = [...new Set(data.map(v=>v.tienda).filter(Boolean))];
-            let conComentario = data.filter(v=>v.comentario&&v.comentario.trim().length>0).length;
-
-            document.getElementById('analitica-kpis').innerHTML = `
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">
-                    <div style="font-size:11px;color:#aaa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Total Visitas</div>
-                    <div style="font-size:32px;font-weight:800;color:#1B1B1B;">${total}</div>
-                </div>
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">
-                    <div style="font-size:11px;color:#aaa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Tiendas Visitadas</div>
-                    <div style="font-size:32px;font-weight:800;color:#FC6E20;">${tiendas.length}</div>
-                </div>
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">
-                    <div style="font-size:11px;color:#aaa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Con Observación</div>
-                    <div style="font-size:32px;font-weight:800;color:#1B1B1B;">${conComentario}</div>
-                </div>
-                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);text-align:center;">
-                    <div style="font-size:11px;color:#aaa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Supervisores</div>
-                    <div style="font-size:32px;font-weight:800;color:#1B1B1B;">${[...new Set(data.map(v=>v.supervisor).filter(Boolean))].length}</div>
-                </div>
-            `;
-
-            // Gráfico visitas por tienda
-            let tMap = {};
-            data.forEach(v=>{ let t=v.tienda||''; if(!t) return; tMap[t]=(tMap[t]||0)+1; });
-            let tLabels = Object.keys(tMap).sort((a,b)=>tMap[b]-tMap[a]);
-            let tValues = tLabels.map(t=>tMap[t]);
-            if (_chartTiendas) { _chartTiendas.destroy(); _chartTiendas = null; }
-            const canvasTiendasV = document.getElementById('chart-tiendas');
-            const ctxT = canvasTiendasV.getContext('2d');
-            ctxT.clearRect(0, 0, canvasTiendasV.width, canvasTiendasV.height);
-            const wrapperElV = canvasTiendasV.parentElement;
-            const safeWV = wrapperElV.clientWidth > 0 ? wrapperElV.clientWidth : window.innerWidth - 64;
-            const minWV = tLabels.length * 80;
-            const chartWV = Math.max(minWV, safeWV);
-            wrapperElV.style.minWidth = '0';
-            canvasTiendasV.style.width = chartWV + 'px';
-            canvasTiendasV.style.height = '240px';
-            const tLabelsShortV = tLabels.map(l => l.length > 12 ? l.substring(0,12)+'...' : l);
-            _chartTiendas = new Chart(canvasTiendasV, {
-                type:'bar',
-                data:{ labels:tLabelsShortV, datasets:[{ data:tValues, backgroundColor:'rgba(252,110,32,0.75)', borderRadius:6 }] },
-                options:{ responsive:false, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}},x:{ticks:{font:{size:10}}}} }
-            });
-            document.getElementById('chart-tiendas-title').textContent = '📊 Visitas por Tienda';
-
-            // Gráfico visitas por supervisor
-            let sMap = {};
-            data.forEach(v=>{ let s=v.supervisor||''; if(!s) return; sMap[s]=(sMap[s]||0)+1; });
-            let sLabels = Object.keys(sMap);
-            let sValues = sLabels.map(s=>sMap[s]);
-            if (_chartSups) { _chartSups.destroy(); _chartSups = null; }
-            const canvasSups = document.getElementById('chart-supervisores');
-            canvasSups.getContext('2d').clearRect(0, 0, canvasSups.width, canvasSups.height);
-            _chartSups = new Chart(canvasSups, {
-                type:'bar',
-                data:{ labels:sLabels, datasets:[{ label:'Visitas', data:sValues, backgroundColor:'rgba(252,110,32,0.75)', borderRadius:6 }] },
-                options:{ responsive:true, maintainAspectRatio:true, aspectRatio:2, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}}} }
-            });
-            document.getElementById('chart-supervisores-title').textContent = '👤 Visitas por Supervisor';
-
-            // Tendencia mensual visitas
-            let mMap = {};
-            data.forEach(v=>{ let {ym}=getAnioMesV(v.datetime||v.fecha||''); if(!ym) return; mMap[ym]=(mMap[ym]||0)+1; });
-            let mLabels = Object.keys(mMap).sort();
-            let mValues = mLabels.map(m=>mMap[m]);
-            const meses=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-            let mLabelsF = mLabels.map(m=>{ let p=m.split('-'); return (meses[parseInt(p[1])-1]||p[1])+' '+p[0]; });
-            if (_chartTend) _chartTend.destroy();
-            _chartTend = new Chart(document.getElementById('chart-tendencia'), {
-                type:'line',
-                data:{ labels:mLabelsF, datasets:[{ label:'Visitas', data:mValues, borderColor:'#FC6E20', backgroundColor:'rgba(252,110,32,0.1)', tension:0.4, pointRadius:5, pointBackgroundColor:'#FC6E20', fill:true }] },
-                options:{ responsive:true, maintainAspectRatio:true, aspectRatio:2.5, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}}} }
-            });
-            document.getElementById('chart-tendencia-title').textContent = '📈 Tendencia Mensual de Visitas';
-
-            // Ranking tiendas por frecuencia
-            let rankHtml = Object.keys(tMap).sort((a,b)=>tMap[b]-tMap[a]).map((t,i)=>{
+            // TOP 5 SEMANAL
+            let lunes = new Date(hoy); lunes.setDate(hoy.getDate()-((hoy.getDay()+6)%7)); lunes.setHours(0,0,0,0);
+            let domingo = new Date(lunes); domingo.setDate(lunes.getDate()+6); domingo.setHours(23,59,59,999);
+            document.getElementById('analitica-top10-label').textContent = `${lunes.toLocaleDateString('es-PE',{day:'numeric',month:'short'})} — ${domingo.toLocaleDateString('es-PE',{day:'numeric',month:'short'})}`;
+            let semAuds = data.filter(a => { let d=parseFechaA(a.fecha); return d && d>=lunes && d<=domingo; });
+            let tMapSem = {};
+            semAuds.forEach(a => { let t=a.tienda_nombre||''; if(!t) return; if(!tMapSem[t]) tMapSem[t]=[]; tMapSem[t].push(a.nota_final||0); });
+            let top5 = Object.entries(tMapSem).map(([t,v])=>({ tienda:t, prom:v.reduce((s,x)=>s+x,0)/v.length, count:v.length })).sort((a,b)=>b.prom-a.prom).slice(0,5);
+            document.getElementById('analitica-top10').innerHTML = top5.map((item,i) => {
+                let c = item.prom>90?'#43A047':item.prom>70?'#F9A825':'#C62828';
                 let medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;
-                return `<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #F0F0F0;">
+                return `<div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F5F5F5;">
                     <span style="font-size:16px;width:24px;text-align:center;">${medal}</span>
-                    <div style="flex:1;font-size:13px;font-weight:700;color:#1B1B1B;">${t}</div>
-                    <span style="background:#FC6E20;color:white;font-size:12px;font-weight:700;padding:3px 10px;border-radius:50px;">${tMap[t]} visita${tMap[t]>1?'s':''}</span>
+                    <div style="flex:1;min-width:0;"><div style="font-size:13px;font-weight:700;color:#1B1B1B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.tienda}</div>
+                    <div style="font-size:11px;color:#aaa;">${item.count} auditoría${item.count>1?'s':''}</div></div>
+                    <span style="background:${c};color:white;font-size:12px;font-weight:700;padding:3px 10px;border-radius:50px;">${item.prom.toFixed(1)}%</span>
                 </div>`;
-            }).join('');
-            document.getElementById('analitica-ranking').innerHTML = rankHtml || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos</div>';
-            document.getElementById('chart-ranking-title').textContent = '🏆 Tiendas más Visitadas';
+            }).join('') || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin auditorías esta semana</div>';
+
+            // RANKING SUPERVISORAS + VISITAS
+            let supMap = {};
+            filtered.forEach(a => {
+                let s=a.supervisor||''; if(!s) return;
+                if(!supMap[s]) supMap[s]={vals:[],auds:0,vis:0};
+                supMap[s].vals.push(a.nota_final||0); supMap[s].auds++;
+            });
+            // Filtrar visitas por mismo período
+            visitas.forEach(v => {
+                let s=v.supervisor||''; if(!s) return;
+                if(!supMap[s]) supMap[s]={vals:[],auds:0,vis:0};
+                let d = v.datetime ? new Date(v.datetime) : null;
+                if (!d) return;
+                let mes = String(d.getMonth()+1).padStart(2,'0');
+                let anio = String(d.getFullYear());
+                if (mesSel && mes !== mesSel) return;
+                if (anioSelVal && anio !== anioSelVal) return;
+                supMap[s].vis++;
+            });
+            let supRanking = Object.entries(supMap)
+                .filter(([,d])=>d.auds>0)
+                .map(([s,d])=>({ sup:s, prom:d.vals.reduce((a,v)=>a+v,0)/d.vals.length, auds:d.auds, vis:d.vis }))
+                .sort((a,b)=>b.prom-a.prom);
+            document.getElementById('analitica-supervisoras').innerHTML = supRanking.map(item => {
+                let c=item.prom>90?'#43A047':item.prom>70?'#F9A825':'#C62828';
+                let inis=item.sup.split(' ').map(n=>n[0]||'').join('').substring(0,2).toUpperCase();
+                return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F5F5F5;">
+                    <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#FC6E20,#e55a0a);color:white;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${inis}</div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:13px;font-weight:700;color:#1B1B1B;">${item.sup}</div>
+                        <div style="display:flex;gap:8px;margin-top:2px;">
+                            <span style="font-size:10px;color:#FC6E20;font-weight:600;">📋 ${item.auds} aud.</span>
+                            <span style="font-size:10px;color:#888;font-weight:600;">📍 ${item.vis} vis.</span>
+                        </div>
+                    </div>
+                    <span style="background:${c};color:white;font-size:12px;font-weight:700;padding:3px 10px;border-radius:50px;">${item.prom.toFixed(1)}%</span>
+                </div>`;
+            }).join('') || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos</div>';
+
+            // TOP 5 PREGUNTAS FALLIDAS
+            let fallidasMap = {};
+            filtered.forEach(a => {
+                let resp = a.respuestas||{};
+                Object.entries(resp).forEach(([pid,r]) => { if(r && r.valor==='NO') fallidasMap[pid]=(fallidasMap[pid]||0)+1; });
+            });
+            let top5f = Object.entries(fallidasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+            document.getElementById('analitica-fallidas').innerHTML = top5f.map(([pid,count]) => {
+                let p = window.PREGUNTAS?.find(x=>String(x.id)===String(pid));
+                let texto = p ? p.texto : `Pregunta ${pid}`;
+                let pct = totalAuds>0 ? Math.min(((count/totalAuds)*100),100).toFixed(0) : 0;
+                return `<div style="padding:10px 0;border-bottom:1px solid #F5F5F5;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
+                        <div style="font-size:12px;font-weight:700;color:#C62828;flex:1;padding-right:8px;">${texto.length>60?texto.substring(0,60)+'...':texto}</div>
+                        <span style="background:#FFEBEE;color:#C62828;font-size:11px;font-weight:700;padding:2px 8px;border-radius:50px;flex-shrink:0;">${count} NO</span>
+                    </div>
+                    <div style="background:#F5F5F5;border-radius:50px;height:5px;">
+                        <div style="background:#C62828;border-radius:50px;height:5px;width:${pct}%;"></div>
+                    </div>
+                </div>`;
+            }).join('') || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos</div>';
         }
 
         function exportarHistorialVisitasExcel() {
@@ -8580,8 +8541,25 @@
             showToast("✓ Excel descargado", "success");
         }
 
-        function exportarHistorialExcel() {
-            let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
+        async function exportarHistorialExcel() {
+            showToast("Preparando Excel...", "success");
+            let auds = [];
+            try {
+                const { data, error } = await sbClient.from('auditorias')
+                    .select('*')
+                    .eq('es_borrador', false)
+                    .order('id', { ascending: false });
+                if (error || !data) throw new Error();
+                auds = data.map(r => ({
+                    id: r.id, tienda: r.tienda_nombre, supervisor: r.supervisor,
+                    encargado: r.encargado, fecha: r.fecha, hora: r.hora,
+                    notaFinal: r.nota_final || 0, finalScore: r.nota_final || 0,
+                    clasificacion: r.clasificacion, resultadoGrupos: r.resultado_grupos || {},
+                    respuestas: r.respuestas || {}
+                }));
+            } catch(e) {
+                auds = JSON.parse(localStorage.getItem("auditorias") || "[]").filter(a => !a.esBorrador);
+            }
             if (auds.length === 0) { showToast("No hay auditorías para exportar", "error"); return; }
 
             // Fila por auditoría con columnas básicas + grupos + observaciones por pregunta
