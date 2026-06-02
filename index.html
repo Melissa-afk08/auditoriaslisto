@@ -4239,7 +4239,8 @@
                 <div style="font-size:12px;color:#888;margin-bottom:8px;" id="ea-fecha"></div>
                 <div style="margin-bottom:16px;">
                     <label style="font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px;">ENCARGADO</label>
-                    <input id="ea-encargado" type="text" placeholder="Nombre del encargado" style="width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid #EEE;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+                    <select id="ea-encargado" style="width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid #EEE;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;background:white;" onchange="if(this.value==='__otro__'){let n=prompt('Nombre del encargado:');if(n){let o=document.createElement('option');o.value=n;o.textContent=n;this.insertBefore(o,this.lastElementChild);this.value=n;}}">
+                    </select>
                 </div>
                 <div style="background:#FFF3E0;border-radius:12px;padding:10px 14px;margin-bottom:16px;border-left:4px solid #FC6E20;">
                     <div style="font-size:12px;color:#FC6E20;font-weight:700;">⚠ Edición de auditoría</div>
@@ -8980,7 +8981,22 @@
 
             document.getElementById('ea-titulo').textContent = nombre;
             document.getElementById('ea-fecha').textContent = `${data.fecha} ${data.hora} · ${data.supervisor}`;
-            document.getElementById('ea-encargado').value = data.encargado || '';
+            // Cargar encargados previos de esa tienda
+            const tiendaNombreEd = typeof data.tienda === 'string' ? data.tienda : data.tienda?.nombre || '';
+            const todasAuds = JSON.parse(localStorage.getItem("auditorias") || "[]");
+            const encargadosPrevios = [...new Set(
+                todasAuds
+                    .filter(a => {
+                        const tn = typeof a.tienda === 'string' ? a.tienda : a.tienda?.nombre || '';
+                        return tn === tiendaNombreEd && a.encargado;
+                    })
+                    .map(a => a.encargado)
+            )];
+            const eaEncargadoEl = document.getElementById('ea-encargado');
+            eaEncargadoEl.innerHTML = `<option value="">Seleccionar encargado...</option>` +
+                encargadosPrevios.map(e => `<option value="${e}" ${e === data.encargado ? 'selected' : ''}>${e}</option>`).join('') +
+                `<option value="__otro__">+ Escribir nuevo...</option>`;
+            eaEncargadoEl.value = data.encargado || '';
             document.getElementById('ea-preguntas').innerHTML = resHtml;
             document.getElementById('modal-editor-auditoria').style.display = 'flex';
         }
