@@ -6245,6 +6245,8 @@
         }
 
         async function syncBorradorSupabase(borrador) {
+            // No sincronizar borradores con ID string — solo existen en localStorage
+            if (typeof borrador.id === 'string') return;
             try {
                 await sbClient.from('auditorias').upsert({
                     id: borrador.id,
@@ -7210,8 +7212,14 @@
 
             let borradoresFiltrados = borradores.filter(b => {
                 let nombre = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '';
-                return !search || nombre.toLowerCase().includes(search);
+                if (search && !nombre.toLowerCase().includes(search)) return false;
+                if (fSup && !(b.supervisor||'').toLowerCase().includes(fSup.split(' ')[0].toLowerCase())) return false;
+                if (fAnio && (b.fecha||'').split('/')[2] !== fAnio) return false;
+                if (fMes && (b.fecha||'').split('/')[1] !== fMes) return false;
+                if (fDia && (b.fecha||'').split('/')[0] !== fDia) return false;
+                return true;
             });
+            borradoresFiltrados.sort((a, b) => orden === 'desc' ? b.id - a.id : a.id - b.id);
 
             let borradoresHtml = borradoresFiltrados.map(b => {
                 let nombre = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '';
@@ -7342,8 +7350,8 @@
 
         function continuarBorradorDesdeHistorial(borradorId) {
             let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
-            let b = borradores.find(x => x.id === borradorId);
-            if (!b) return;
+            let b = borradores.find(x => String(x.id) === String(borradorId));
+            if (!b) { showToast("No se encontró el borrador", "error"); return; }
             window.selectedStore = typeof b.tienda === 'string' ? { nombre: b.tienda } : b.tienda;
             continuarBorradorAuditoria(b);
         }
