@@ -8350,12 +8350,14 @@
             const canvasTiendas = document.getElementById('chart-tiendas');
             const wrapperEl = canvasTiendas.parentElement;
             const containerW = wrapperEl.parentElement.clientWidth || window.innerWidth - 32;
-            const chartW = tLabels.length > 8 ? tLabels.length * BAR_WIDTH : containerW;
+            const minW = tLabels.length * BAR_WIDTH;
+            const chartW = Math.max(minW, containerW);
             canvasTiendas.style.width = chartW + 'px';
             canvasTiendas.style.height = '260px';
+            const tLabelsShort = tLabels.map(l => l.length > 12 ? l.substring(0,12)+'...' : l);
             _chartTiendas = new Chart(canvasTiendas, {
                 type: 'bar',
-                data: { labels: tLabels, datasets: [{ data: tValues, backgroundColor: tColors, borderRadius: 6 }] },
+                data: { labels: tLabelsShort, datasets: [{ data: tValues, backgroundColor: tColors, borderRadius: 6 }] },
                 options: { responsive: false, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:10}}}} }
             });
 
@@ -8499,12 +8501,14 @@
             ctxT.clearRect(0, 0, canvasTiendasV.width, canvasTiendasV.height);
             const wrapperElV = canvasTiendasV.parentElement;
             const containerWV = wrapperElV.parentElement.clientWidth || window.innerWidth - 32;
-            const chartWV = tLabels.length > 8 ? tLabels.length * 80 : containerWV;
+            const minWV = tLabels.length * 80;
+            const chartWV = Math.max(minWV, containerWV);
             canvasTiendasV.style.width = chartWV + 'px';
             canvasTiendasV.style.height = '260px';
+            const tLabelsShortV = tLabels.map(l => l.length > 12 ? l.substring(0,12)+'...' : l);
             _chartTiendas = new Chart(canvasTiendasV, {
                 type:'bar',
-                data:{ labels:tLabels, datasets:[{ data:tValues, backgroundColor:'rgba(252,110,32,0.75)', borderRadius:6 }] },
+                data:{ labels:tLabelsShortV, datasets:[{ data:tValues, backgroundColor:'rgba(252,110,32,0.75)', borderRadius:6 }] },
                 options:{ responsive:false, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}},x:{ticks:{font:{size:10}}}} }
             });
             document.getElementById('chart-tiendas-title').textContent = '📊 Visitas por Tienda';
