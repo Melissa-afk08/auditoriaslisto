@@ -8475,10 +8475,16 @@
             let tLabels = Object.keys(tMap).sort((a,b)=>tMap[b]-tMap[a]).slice(0,10);
             let tValues = tLabels.map(t=>tMap[t]);
             if (_chartTiendas) _chartTiendas.destroy();
-            _chartTiendas = new Chart(document.getElementById('chart-tiendas'), {
+            const canvasTiendasV = document.getElementById('chart-tiendas');
+            const wrapperV = canvasTiendasV.parentElement;
+            const wrapperWV = wrapperV.clientWidth || 300;
+            const chartWV = tLabels.length > 8 ? tLabels.length * 80 : wrapperWV;
+            canvasTiendasV.style.width = chartWV + 'px';
+            canvasTiendasV.style.height = '260px';
+            _chartTiendas = new Chart(canvasTiendasV, {
                 type:'bar',
                 data:{ labels:tLabels, datasets:[{ data:tValues, backgroundColor:'rgba(252,110,32,0.75)', borderRadius:6 }] },
-                options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}},x:{ticks:{font:{size:10}}}} }
+                options:{ responsive:false, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}},x:{ticks:{font:{size:10}}}} }
             });
             document.querySelector('#chart-tiendas').closest('div').querySelector('div').textContent = '📊 Visitas por Tienda';
 
