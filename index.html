@@ -6399,9 +6399,12 @@
             // Con señal: flujo normal
             if (window.auditActual._borradorId) {
                 let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
-                borradores = borradores.filter(b => b.id !== window.auditActual._borradorId);
+                borradores = borradores.filter(b => String(b.id) !== String(window.auditActual._borradorId));
                 localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
-                try { sbClient.from('auditorias').delete().eq('id', window.auditActual._borradorId).then(() => {}); } catch(e) {}
+                try { sbClient.from('auditorias').delete().eq('id', parseInt(window.auditActual._borradorId) || window.auditActual._borradorId).then(() => {}); } catch(e) {}
+                let audsGuardadas = JSON.parse(localStorage.getItem("auditorias_guardadas") || "[]");
+                audsGuardadas = audsGuardadas.filter(b => String(b.id) !== String(window.auditActual._borradorId));
+                localStorage.setItem("auditorias_guardadas", JSON.stringify(audsGuardadas));
             }
 
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
