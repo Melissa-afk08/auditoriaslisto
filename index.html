@@ -4097,6 +4097,15 @@
                     <span class="ajustes-item-arrow">›</span>
                 </div>
                 <div style="height:1px; background:#F0F0F0; margin:0 16px;"></div>
+                <div class="ajustes-item" onclick="solicitarPasswordAdmin('borrar-local-id')">
+                    <div class="ajustes-item-icon" style="background:#FFF0F0;">🚨</div>
+                    <div class="ajustes-item-text">
+                        <div class="ajustes-item-label" style="color:#C62828;">🔒 Borrar auditoría local por ID</div>
+                        <div class="ajustes-item-desc">Elimina una auditoría atascada del localStorage</div>
+                    </div>
+                    <span class="ajustes-item-arrow">›</span>
+                </div>
+                <div style="height:1px; background:#F0F0F0; margin:0 16px;"></div>
                 <div class="ajustes-item" onclick="solicitarPasswordAdmin('editor-registros')">
                     <div class="ajustes-item-icon" style="background:#E8F5E9;">✏️</div>
                     <div class="ajustes-item-text">
@@ -4984,6 +4993,7 @@
                 else if (window.adminDestino === 'usuarios') openEditorUsuarios();
                 else if (window.adminDestino === 'papelera') abrirPapelera();
                 else if (window.adminDestino === 'editor-registros') abrirEditorRegistros();
+                else if (window.adminDestino === 'borrar-local-id') borrarAuditoriaLocalPorID();
             } else {
                 document.getElementById('admin-pass-error').style.display = 'block';
                 document.getElementById('admin-pass-input').value = '';
@@ -8595,6 +8605,19 @@
             closeModalRo('modal-ro-visita');
             showToast("✓ Visita movida a la papelera", "success");
             renderHistorialVisitas();
+        }
+
+        function borrarAuditoriaLocalPorID() {
+            let auds = JSON.parse(localStorage.getItem('auditorias_guardadas') || '[]');
+            if (auds.length === 0) { alert('No hay auditorías en localStorage.'); return; }
+            let lista = auds.map((a, i) => `${i}: ${a.tienda || '?'} | ${a.fecha || '?'} | ${a.supervisor || '?'} | ID: ${a.id}`).join('\n');
+            let input = prompt('Auditorías en localStorage:\n\n' + lista + '\n\nPega el ID exacto a borrar:');
+            if (!input) return;
+            let antes = auds.length;
+            let nuevas = auds.filter(a => String(a.id) !== String(input.trim()));
+            if (nuevas.length === antes) { alert('No se encontró ninguna auditoría con ese ID.'); return; }
+            localStorage.setItem('auditorias_guardadas', JSON.stringify(nuevas));
+            alert('Auditoría eliminada del localStorage. Recarga la app.');
         }
 
         function abrirPapelera() {
