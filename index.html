@@ -4236,7 +4236,11 @@
                     <div style="font-size:16px;font-weight:800;" id="ea-titulo"></div>
                     <button onclick="document.getElementById('modal-editor-auditoria').style.display='none'" style="background:#EEE;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;">✕</button>
                 </div>
-                <div style="font-size:12px;color:#888;margin-bottom:16px;" id="ea-fecha"></div>
+                <div style="font-size:12px;color:#888;margin-bottom:8px;" id="ea-fecha"></div>
+                <div style="margin-bottom:16px;">
+                    <label style="font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px;">ENCARGADO</label>
+                    <input id="ea-encargado" type="text" placeholder="Nombre del encargado" style="width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid #EEE;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+                </div>
                 <div style="background:#FFF3E0;border-radius:12px;padding:10px 14px;margin-bottom:16px;border-left:4px solid #FC6E20;">
                     <div style="font-size:12px;color:#FC6E20;font-weight:700;">⚠ Edición de auditoría</div>
                     <div style="font-size:12px;color:#888;margin-top:2px;">Al guardar, el score y la clasificación se recalcularán y se actualizarán en todos los historiales.</div>
@@ -8976,6 +8980,7 @@
 
             document.getElementById('ea-titulo').textContent = nombre;
             document.getElementById('ea-fecha').textContent = `${data.fecha} ${data.hora} · ${data.supervisor}`;
+            document.getElementById('ea-encargado').value = data.encargado || '';
             document.getElementById('ea-preguntas').innerHTML = resHtml;
             document.getElementById('modal-editor-auditoria').style.display = 'flex';
         }
@@ -9058,6 +9063,7 @@
                 resultGrupos[i] = pct;
                 nota += pct * (PESOS[i] || 0.2);
             }
+            data.encargado = document.getElementById('ea-encargado').value.trim();
             data.resultadoGrupos = resultGrupos;
             data.notaFinal = nota;
             data.finalScore = nota;
