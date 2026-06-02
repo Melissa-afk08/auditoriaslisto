@@ -8242,7 +8242,7 @@
             document.getElementById('analitica-kpis').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:#aaa;font-size:13px;">Cargando datos...</div>';
             let audsRaw = [];
             try {
-                let { data, error } = await sbClient.from('auditorias').select('id,tienda_nombre,supervisor,fecha,hora,nota_final,clasificacion,resultado_grupos').order('id', { ascending: false });
+                let { data, error } = await sbClient.from('auditorias').select('id,tienda_nombre,supervisor,fecha,hora,nota_final,clasificacion,resultado_grupos').eq('es_borrador', false).order('id', { ascending: false });
                 if (!error && data) audsRaw = data;
             } catch(e) {}
             if (audsRaw.length === 0) audsRaw = JSON.parse(localStorage.getItem("auditorias") || "[]");
