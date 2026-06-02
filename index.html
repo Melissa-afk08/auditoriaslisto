@@ -7259,7 +7259,14 @@
             const fDia = document.getElementById('filtro-aud-dia-sel')?.value || '';
             const orden = document.getElementById('filtro-aud-orden-sel')?.value || 'desc';
 
-            auditorias.sort((a, b) => orden === 'desc' ? b.id - a.id : a.id - b.id);
+            function parseFechaHora(a) {
+                let f = a.fecha || '';
+                let h = a.hora || '00:00:00';
+                let partes = f.includes('-') && f.indexOf('-') === 4 ? f.split('-') : (f.split('/').length === 3 ? [f.split('/')[2], f.split('/')[1], f.split('/')[0]] : null);
+                if (!partes) return 0;
+                return new Date(`${partes[0]}-${partes[1]}-${partes[2]}T${h}`).getTime() || 0;
+            }
+            auditorias.sort((a, b) => orden === 'desc' ? parseFechaHora(b) - parseFechaHora(a) : parseFechaHora(a) - parseFechaHora(b));
 
             if (search) auditorias = auditorias.filter(a => (a.tienda?.nombre || a.tienda || '').toLowerCase().includes(search));
             if (fSup) auditorias = auditorias.filter(a => (a.supervisor||'').toLowerCase().includes(fSup.split(' ')[0].toLowerCase()));
@@ -7276,7 +7283,7 @@
                 if (fDia && (b.fecha||'').split('/')[0] !== fDia) return false;
                 return true;
             });
-            borradoresFiltrados.sort((a, b) => orden === 'desc' ? b.id - a.id : a.id - b.id);
+            borradoresFiltrados.sort((a, b) => orden === 'desc' ? parseFechaHora(b) - parseFechaHora(a) : parseFechaHora(a) - parseFechaHora(b));
 
             let borradoresHtml = borradoresFiltrados.map(b => {
                 let nombre = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '';
