@@ -4008,13 +4008,13 @@
                 </div>
                 <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
                     <div id="chart-supervisores-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">👤 Desempeño por Supervisor</div>
-                    <canvas id="chart-supervisores" style="width:100%;max-height:220px;"></canvas>
+                    <canvas id="chart-supervisores" style="width:100%;height:220px;"></canvas>
                 </div>
             </div>
             <!-- GRÁFICO TENDENCIA MENSUAL -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
                 <div id="chart-tendencia-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📈 Tendencia Mensual</div>
-                <canvas id="chart-tendencia" style="width:100%;max-height:220px;"></canvas>
+                <canvas id="chart-tendencia" style="width:100%;height:220px;"></canvas>
             </div>
             <!-- RANKING TIENDAS -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
@@ -8342,18 +8342,19 @@
                 let pa = tMap[a].reduce((s,v)=>s+v,0)/tMap[a].length;
                 let pb = tMap[b].reduce((s,v)=>s+v,0)/tMap[b].length;
                 return pb-pa;
-            }).slice(0,10);
+            });
             let tValues = tLabels.map(t => parseFloat((tMap[t].reduce((s,v)=>s+v,0)/tMap[t].length).toFixed(1)));
             let tColors = tValues.map(v => v>90?'#43A047':v>70?'#F9A825':'#C62828');
             if (_chartTiendas) _chartTiendas.destroy();
             const BAR_WIDTH = 80;
             const canvasTiendas = document.getElementById('chart-tiendas');
             const wrapperEl = canvasTiendas.parentElement;
-            const containerW = wrapperEl.parentElement.clientWidth || window.innerWidth - 32;
+            const safeW = (wrapperEl.clientWidth > 0 ? wrapperEl.clientWidth : window.innerWidth - 64);
             const minW = tLabels.length * BAR_WIDTH;
-            const chartW = Math.max(minW, containerW);
+            const chartW = Math.max(minW, safeW);
+            wrapperEl.style.minWidth = '0';
             canvasTiendas.style.width = chartW + 'px';
-            canvasTiendas.style.height = '260px';
+            canvasTiendas.style.height = '240px';
             const tLabelsShort = tLabels.map(l => l.length > 12 ? l.substring(0,12)+'...' : l);
             _chartTiendas = new Chart(canvasTiendas, {
                 type: 'bar',
@@ -8380,7 +8381,7 @@
                     { label:'Promedio (%)', data:sValues, backgroundColor:sColors, borderRadius:6, yAxisID:'y' },
                     { label:'Auditorías', data:sCounts, type:'line', borderColor:'#FC6E20', backgroundColor:'rgba(252,110,32,0.1)', tension:0.3, yAxisID:'y1', pointRadius:5 }
                 ]},
-                options: { responsive:true, plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}, scales:{
+                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}, scales:{
                     y:{min:0,max:100,ticks:{callback:v=>v+'%'},position:'left'},
                     y1:{min:0,position:'right',grid:{drawOnChartArea:false},ticks:{stepSize:1}}
                 }}
@@ -8402,7 +8403,7 @@
             _chartTend = new Chart(document.getElementById('chart-tendencia'), {
                 type: 'line',
                 data: { labels: mLabelsF, datasets: [{ label:'Promedio mensual', data:mValues, borderColor:'#FC6E20', backgroundColor:'rgba(252,110,32,0.1)', tension:0.4, pointRadius:5, pointBackgroundColor:'#FC6E20', fill:true }] },
-                options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}} }
+                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}}} }
             });
 
             // --- RANKING TIENDAS ---
@@ -8493,18 +8494,19 @@
             // Gráfico visitas por tienda
             let tMap = {};
             data.forEach(v=>{ let t=v.tienda||''; if(!t) return; tMap[t]=(tMap[t]||0)+1; });
-            let tLabels = Object.keys(tMap).sort((a,b)=>tMap[b]-tMap[a]).slice(0,10);
+            let tLabels = Object.keys(tMap).sort((a,b)=>tMap[b]-tMap[a]);
             let tValues = tLabels.map(t=>tMap[t]);
             if (_chartTiendas) { _chartTiendas.destroy(); _chartTiendas = null; }
             const canvasTiendasV = document.getElementById('chart-tiendas');
             const ctxT = canvasTiendasV.getContext('2d');
             ctxT.clearRect(0, 0, canvasTiendasV.width, canvasTiendasV.height);
             const wrapperElV = canvasTiendasV.parentElement;
-            const containerWV = wrapperElV.parentElement.clientWidth || window.innerWidth - 32;
+            const safeWV = wrapperElV.clientWidth > 0 ? wrapperElV.clientWidth : window.innerWidth - 64;
             const minWV = tLabels.length * 80;
-            const chartWV = Math.max(minWV, containerWV);
+            const chartWV = Math.max(minWV, safeWV);
+            wrapperElV.style.minWidth = '0';
             canvasTiendasV.style.width = chartWV + 'px';
-            canvasTiendasV.style.height = '260px';
+            canvasTiendasV.style.height = '240px';
             const tLabelsShortV = tLabels.map(l => l.length > 12 ? l.substring(0,12)+'...' : l);
             _chartTiendas = new Chart(canvasTiendasV, {
                 type:'bar',
@@ -8524,7 +8526,7 @@
             _chartSups = new Chart(canvasSups, {
                 type:'bar',
                 data:{ labels:sLabels, datasets:[{ label:'Visitas', data:sValues, backgroundColor:'rgba(252,110,32,0.75)', borderRadius:6 }] },
-                options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}}} }
+                options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}}} }
             });
             document.getElementById('chart-supervisores-title').textContent = '👤 Visitas por Supervisor';
 
@@ -8539,7 +8541,7 @@
             _chartTend = new Chart(document.getElementById('chart-tendencia'), {
                 type:'line',
                 data:{ labels:mLabelsF, datasets:[{ label:'Visitas', data:mValues, borderColor:'#FC6E20', backgroundColor:'rgba(252,110,32,0.1)', tension:0.4, pointRadius:5, pointBackgroundColor:'#FC6E20', fill:true }] },
-                options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}}} }
+                options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}}} }
             });
             document.getElementById('chart-tendencia-title').textContent = '📈 Tendencia Mensual de Visitas';
 
