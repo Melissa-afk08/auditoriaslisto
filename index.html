@@ -6240,7 +6240,7 @@
                 }
             });
             let borrador = {
-                id: window.auditActual._borradorId || ('borrador_' + Date.now()),
+                id: window.auditActual._borradorId || Date.now(),
                 esBorrador: true,
                 tienda: window.selectedStore,
                 supervisor: document.getElementById("form-aud-supervisor")?.value || '',
@@ -6262,15 +6262,7 @@
         }
 
         async function syncBorradorSupabase(borrador) {
-            // Convertir ID string a número si es necesario
-            let numId = typeof borrador.id === 'string' ? parseInt(borrador.id.replace(/\D/g, '')) || Date.now() : borrador.id;
-            if (String(numId) !== String(borrador.id)) {
-                borrador.id = numId;
-                // Actualizar en localStorage
-                let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
-                let idx = borradores.findIndex(b => String(b.id) === String(numId) || b.id === borrador.id);
-                if (idx >= 0) { borradores[idx].id = numId; localStorage.setItem("borradores_auditorias", JSON.stringify(borradores)); }
-            }
+            let numId = typeof borrador.id === 'number' ? borrador.id : parseInt(borrador.id) || Date.now();
             try {
                 // Subir firma si existe y es base64
                 let firmaUrl = null;
@@ -9224,7 +9216,7 @@
                 }
             });
             let borrador = {
-                id: window.auditActual._borradorId || ('borrador_' + Date.now()),
+                id: window.auditActual._borradorId || Date.now(),
                 esBorrador: true,
                 tienda: window.selectedStore,
                 supervisor: document.getElementById("form-aud-supervisor")?.value || '',
