@@ -6329,7 +6329,7 @@
             const sinSenal = !navigator.onLine;
 
             let auditRecord = {
-                id: window.auditActual._borradorId || ('aud_' + Date.now()),
+                id: Date.now(),
                 tienda: window.selectedStore,
                 supervisor: document.getElementById("form-aud-supervisor").value,
                 encargado: document.getElementById("form-aud-encargado").value,
