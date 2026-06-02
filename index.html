@@ -1008,6 +1008,12 @@
             }
         }
 
+        @media (min-width: 1024px) {
+            #analitica-charts-row {
+                grid-template-columns: 1fr 1fr !important;
+            }
+        }
+
         /* Pantallas medianas (tablet) */
         @media (min-width: 480px) and (max-width: 1023px) {
             #home-kpi-section {
@@ -3992,17 +3998,18 @@
             </div>
             <!-- KPI CARDS -->
             <div id="analitica-kpis" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;"></div>
-            <!-- GRÁFICO PROMEDIO POR TIENDA -->
-            <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div id="chart-tiendas-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📊 Promedio por Tienda</div>
-                <div id="chart-tiendas-wrapper" style="overflow-x:auto;">
-                    <canvas id="chart-tiendas" style="max-height:260px;"></canvas>
+            <!-- GRÁFICOS TIENDA + SUPERVISOR (2 columnas en desktop) -->
+            <div id="analitica-charts-row" style="display:grid;grid-template-columns:1fr;gap:16px;margin-bottom:16px;">
+                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                    <div id="chart-tiendas-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📊 Promedio por Tienda</div>
+                    <div id="chart-tiendas-wrapper" style="overflow-x:auto;">
+                        <canvas id="chart-tiendas" style="max-height:260px;"></canvas>
+                    </div>
                 </div>
-            </div>
-            <!-- GRÁFICO DESEMPEÑO POR SUPERVISOR -->
-            <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div id="chart-supervisores-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">👤 Desempeño por Supervisor</div>
-                <canvas id="chart-supervisores" style="width:100%;max-height:220px;"></canvas>
+                <div style="background:white;border-radius:16px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
+                    <div id="chart-supervisores-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">👤 Desempeño por Supervisor</div>
+                    <canvas id="chart-supervisores" style="width:100%;max-height:220px;"></canvas>
+                </div>
             </div>
             <!-- GRÁFICO TENDENCIA MENSUAL -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
