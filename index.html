@@ -7453,6 +7453,7 @@
                 let anioStr = String(ahora.getFullYear());
                 const { data, error } = await sbClient.from('auditorias')
                     .select('id,tienda_nombre,supervisor,fecha,nota_final,clasificacion')
+                    .eq('es_borrador', false)
                     .order('id', { ascending: false });
                 if (!error && data) {
                     auditorias = data.map(r => ({
