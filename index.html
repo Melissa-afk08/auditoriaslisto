@@ -3994,24 +3994,24 @@
             <div id="analitica-kpis" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;"></div>
             <!-- GRÁFICO PROMEDIO POR TIENDA -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📊 Promedio por Tienda</div>
+                <div id="chart-tiendas-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📊 Promedio por Tienda</div>
                 <div id="chart-tiendas-wrapper" style="overflow-x:auto;">
                     <canvas id="chart-tiendas" style="max-height:260px;"></canvas>
                 </div>
             </div>
             <!-- GRÁFICO DESEMPEÑO POR SUPERVISOR -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">👤 Desempeño por Supervisor</div>
+                <div id="chart-supervisores-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">👤 Desempeño por Supervisor</div>
                 <canvas id="chart-supervisores" style="width:100%;max-height:220px;"></canvas>
             </div>
             <!-- GRÁFICO TENDENCIA MENSUAL -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📈 Tendencia Mensual</div>
+                <div id="chart-tendencia-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📈 Tendencia Mensual</div>
                 <canvas id="chart-tendencia" style="width:100%;max-height:220px;"></canvas>
             </div>
             <!-- RANKING TIENDAS -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">🏆 Ranking de Tiendas</div>
+                <div id="chart-ranking-title" style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">🏆 Ranking de Tiendas</div>
                 <div id="analitica-ranking"></div>
             </div>
         </div>
@@ -8486,7 +8486,7 @@
                 data:{ labels:tLabels, datasets:[{ data:tValues, backgroundColor:'rgba(252,110,32,0.75)', borderRadius:6 }] },
                 options:{ responsive:false, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}},x:{ticks:{font:{size:10}}}} }
             });
-            document.querySelector('#chart-tiendas').closest('div').querySelector('div').textContent = '📊 Visitas por Tienda';
+            document.getElementById('chart-tiendas-title').textContent = '📊 Visitas por Tienda';
 
             // Gráfico visitas por supervisor
             let sMap = {};
@@ -8499,7 +8499,7 @@
                 data:{ labels:sLabels, datasets:[{ label:'Visitas', data:sValues, backgroundColor:'rgba(252,110,32,0.75)', borderRadius:6 }] },
                 options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}}} }
             });
-            document.querySelector('#chart-supervisores').closest('div').querySelector('div').textContent = '👤 Visitas por Supervisor';
+            document.getElementById('chart-supervisores-title').textContent = '👤 Visitas por Supervisor';
 
             // Tendencia mensual visitas
             let mMap = {};
@@ -8514,7 +8514,7 @@
                 data:{ labels:mLabelsF, datasets:[{ label:'Visitas', data:mValues, borderColor:'#FC6E20', backgroundColor:'rgba(252,110,32,0.1)', tension:0.4, pointRadius:5, pointBackgroundColor:'#FC6E20', fill:true }] },
                 options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}}} }
             });
-            document.querySelector('#chart-tendencia').closest('div').querySelector('div').textContent = '📈 Tendencia Mensual de Visitas';
+            document.getElementById('chart-tendencia-title').textContent = '📈 Tendencia Mensual de Visitas';
 
             // Ranking tiendas por frecuencia
             let rankHtml = Object.keys(tMap).sort((a,b)=>tMap[b]-tMap[a]).map((t,i)=>{
@@ -8526,7 +8526,7 @@
                 </div>`;
             }).join('');
             document.getElementById('analitica-ranking').innerHTML = rankHtml || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos</div>';
-            document.querySelector('#analitica-ranking').closest('div').querySelector('div').textContent = '🏆 Tiendas más Visitadas';
+            document.getElementById('chart-ranking-title').textContent = '🏆 Tiendas más Visitadas';
         }
 
         function exportarHistorialVisitasExcel() {
