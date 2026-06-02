@@ -6245,11 +6245,25 @@
         }
 
         async function syncBorradorSupabase(borrador) {
-            // No sincronizar borradores con ID string — solo existen en localStorage
-            if (typeof borrador.id === 'string') return;
+            // Convertir ID string a número si es necesario
+            let numId = typeof borrador.id === 'string' ? parseInt(borrador.id.replace(/\D/g, '')) || Date.now() : borrador.id;
+            if (String(numId) !== String(borrador.id)) {
+                borrador.id = numId;
+                // Actualizar en localStorage
+                let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
+                let idx = borradores.findIndex(b => String(b.id) === String(numId) || b.id === borrador.id);
+                if (idx >= 0) { borradores[idx].id = numId; localStorage.setItem("borradores_auditorias", JSON.stringify(borradores)); }
+            }
             try {
+                // Subir firma si existe y es base64
+                let firmaUrl = null;
+                if (borrador.firma && borrador.firma.startsWith('data:')) {
+                    firmaUrl = await supabaseUploadFoto(borrador.firma, numId, 'firma', 0);
+                } else if (borrador.firma) {
+                    firmaUrl = borrador.firma;
+                }
                 await sbClient.from('auditorias').upsert({
-                    id: borrador.id,
+                    id: numId,
                     tienda_nombre: borrador.tienda?.nombre || borrador.tienda,
                     tienda_distrito: borrador.tienda?.distrito || null,
                     tienda_direccion: borrador.tienda?.direccion || null,
@@ -6261,10 +6275,12 @@
                     resultado_grupos: null,
                     nota_final: null,
                     clasificacion: 'BORRADOR',
-                    firma_url: null,
+                    firma_url: firmaUrl,
+                    es_borrador: true,
+                    pendiente_verificacion: borrador._pendienteVerificacion || false,
                     created_by: window.currentUser?.email || null
                 }, { onConflict: 'id' });
-            } catch(e) { /* sin conexión, ok */ }
+            } catch(e) { console.error('Error sync borrador:', e); }
         }
 
         async function finalizarAuditoria() {
@@ -7192,6 +7208,36 @@
                 }
             } catch(e) { /* usa localStorage si falla */ }
 
+            // Sincronizar borradores desde Supabase
+            try {
+                const { data: sbBorradores } = await sbClient.from('auditorias')
+                    .select('*')
+                    .eq('es_borrador', true)
+                    .eq('created_by', window.currentUser?.email || '')
+                    .order('id', { ascending: false });
+                if (sbBorradores && sbBorradores.length > 0) {
+                    const mapped = sbBorradores.map(r => ({
+                        id: r.id,
+                        esBorrador: true,
+                        _pendienteVerificacion: r.pendiente_verificacion || false,
+                        tienda: { nombre: r.tienda_nombre, distrito: r.tienda_distrito, direccion: r.tienda_direccion },
+                        supervisor: r.supervisor,
+                        encargado: r.encargado,
+                        fecha: r.fecha,
+                        hora: r.hora,
+                        respuestas: r.respuestas,
+                        firma: r.firma_url || null,
+                        guardadoEn: r.created_at
+                    }));
+                    // Merge con borradores locales — locales tienen prioridad
+                    let locales = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
+                    const idsLocales = new Set(locales.map(b => String(b.id)));
+                    const soloRemoto = mapped.filter(b => !idsLocales.has(String(b.id)));
+                    const merged = [...locales, ...soloRemoto];
+                    localStorage.setItem('borradores_auditorias', JSON.stringify(merged));
+                }
+            } catch(e) { /* usa localStorage */ }
+
             let auditorias = JSON.parse(localStorage.getItem('auditorias') || '[]');
             let borradores = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
 
@@ -7337,10 +7383,11 @@
 
         function eliminarBorrador(borradorId) {
             document.getElementById("mc-desc").innerText = "¿Eliminar esta auditoría en progreso? Se perderá todo el avance.";
-            document.getElementById("mc-btn").onclick = function() {
+            document.getElementById("mc-btn").onclick = async function() {
                 let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
-                borradores = borradores.filter(b => b.id != borradorId);
+                borradores = borradores.filter(b => String(b.id) !== String(borradorId));
                 localStorage.setItem("borradores_auditorias", JSON.stringify(borradores));
+                try { await sbClient.from('auditorias').delete().eq('id', parseInt(borradorId) || borradorId); } catch(e) {}
                 closeModal('modal-confirm');
                 renderHistorialAuditorias();
                 showToast("Borrador eliminado", "success");
