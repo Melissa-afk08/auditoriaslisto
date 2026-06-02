@@ -8480,8 +8480,10 @@
             data.forEach(v=>{ let t=v.tienda||''; if(!t) return; tMap[t]=(tMap[t]||0)+1; });
             let tLabels = Object.keys(tMap).sort((a,b)=>tMap[b]-tMap[a]).slice(0,10);
             let tValues = tLabels.map(t=>tMap[t]);
-            if (_chartTiendas) _chartTiendas.destroy();
+            if (_chartTiendas) { _chartTiendas.destroy(); _chartTiendas = null; }
             const canvasTiendasV = document.getElementById('chart-tiendas');
+            const ctxT = canvasTiendasV.getContext('2d');
+            ctxT.clearRect(0, 0, canvasTiendasV.width, canvasTiendasV.height);
             const wrapperWV = canvasTiendasV.parentElement.parentElement.clientWidth || 300;
             const chartWV = tLabels.length > 8 ? tLabels.length * 80 : wrapperWV;
             canvasTiendasV.style.width = chartWV + 'px';
@@ -8498,8 +8500,10 @@
             data.forEach(v=>{ let s=v.supervisor||''; if(!s) return; sMap[s]=(sMap[s]||0)+1; });
             let sLabels = Object.keys(sMap);
             let sValues = sLabels.map(s=>sMap[s]);
-            if (_chartSups) _chartSups.destroy();
-            _chartSups = new Chart(document.getElementById('chart-supervisores'), {
+            if (_chartSups) { _chartSups.destroy(); _chartSups = null; }
+            const canvasSups = document.getElementById('chart-supervisores');
+            canvasSups.getContext('2d').clearRect(0, 0, canvasSups.width, canvasSups.height);
+            _chartSups = new Chart(canvasSups, {
                 type:'bar',
                 data:{ labels:sLabels, datasets:[{ label:'Visitas', data:sValues, backgroundColor:'rgba(252,110,32,0.75)', borderRadius:6 }] },
                 options:{ responsive:true, plugins:{legend:{display:false}}, scales:{y:{ticks:{stepSize:1}}} }
