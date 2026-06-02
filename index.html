@@ -7170,7 +7170,7 @@
             if (!contenedor) return;
 
             try {
-                const { data, error } = await sbClient.from('auditorias').select('*').order('id', { ascending: false });
+                const { data, error } = await sbClient.from('auditorias').select('*').eq('es_borrador', false).order('id', { ascending: false });
                 if (!error && data) {
                     const mapped = data.map(r => ({
                         id: r.id,
