@@ -8329,8 +8329,7 @@
             if (_chartTiendas) _chartTiendas.destroy();
             const BAR_WIDTH = 80;
             const canvasTiendas = document.getElementById('chart-tiendas');
-            const wrapper = canvasTiendas.parentElement;
-            const wrapperW = wrapper.clientWidth || 300;
+            const wrapperW = canvasTiendas.parentElement.parentElement.clientWidth || 300;
             const chartW = tLabels.length > 8 ? tLabels.length * BAR_WIDTH : wrapperW;
             canvasTiendas.style.width = chartW + 'px';
             canvasTiendas.style.height = '260px';
@@ -8476,8 +8475,7 @@
             let tValues = tLabels.map(t=>tMap[t]);
             if (_chartTiendas) _chartTiendas.destroy();
             const canvasTiendasV = document.getElementById('chart-tiendas');
-            const wrapperV = canvasTiendasV.parentElement;
-            const wrapperWV = wrapperV.clientWidth || 300;
+            const wrapperWV = canvasTiendasV.parentElement.parentElement.clientWidth || 300;
             const chartWV = tLabels.length > 8 ? tLabels.length * 80 : wrapperWV;
             canvasTiendasV.style.width = chartWV + 'px';
             canvasTiendasV.style.height = '260px';
