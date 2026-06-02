@@ -575,16 +575,21 @@
             #home-main {
                 display: grid;
                 grid-template-columns: 1fr 320px;
-                grid-template-rows: auto auto 1fr;
+                grid-template-rows: auto auto auto 1fr;
                 gap: 0 28px;
                 padding: 36px 48px 32px 48px;
                 align-items: start;
             }
 
             /* KPI CARDS */
-            #home-kpi-section {
+            #home-kpi-mes-label {
                 grid-column: 1;
                 grid-row: 1;
+                margin-bottom: 8px;
+            }
+            #home-kpi-section {
+                grid-column: 1;
+                grid-row: 2;
                 display: grid;
                 grid-template-columns: repeat(3, 1fr);
                 gap: 16px;
@@ -630,7 +635,7 @@
             /* TÍTULO Acciones */
             #home-main-title {
                 grid-column: 1;
-                grid-row: 2;
+                grid-row: 3;
                 font-size: 16px;
                 font-weight: 700;
                 color: #1B1B1B;
@@ -644,7 +649,7 @@
             /* GRID de cards */
             #home-actions-wrapper {
                 grid-column: 1;
-                grid-row: 3;
+                grid-row: 4;
             }
 
             #view-home .action-grid {
@@ -712,7 +717,7 @@
             /* PANEL LATERAL */
             #home-panel-lateral {
                 grid-column: 2;
-                grid-row: 1 / 4;
+                grid-row: 1 / 5;
                 display: flex;
                 flex-direction: column;
                 gap: 20px;
