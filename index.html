@@ -7234,9 +7234,13 @@
                     }));
                     // Merge con borradores locales — locales tienen prioridad
                     let locales = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
-                    const idsLocales = new Set(locales.map(b => String(b.id)));
+                    const idsRemoto = new Set(mapped.map(b => String(b.id)));
+                    const locales = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
+                    // Eliminar locales que ya no existen en Supabase (fueron borrados desde otro dispositivo)
+                    const localesFiltrados = locales.filter(b => !b.esBorrador || idsRemoto.has(String(b.id)));
+                    const idsLocales = new Set(localesFiltrados.map(b => String(b.id)));
                     const soloRemoto = mapped.filter(b => !idsLocales.has(String(b.id)));
-                    const merged = [...locales, ...soloRemoto];
+                    const merged = [...localesFiltrados, ...soloRemoto];
                     localStorage.setItem('borradores_auditorias', JSON.stringify(merged));
                 }
             } catch(e) { /* usa localStorage */ }
