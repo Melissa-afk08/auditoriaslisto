@@ -8327,20 +8327,21 @@
             let tValues = tLabels.map(t => parseFloat((tMap[t].reduce((s,v)=>s+v,0)/tMap[t].length).toFixed(1)));
             let tColors = tValues.map(v => v>90?'#43A047':v>70?'#F9A825':'#C62828');
             if (_chartTiendas) _chartTiendas.destroy();
-            const BAR_WIDTH = 60;
+            const BAR_WIDTH = 80;
             const canvasTiendas = document.getElementById('chart-tiendas');
-            const wrapperTiendas = document.getElementById('chart-tiendas-wrapper');
             if (tLabels.length > 8) {
                 canvasTiendas.style.width = (tLabels.length * BAR_WIDTH) + 'px';
                 canvasTiendas.style.minWidth = (tLabels.length * BAR_WIDTH) + 'px';
+                canvasTiendas.style.height = '260px';
             } else {
                 canvasTiendas.style.width = '100%';
                 canvasTiendas.style.minWidth = '';
+                canvasTiendas.style.height = '260px';
             }
             _chartTiendas = new Chart(canvasTiendas, {
                 type: 'bar',
                 data: { labels: tLabels, datasets: [{ data: tValues, backgroundColor: tColors, borderRadius: 6 }] },
-                options: { responsive:false, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:10}}}} }
+                options: { responsive: tLabels.length <= 8, maintainAspectRatio: false, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:10}}}} }
             });
 
             // --- GRÁFICO SUPERVISORES ---
@@ -8403,7 +8404,11 @@
                     <span style="background:${c};color:white;font-size:12px;font-weight:700;padding:3px 10px;border-radius:50px;">${prom.toFixed(1)}%</span>
                 </div>`;
             }).join('');
-            document.getElementById('analitica-ranking').innerHTML = rankHtml || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos</div>';
+            const rankEl = document.getElementById('analitica-ranking');
+            rankEl.innerHTML = rankHtml || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos</div>';
+            const rankCount = Object.keys(tMap).length;
+            rankEl.style.maxHeight = rankCount > 8 ? '400px' : 'none';
+            rankEl.style.overflowY = rankCount > 8 ? 'auto' : 'visible';
         }
 
         async function renderAnaliticaVisitas() {
