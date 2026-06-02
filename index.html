@@ -3995,7 +3995,9 @@
             <!-- GRÁFICO PROMEDIO POR TIENDA -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
                 <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:12px;">📊 Promedio por Tienda</div>
-                <canvas id="chart-tiendas" style="width:100%;max-height:260px;"></canvas>
+                <div id="chart-tiendas-wrapper" style="overflow-x:auto;">
+                    <canvas id="chart-tiendas" style="max-height:260px;"></canvas>
+                </div>
             </div>
             <!-- GRÁFICO DESEMPEÑO POR SUPERVISOR -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
@@ -8325,10 +8327,20 @@
             let tValues = tLabels.map(t => parseFloat((tMap[t].reduce((s,v)=>s+v,0)/tMap[t].length).toFixed(1)));
             let tColors = tValues.map(v => v>90?'#43A047':v>70?'#F9A825':'#C62828');
             if (_chartTiendas) _chartTiendas.destroy();
-            _chartTiendas = new Chart(document.getElementById('chart-tiendas'), {
+            const BAR_WIDTH = 60;
+            const canvasTiendas = document.getElementById('chart-tiendas');
+            const wrapperTiendas = document.getElementById('chart-tiendas-wrapper');
+            if (tLabels.length > 8) {
+                canvasTiendas.style.width = (tLabels.length * BAR_WIDTH) + 'px';
+                canvasTiendas.style.minWidth = (tLabels.length * BAR_WIDTH) + 'px';
+            } else {
+                canvasTiendas.style.width = '100%';
+                canvasTiendas.style.minWidth = '';
+            }
+            _chartTiendas = new Chart(canvasTiendas, {
                 type: 'bar',
                 data: { labels: tLabels, datasets: [{ data: tValues, backgroundColor: tColors, borderRadius: 6 }] },
-                options: { responsive:true, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:10}}}} }
+                options: { responsive:false, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{min:0,max:100,ticks:{callback:v=>v+'%'}},x:{ticks:{font:{size:10}}}} }
             });
 
             // --- GRÁFICO SUPERVISORES ---
