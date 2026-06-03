@@ -3538,11 +3538,16 @@
                     </svg>
                 </div>
                 <div style="flex:1;">
-                    <div
-                        style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:2px;">
-                        Fecha y Hora</div>
-                    <div style="font-size:14px; color:#1B1B1B; font-weight:700;"><span id="form-aud-fecha"></span> -
-                        <span id="form-aud-hora"></span></div>
+                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
+                        <span style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Fecha y Hora</span>
+                        <button onclick="toggleEditFechaHora()" style="font-size:10px;color:#FC6E20;font-weight:700;background:none;border:1px solid #FC6E20;border-radius:6px;padding:1px 7px;cursor:pointer;">Editar</button>
+                    </div>
+                    <div style="font-size:14px;color:#1B1B1B;font-weight:700;"><span id="form-aud-fecha"></span> - <span id="form-aud-hora"></span></div>
+                    <div id="edit-fecha-hora-panel" style="display:none;margin-top:8px;">
+                        <input type="date" id="input-aud-fecha" style="padding:6px 8px;border:1.5px solid #FC6E20;border-radius:8px;font-size:13px;font-family:inherit;outline:none;margin-right:6px;">
+                        <input type="time" id="input-aud-hora" style="padding:6px 8px;border:1.5px solid #FC6E20;border-radius:8px;font-size:13px;font-family:inherit;outline:none;">
+                        <button onclick="aplicarFechaHora()" style="margin-left:6px;padding:6px 12px;background:#FC6E20;color:white;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;">OK</button>
+                    </div>
                 </div>
             </div>
             <div style="display:flex; align-items:center; padding:12px 0; border-bottom:1px solid #F5F5F5;">
@@ -5836,6 +5841,42 @@
         }
 
         // --- AUDITORIA FLOW ---
+        function toggleEditFechaHora() {
+            let panel = document.getElementById('edit-fecha-hora-panel');
+            if (!panel) return;
+            let visible = panel.style.display === 'flex';
+            if (!visible) {
+                let fechaActual = document.getElementById('form-aud-fecha').textContent;
+                let horaActual = document.getElementById('form-aud-hora').textContent;
+                if (fechaActual) {
+                    let p = fechaActual.split('/');
+                    if (p.length === 3) document.getElementById('input-aud-fecha').value = `${p[2]}-${p[1]}-${p[0]}`;
+                }
+                if (horaActual) {
+                    document.getElementById('input-aud-hora').value = horaActual.substring(0,5);
+                }
+                panel.style.display = 'flex';
+                panel.style.alignItems = 'center';
+                panel.style.flexWrap = 'wrap';
+                panel.style.gap = '4px';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function aplicarFechaHora() {
+            let fechaInput = document.getElementById('input-aud-fecha').value;
+            let horaInput = document.getElementById('input-aud-hora').value;
+            if (!fechaInput || !horaInput) { showToast('Completa fecha y hora', 'error'); return; }
+            let p = fechaInput.split('-');
+            let fechaFormateada = `${p[2]}/${p[1]}/${p[0]}`;
+            let horaFormateada = horaInput + ':00';
+            document.getElementById('form-aud-fecha').textContent = fechaFormateada;
+            document.getElementById('form-aud-hora').textContent = horaFormateada;
+            document.getElementById('edit-fecha-hora-panel').style.display = 'none';
+            showToast('Fecha y hora actualizadas', 'success');
+        }
+
         function iniciarAuditoria() {
             let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
             let tiendaNombre = window.selectedStore.nombre;
