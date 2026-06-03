@@ -5350,7 +5350,7 @@
         }
 
         // Init App
-        function initApp() {
+        async function initApp() {
             let u = JSON.parse(localStorage.getItem("currentUser"));
             // Sync mobile greeting
             let mobileGreeting = document.getElementById("home-greeting-mobile");
@@ -8281,7 +8281,7 @@
                     <input type="number" id="edit-p-pmax" value="${p.pmax}" min="1" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
                 </div>`;
             document.getElementById('mc-btn').textContent = 'Guardar cambios';
-            document.getElementById('mc-btn').onclick = function() {
+            document.getElementById('mc-btn').onclick = async function() {
                 let nuevoTexto = document.getElementById('edit-p-texto').value.trim();
                 let nuevoGrupo = parseInt(document.getElementById('edit-p-grupo').value);
                 let nuevoPmax = parseInt(document.getElementById('edit-p-pmax').value) || p.pmax;
@@ -8303,7 +8303,7 @@
             const p = window.PREGUNTAS.find(p => p.id === id);
             if (!p) return;
             document.getElementById("mc-desc").innerText = `¿Eliminar la pregunta Q${id}? Los registros anteriores no se verán afectados.`;
-            document.getElementById("mc-btn").onclick = function() {
+            document.getElementById("mc-btn").onclick = async function() {
                 // Guardar estado actual antes de eliminar
                 window.PREGUNTAS.forEach(p => {
                     const txtEl = document.getElementById(`edit-txt-${p.id}`);
