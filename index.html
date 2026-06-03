@@ -8189,6 +8189,7 @@
             <div style="position:relative;">
                 <button onclick="togglePreguntaMenu(${p.id}, event)" style="background:none;border:none;font-size:18px;color:#888;font-weight:bold;cursor:pointer;padding:4px 8px;">⋮</button>
                 <div id="pmenu-${p.id}" style="display:none;position:absolute;right:0;top:28px;background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.15);z-index:10;width:150px;">
+                    <div onclick="abrirEditarPregunta(${p.id})" style="padding:12px 16px;font-size:13px;color:#1B1B1B;cursor:pointer;font-weight:600;border-bottom:1px solid #F5F5F5;">✏️ Editar</div>
                     <div onclick="eliminarPregunta(${p.id})" style="padding:12px 16px;font-size:13px;color:#FF3B30;cursor:pointer;font-weight:600;">🗑 Eliminar</div>
                 </div>
             </div>
@@ -8245,6 +8246,44 @@
             document.querySelectorAll('[id^="pmenu-"]').forEach(x => x.style.display = 'none');
             let m = document.getElementById(`pmenu-${id}`);
             if (m) m.style.display = m.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function abrirEditarPregunta(id) {
+            document.querySelectorAll('[id^="pmenu-"]').forEach(x => x.style.display = 'none');
+            let p = window.PREGUNTAS.find(p => p.id === id);
+            if (!p) return;
+            let gruposOpts = [1,2,3,4,5].map(g => {
+                let nombres = {1:'G1 — Customer Journey',2:'G2 — Control de Calidad',3:'G3 — Equipos y Utensilios',4:'G4 — Monitoreo de Equipos',5:'G5 — Control Documentario'};
+                return `<option value="${g}" ${p.grupo===g?'selected':''}>${nombres[g]}</option>`;
+            }).join('');
+            document.getElementById('mc-desc').innerHTML = `
+                <div style="margin-bottom:12px;">
+                    <div style="font-size:11px;color:#888;font-weight:600;margin-bottom:6px;">GRUPO</div>
+                    <select id="edit-p-grupo" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">${gruposOpts}</select>
+                </div>
+                <div style="margin-bottom:12px;">
+                    <div style="font-size:11px;color:#888;font-weight:600;margin-bottom:6px;">PREGUNTA</div>
+                    <textarea id="edit-p-texto" style="width:100%;padding:10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;resize:none;min-height:80px;outline:none;box-sizing:border-box;">${p.texto}</textarea>
+                </div>
+                <div>
+                    <div style="font-size:11px;color:#888;font-weight:600;margin-bottom:6px;">PUNTAJE MÁXIMO</div>
+                    <input type="number" id="edit-p-pmax" value="${p.pmax}" min="1" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box;">
+                </div>`;
+            document.getElementById('mc-btn').textContent = 'Guardar cambios';
+            document.getElementById('mc-btn').onclick = function() {
+                let nuevoTexto = document.getElementById('edit-p-texto').value.trim();
+                let nuevoGrupo = parseInt(document.getElementById('edit-p-grupo').value);
+                let nuevoPmax = parseInt(document.getElementById('edit-p-pmax').value) || p.pmax;
+                if (!nuevoTexto) { showToast('El texto no puede estar vacío', 'error'); return; }
+                p.texto = nuevoTexto;
+                p.grupo = nuevoGrupo;
+                p.pmax = nuevoPmax;
+                localStorage.setItem('preguntas_checklist', JSON.stringify(window.PREGUNTAS));
+                closeModal('modal-confirm');
+                openEditorChecklist();
+                showToast('Pregunta actualizada', 'success');
+            };
+            document.getElementById('modal-confirm').style.display = 'flex';
         }
 
         function eliminarPregunta(id) {
