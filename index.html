@@ -4846,7 +4846,7 @@
             if (type === 'catalogo') renderTiendasList('view-tiendas');
         }
 
-        function initData() {
+        async function initData() {
             // Users
             if (!localStorage.getItem("usuarios")) {
                 localStorage.setItem("usuarios", JSON.stringify(USUARIOS_VALIDOS));
