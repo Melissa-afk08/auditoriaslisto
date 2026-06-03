@@ -5147,10 +5147,14 @@
                         }
                     }
                 } catch(e) {}
+                // Limpiar papelera
+                await sbClient.from('papelera').delete().neq('id', 0);
                 // Limpiar localStorage
                 localStorage.removeItem('auditorias');
                 localStorage.removeItem('visitas');
                 localStorage.removeItem('borradores');
+                localStorage.removeItem('papelera_auditorias');
+                localStorage.removeItem('papelera_visitas');
                 showToast('✅ Todos los datos eliminados correctamente', 'success');
             } catch(e) {
                 showToast('Error al eliminar datos. Intenta de nuevo.', 'error');
@@ -8851,15 +8855,20 @@
             }
         }
 
-        function borrarAuditoria(id) {
+        async function borrarAuditoria(id) {
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
             let idx = auds.findIndex(a => a.id === id);
             if (idx === -1) return;
+            let item = { ...auds[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: window.currentUser?.nombre || '' };
             let papelera = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
-            papelera.push({ ...auds[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: window.currentUser?.nombre || '' });
+            papelera.push(item);
             localStorage.setItem("papelera_auditorias", JSON.stringify(papelera));
             auds.splice(idx, 1);
             localStorage.setItem("auditorias", JSON.stringify(auds));
+            try {
+                await sbClient.from('auditorias').delete().eq('id', id);
+                await sbClient.from('papelera').insert({ tipo: 'auditoria', datos: item, eliminado_por: item.eliminadoPor });
+            } catch(e) {}
             closeModalRo('modal-ro-auditoria');
             showToast("✓ Auditoría movida a la papelera", "success");
             renderHistorialAuditorias();
@@ -8878,15 +8887,20 @@
             document.getElementById("modal-confirm").style.display = "flex";
         }
 
-        function borrarVisita(id) {
+        async function borrarVisita(id) {
             let viss = JSON.parse(localStorage.getItem("visitas") || "[]");
             let idx = viss.findIndex(v => v.id === id);
             if (idx === -1) return;
+            let item = { ...viss[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: window.currentUser?.nombre || '' };
             let papelera = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
-            papelera.push({ ...viss[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: window.currentUser?.nombre || '' });
+            papelera.push(item);
             localStorage.setItem("papelera_visitas", JSON.stringify(papelera));
             viss.splice(idx, 1);
             localStorage.setItem("visitas", JSON.stringify(viss));
+            try {
+                await sbClient.from('visitas').delete().eq('id', id);
+                await sbClient.from('papelera').insert({ tipo: 'visita', datos: item, eliminado_por: item.eliminadoPor });
+            } catch(e) {}
             closeModalRo('modal-ro-visita');
             showToast("✓ Visita movida a la papelera", "success");
             renderHistorialVisitas();
@@ -9061,7 +9075,10 @@
                 pap.splice(idx, 1);
                 localStorage.setItem("papelera_auditorias", JSON.stringify(pap));
                 closeModal('modal-confirm');
-                if (aud?.id) await limpiarFotosAuditoria(aud.id);
+                if (aud?.id) {
+                    await limpiarFotosAuditoria(aud.id);
+                    try { await sbClient.from('papelera').delete().eq('tipo','auditoria').eq('datos->>id', String(aud.id)); } catch(e) {}
+                }
                 showToast("Auditoría eliminada definitivamente", "error");
                 renderPapelera();
             };
@@ -9085,11 +9102,13 @@
 
         function eliminarDefinitivoVisita(idx) {
             document.getElementById("mc-desc").innerText = "¿Eliminar definitivamente esta visita? Esta acción NO se puede deshacer.";
-            document.getElementById("mc-btn").onclick = function() {
+            document.getElementById("mc-btn").onclick = async function() {
                 let pap = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
+                let vis = pap[idx];
                 pap.splice(idx, 1);
                 localStorage.setItem("papelera_visitas", JSON.stringify(pap));
                 closeModal('modal-confirm');
+                try { await sbClient.from('papelera').delete().eq('tipo','visita').eq('datos->>id', String(vis?.id)); } catch(e) {}
                 showToast("Visita eliminada definitivamente", "error");
                 renderPapelera();
             };
