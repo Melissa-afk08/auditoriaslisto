@@ -7578,7 +7578,8 @@
                 return d.getMonth() === mesActual && d.getFullYear() === anioActual;
             });
 
-            let misMes = delMes.filter(a => a.supervisor && a.supervisor.trim() === u.nombre.trim());
+            let nombreCorto = u.nombre.trim().split(' ').slice(0,2).join(' ');
+            let misMes = delMes.filter(a => a.supervisor && a.supervisor.trim() === nombreCorto);
             let miPromedio = misMes.length > 0
                 ? (misMes.reduce((s,a) => s + (a.notaFinal||0), 0) / misMes.length).toFixed(1) + '%'
                 : '—';
