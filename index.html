@@ -5249,7 +5249,7 @@
 
         async function logout() {
             localStorage.removeItem("currentUser");
-            try { await sbClient.auth.signOut(); } catch(e) {}
+            try { await sbClient.auth.signOut({ scope: 'global' }); } catch(e) {}
             showView("view-login");
         }
 
