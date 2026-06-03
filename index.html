@@ -7633,6 +7633,12 @@
                 closeModal('modal-confirm');
                 showToast(`${n} registro${n>1?'s':''} enviado${n>1?'s':''} a papelera`, 'success');
                 try { await sbClient.from('auditorias').delete().in('id', idsToDelete); } catch(e) {}
+                try {
+                    const user = window.currentUser?.nombre || '';
+                    await Promise.all(papelera.slice(-idsToDelete.length).map(item =>
+                        sbClient.from('papelera').insert({ tipo: 'auditoria', datos: item, eliminado_por: user })
+                    ));
+                } catch(e) {}
                 // Limpiar localStorage antes de re-renderizar para que no muestre datos viejos
                 let audsActuales = JSON.parse(localStorage.getItem("auditorias") || "[]");
                 audsActuales = audsActuales.filter(a => !idsToDelete.includes(a.id));
@@ -7980,6 +7986,12 @@
                 closeModal('modal-confirm');
                 showToast(`${n} registro${n>1?'s':''} enviado${n>1?'s':''} a papelera`, 'success');
                 try { await sbClient.from('visitas').delete().in('id', idsToDeleteV); } catch(e) {}
+                try {
+                    const user = window.currentUser?.nombre || '';
+                    await Promise.all(papelera.slice(-idsToDeleteV.length).map(item =>
+                        sbClient.from('papelera').insert({ tipo: 'visita', datos: item, eliminado_por: user })
+                    ));
+                } catch(e) {}
                 renderHistorialVisitas();
             };
             document.getElementById("modal-confirm").style.display = "flex";
@@ -8887,9 +8899,21 @@
             showView('view-papelera');
         }
 
-        function renderPapelera() {
-            let audsPap = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
-            let visPap = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
+        async function renderPapelera() {
+            // Cargar papelera desde Supabase
+            let audsPap = [], visPap = [];
+            try {
+                let { data } = await sbClient.from('papelera').select('*').order('eliminado_en', { ascending: false });
+                if (data) {
+                    audsPap = data.filter(x => x.tipo === 'auditoria').map(x => x.datos);
+                    visPap = data.filter(x => x.tipo === 'visita').map(x => x.datos);
+                    localStorage.setItem("papelera_auditorias", JSON.stringify(audsPap));
+                    localStorage.setItem("papelera_visitas", JSON.stringify(visPap));
+                }
+            } catch(e) {
+                audsPap = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
+                visPap = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
+            }
             window._selPapAud = window._selPapAud || new Set();
             window._selPapVis = window._selPapVis || new Set();
             let html = '';
@@ -9014,15 +9038,17 @@
             document.getElementById("modal-confirm").style.display = "flex";
         }
 
-        function restaurarAuditoria(idx) {
-            let pap = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
-            let item = pap[idx];
+        async function restaurarAuditoria(idx) {
+            let audsPap = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
+            let item = { ...audsPap[idx] };
+            let audId = item.id;
             delete item.eliminadoEn; delete item.eliminadoPor;
-            let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
-            auds.push(item);
-            localStorage.setItem("auditorias", JSON.stringify(auds));
-            pap.splice(idx, 1);
-            localStorage.setItem("papelera_auditorias", JSON.stringify(pap));
+            try {
+                await sbClient.from('auditorias').upsert(item);
+                await sbClient.from('papelera').delete().eq('tipo','auditoria').eq('datos->>id', String(audId));
+            } catch(e) {}
+            audsPap.splice(idx, 1);
+            localStorage.setItem("papelera_auditorias", JSON.stringify(audsPap));
             showToast("✓ Auditoría restaurada", "success");
             renderPapelera();
         }
@@ -9042,15 +9068,17 @@
             document.getElementById("modal-confirm").style.display = "flex";
         }
 
-        function restaurarVisita(idx) {
-            let pap = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
-            let item = pap[idx];
+        async function restaurarVisita(idx) {
+            let visPap = JSON.parse(localStorage.getItem("papelera_visitas") || "[]");
+            let item = { ...visPap[idx] };
+            let visId = item.id;
             delete item.eliminadoEn; delete item.eliminadoPor;
-            let viss = JSON.parse(localStorage.getItem("visitas") || "[]");
-            viss.push(item);
-            localStorage.setItem("visitas", JSON.stringify(viss));
-            pap.splice(idx, 1);
-            localStorage.setItem("papelera_visitas", JSON.stringify(pap));
+            try {
+                await sbClient.from('visitas').upsert(item);
+                await sbClient.from('papelera').delete().eq('tipo','visita').eq('datos->>id', String(visId));
+            } catch(e) {}
+            visPap.splice(idx, 1);
+            localStorage.setItem("papelera_visitas", JSON.stringify(visPap));
             showToast("✓ Visita restaurada", "success");
             renderPapelera();
         }
