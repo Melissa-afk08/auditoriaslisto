@@ -4153,6 +4153,29 @@
                 </div>
             </div>
 
+            <!-- OPCIONES EXCLUSIVAS KLEIDDY -->
+            <div id="seccion-admin-kleiddy" style="display:none;">
+                <div class="ajustes-section-title">Administración</div>
+                <div class="ajustes-card" style="margin-bottom:12px;">
+                    <div class="ajustes-item" onclick="solicitarPasswordAdmin('reset-global')" style="cursor:pointer;">
+                        <div class="ajustes-item-icon" style="background:#FFF0F0;">🗑️</div>
+                        <div class="ajustes-item-text">
+                            <div class="ajustes-item-label" style="color:#C62828;">⚠️ Resetear todos los datos</div>
+                            <div class="ajustes-item-desc">Elimina todos los registros de Supabase y este dispositivo</div>
+                        </div>
+                        <span class="ajustes-item-arrow">›</span>
+                    </div>
+                    <div class="ajustes-item" onclick="solicitarPasswordAdmin('cambiar-password')" style="cursor:pointer;border-top:1px solid #F5F5F5;">
+                        <div class="ajustes-item-icon" style="background:#FFF0E6;">🔑</div>
+                        <div class="ajustes-item-text">
+                            <div class="ajustes-item-label">Cambiar contraseña madre</div>
+                            <div class="ajustes-item-desc">Actualiza la contraseña de acceso restringido</div>
+                        </div>
+                        <span class="ajustes-item-arrow">›</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- CERRAR SESIÓN -->
             <div class="ajustes-logout" onclick="logout()">
                 <div class="ajustes-item-icon" style="background:#FFF0F0;">🚪</div>
@@ -4162,6 +4185,21 @@
                 </div>
             </div>
 
+        </div>
+
+        <!-- MODAL CAMBIAR CONTRASEÑA MADRE -->
+        <div id="modal-cambiar-pass" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
+            <div style="background:white;border-radius:24px;padding:28px 24px;width:90%;max-width:340px;box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+                <div style="font-size:32px;text-align:center;margin-bottom:8px;">🔑</div>
+                <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:16px;">Cambiar contraseña madre</div>
+                <input id="pass-nueva-1" type="password" placeholder="Nueva contraseña" style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid #ddd;font-size:14px;box-sizing:border-box;margin-bottom:8px;outline:none;">
+                <input id="pass-nueva-2" type="password" placeholder="Confirmar nueva contraseña" style="width:100%;padding:12px 16px;border-radius:12px;border:1.5px solid #ddd;font-size:14px;box-sizing:border-box;margin-bottom:8px;outline:none;">
+                <div id="cambiar-pass-error" style="color:#C62828;font-size:12px;text-align:center;margin-bottom:12px;display:none;"></div>
+                <div style="display:flex;gap:10px;">
+                    <button onclick="document.getElementById('modal-cambiar-pass').style.display='none'" style="flex:1;padding:12px;border-radius:50px;background:#EEE;border:none;font-size:13px;font-weight:700;cursor:pointer;">Cancelar</button>
+                    <button onclick="guardarNuevaPassword()" style="flex:1;padding:12px;border-radius:50px;background:var(--naranja);border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;">Guardar</button>
+                </div>
+            </div>
         </div>
 
         <!-- MODAL CONTRASEÑA ADMIN -->
@@ -4775,6 +4813,7 @@
             }
 
             if (viewId === 'view-home') renderHomeDashboard();
+            if (viewId === 'view-ajustes') mostrarSeccionKleiddy();
             if (viewId === 'view-analitica') renderAnalitica();
             if (viewId === 'view-usuarios') renderUsuarios();
             if (viewId === 'view-auditoria-tiendas') renderListaTiendas('auditoria');
@@ -5004,8 +5043,25 @@
             document.getElementById("login-email").focus();
         }
 
-        const ADMIN_PASSWORD = "listo2026";
+        window._adminPassword = "listo2026";
         window.adminDestino = null;
+
+        // Cargar contraseña desde Supabase al iniciar
+        async function cargarPasswordAdmin() {
+            try {
+                let { data } = await sbClient.from('configuracion').select('valor').eq('clave','password_admin').single();
+                if (data?.valor) window._adminPassword = data.valor;
+            } catch(e) {}
+        }
+
+        // Mostrar sección admin si es Kleiddy
+        function mostrarSeccionKleiddy() {
+            let u = window.currentUser;
+            if (u && u.nombre && u.nombre.toLowerCase().includes('kleiddy')) {
+                let el = document.getElementById('seccion-admin-kleiddy');
+                if (el) el.style.display = 'block';
+            }
+        }
 
         function solicitarPasswordAdmin(destino) {
             window.adminDestino = destino;
@@ -5017,7 +5073,7 @@
 
         function verificarPasswordAdmin() {
             let pass = document.getElementById('admin-pass-input').value;
-            if (pass === ADMIN_PASSWORD) {
+            if (pass === window._adminPassword) {
                 document.getElementById('modal-admin-pass').style.display = 'none';
                 if (window.adminDestino === 'editor') openEditorChecklist();
                 else if (window.adminDestino === 'pesos') openEditorChecklist();
@@ -5025,10 +5081,68 @@
                 else if (window.adminDestino === 'usuarios') openEditorUsuarios();
                 else if (window.adminDestino === 'papelera') abrirPapelera();
                 else if (window.adminDestino === 'editor-registros') abrirEditorRegistros();
-                
+                else if (window.adminDestino === 'reset-global') confirmarResetGlobal();
+                else if (window.adminDestino === 'cambiar-password') abrirCambiarPassword();
             } else {
                 document.getElementById('admin-pass-error').style.display = 'block';
                 document.getElementById('admin-pass-input').value = '';
+            }
+        }
+
+        function abrirCambiarPassword() {
+            document.getElementById('pass-nueva-1').value = '';
+            document.getElementById('pass-nueva-2').value = '';
+            document.getElementById('cambiar-pass-error').style.display = 'none';
+            document.getElementById('modal-cambiar-pass').style.display = 'flex';
+        }
+
+        async function guardarNuevaPassword() {
+            let p1 = document.getElementById('pass-nueva-1').value.trim();
+            let p2 = document.getElementById('pass-nueva-2').value.trim();
+            let errEl = document.getElementById('cambiar-pass-error');
+            if (!p1 || p1.length < 4) { errEl.textContent = 'Mínimo 4 caracteres'; errEl.style.display='block'; return; }
+            if (p1 !== p2) { errEl.textContent = 'Las contraseñas no coinciden'; errEl.style.display='block'; return; }
+            try {
+                let { error } = await sbClient.from('configuracion').update({ valor: p1 }).eq('clave','password_admin');
+                if (error) throw error;
+                window._adminPassword = p1;
+                document.getElementById('modal-cambiar-pass').style.display = 'none';
+                showToast('Contraseña actualizada correctamente', 'success');
+            } catch(e) {
+                errEl.textContent = 'Error al guardar. Intenta de nuevo.';
+                errEl.style.display = 'block';
+            }
+        }
+
+        async function confirmarResetGlobal() {
+            if (!confirm('⚠️ ADVERTENCIA: Esta acción eliminará TODOS los registros de auditorías, visitas y fotos de forma permanente e irreversible.\n\n¿Estás segura de continuar?')) return;
+            if (!confirm('Segunda confirmación: ¿Eliminar absolutamente todos los datos?')) return;
+            showToast('Eliminando todos los datos...', 'success');
+            try {
+                // Eliminar auditorías
+                await sbClient.from('auditorias').delete().neq('id', 0);
+                // Eliminar visitas
+                await sbClient.from('visitas').delete().neq('id', 0);
+                // Eliminar fotos
+                try {
+                    let { data: folders } = await sbClient.storage.from('fotos-auditorias').list();
+                    if (folders && folders.length > 0) {
+                        for (let folder of folders) {
+                            let { data: files } = await sbClient.storage.from('fotos-auditorias').list(folder.name);
+                            if (files && files.length > 0) {
+                                let paths = files.map(f => `${folder.name}/${f.name}`);
+                                await sbClient.storage.from('fotos-auditorias').remove(paths);
+                            }
+                        }
+                    }
+                } catch(e) {}
+                // Limpiar localStorage
+                localStorage.removeItem('auditorias');
+                localStorage.removeItem('visitas');
+                localStorage.removeItem('borradores');
+                showToast('✅ Todos los datos eliminados correctamente', 'success');
+            } catch(e) {
+                showToast('Error al eliminar datos. Intenta de nuevo.', 'error');
             }
         }
 
@@ -5237,6 +5351,7 @@
             window.currentUser = u;
             document.getElementById("home-greeting").textContent = `Hola, ${u.nombre.split(" ")[0]}`;
             renderHomeDashboard();
+            cargarPasswordAdmin();
 
             let inis = u.nombre.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
             document.getElementById("home-avatar").textContent = inis;
