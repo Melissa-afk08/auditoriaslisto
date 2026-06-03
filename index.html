@@ -4852,10 +4852,21 @@
                 localStorage.setItem("usuarios", JSON.stringify(USUARIOS_VALIDOS));
             }
 
-            // Questions
-            let pq = localStorage.getItem("preguntas_custom");
-            let parsedPreguntas = pq ? JSON.parse(pq) : null;
-            window.PREGUNTAS = parsedPreguntas || JSON.parse(JSON.stringify(PREGUNTAS_DEFAULT));
+            // Questions — cargar desde Supabase, fallback a localStorage
+            window.PREGUNTAS = JSON.parse(JSON.stringify(PREGUNTAS_DEFAULT));
+            try {
+                let { data: pqData, error: pqError } = await sbClient.from('checklist').select('*').order('id', { ascending: true });
+                if (!pqError && pqData && pqData.length > 0) {
+                    window.PREGUNTAS = pqData.map(p => ({ id: p.id, grupo: p.grupo, texto: p.texto, pmax: p.pmax }));
+                    localStorage.setItem('preguntas_custom', JSON.stringify(window.PREGUNTAS));
+                } else {
+                    let pq = localStorage.getItem("preguntas_custom");
+                    if (pq) window.PREGUNTAS = JSON.parse(pq);
+                }
+            } catch(e) {
+                let pq = localStorage.getItem("preguntas_custom");
+                if (pq) window.PREGUNTAS = JSON.parse(pq);
+            }
 
             let p_p = localStorage.getItem("pesos_custom");
             let parsedPesos = p_p ? JSON.parse(p_p) : null;
@@ -8248,7 +8259,7 @@
             if (m) m.style.display = m.style.display === 'block' ? 'none' : 'block';
         }
 
-        function abrirEditarPregunta(id) {
+        async function abrirEditarPregunta(id) {
             document.querySelectorAll('[id^="pmenu-"]').forEach(x => x.style.display = 'none');
             let p = window.PREGUNTAS.find(p => p.id === id);
             if (!p) return;
@@ -8278,7 +8289,8 @@
                 p.texto = nuevoTexto;
                 p.grupo = nuevoGrupo;
                 p.pmax = nuevoPmax;
-                localStorage.setItem('preguntas_checklist', JSON.stringify(window.PREGUNTAS));
+                localStorage.setItem('preguntas_custom', JSON.stringify(window.PREGUNTAS));
+                try { await sbClient.from('checklist').upsert({id: p.id, grupo: nuevoGrupo, texto: nuevoTexto, pmax: nuevoPmax}); } catch(e) {}
                 closeModal('modal-confirm');
                 openEditorChecklist();
                 showToast('Pregunta actualizada', 'success');
@@ -8286,7 +8298,7 @@
             document.getElementById('modal-confirm').style.display = 'flex';
         }
 
-        function eliminarPregunta(id) {
+        async function eliminarPregunta(id) {
             document.querySelectorAll('[id^="pmenu-"]').forEach(x => x.style.display = 'none');
             const p = window.PREGUNTAS.find(p => p.id === id);
             if (!p) return;
@@ -8301,6 +8313,7 @@
                 });
                 window.PREGUNTAS = window.PREGUNTAS.filter(p => p.id !== id);
                 localStorage.setItem("preguntas_custom", JSON.stringify(window.PREGUNTAS));
+                try { await sbClient.from('checklist').delete().eq('id', id); } catch(e) {}
                 closeModal('modal-confirm');
                 abrirEditorChecklist();
                 showToast("Pregunta eliminada", "success");
@@ -8313,7 +8326,7 @@
             if (f) { f.style.display = 'block'; f.scrollIntoView({ behavior: 'smooth' }); }
         }
 
-        function guardarNuevaPregunta() {
+        async function guardarNuevaPregunta() {
             const grupo = parseInt(document.getElementById('np-grupo').value);
             const texto = document.getElementById('np-texto').value.trim();
             const pmax = parseInt(document.getElementById('np-pmax').value) || 2;
@@ -8330,11 +8343,12 @@
             const maxId = window.PREGUNTAS.reduce((m, p) => Math.max(m, p.id), 0);
             window.PREGUNTAS.push({ id: maxId + 1, grupo, texto, pmax });
             localStorage.setItem("preguntas_custom", JSON.stringify(window.PREGUNTAS));
+            try { await sbClient.from('checklist').upsert({id: maxId + 1, grupo, texto, pmax}); } catch(e) {}
             openEditorChecklist();
             showToast("✓ Pregunta agregada", "success");
         }
 
-        function saveChecklistCustom() {
+        async function saveChecklistCustom() {
             let g1 = parseFloat(document.getElementById("edit-g1").value);
             let g2 = parseFloat(document.getElementById("edit-g2").value);
             let g3 = parseFloat(document.getElementById("edit-g3").value);
@@ -8363,6 +8377,11 @@
             localStorage.setItem("pesos_custom", JSON.stringify(newPesos));
             localStorage.setItem("preguntas_custom", JSON.stringify(newPreguntas));
 
+            try {
+                await Promise.all(newPreguntas.map(p =>
+                    sbClient.from('checklist').upsert({id: p.id, grupo: p.grupo, texto: p.texto, pmax: p.pmax})
+                ));
+            } catch(e) {}
             showToast("Checklist actualizado", "success");
             showView('view-ajustes');
         }
