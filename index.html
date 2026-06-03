@@ -5247,8 +5247,9 @@
             showToast("✓ Usuario agregado correctamente", "success");
         }
 
-        function logout() {
+        async function logout() {
             localStorage.removeItem("currentUser");
+            try { await sbClient.auth.signOut(); } catch(e) {}
             showView("view-login");
         }
 
