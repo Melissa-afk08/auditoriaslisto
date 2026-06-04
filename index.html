@@ -6641,7 +6641,7 @@
             localStorage.setItem("auditorias", JSON.stringify(auds));
 
             window._auditFotosBase64 = JSON.parse(JSON.stringify(auditRecord.respuestas));
-            syncAuditoriaSupabase(auditRecord).then(() => renderHomeDashboard());
+            syncAuditoriaSupabase(auditRecord).then(() => setTimeout(() => renderHomeDashboard(), 1500));
 
             window._auditoriaEnProgreso = false;
             window.auditActual = auditRecord;
