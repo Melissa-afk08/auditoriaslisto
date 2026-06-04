@@ -7483,9 +7483,10 @@
                             m.fecha === a.fecha
                         );
                         if (!yaExiste) {
-                            const resetData = await sbClient.from('configuracion').select('valor').eq('clave','ultimo_reset').single();
-                            const resetTs = resetData?.data?.valor ? parseInt(resetData.data.valor) : 0;
-                            if (a.id > resetTs) syncAuditoriaSupabase(a);
+                            sbClient.from('configuracion').select('valor').eq('clave','ultimo_reset').single().then(resetData => {
+                                const resetTs = resetData?.data?.valor ? parseInt(resetData.data.valor) : 0;
+                                if (a.id > resetTs) syncAuditoriaSupabase(a);
+                            });
                         }
                     });
                     const soloLocalesSinDuplicados = soloLocales.filter(a =>
