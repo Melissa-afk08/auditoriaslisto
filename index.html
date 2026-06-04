@@ -9484,8 +9484,10 @@
             window.PREGUNTAS.forEach(p => {
                 let resp = data.respuestas[p.id];
                 if (!resp) return;
+                const val = resp.valor;
+                if (val === 'NA' || val === 'N/A' || val === 'NO APLICA') return;
                 grupos[p.grupo].maximo += p.pmax;
-                if (resp.valor === 'SI' || resp.valor === 1 || resp.valor === true) grupos[p.grupo].obtenido += p.pmax;
+                if (val === 'SI' || val === 1 || val === true) grupos[p.grupo].obtenido += p.pmax;
             });
             let nota = 0;
             let resultGrupos = {};
