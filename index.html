@@ -7710,7 +7710,10 @@
             window.auditActual = data;
             window.auditDesdeHistorial = true;
             window._auditoriaEnProgreso = false;
+            window._auditFotosBase64 = null;
             renderAuditoriaResultado(data);
+            const btnDriveH = document.getElementById('btn-drive');
+            if (btnDriveH) { btnDriveH.disabled = false; btnDriveH.innerHTML = '☁️ Guardar en Drive'; btnDriveH.style.background = '#34A853'; }
             showView('view-auditoria-resultado');
         }
 
@@ -8602,8 +8605,7 @@
                             resolve(p.output('blob'));
                         } catch(e) { resolve(null); }
                     });
-                    if (pdfBlob) driveSubirPDF(pdfBlob, record.tienda?.nombre || record.tienda, record.supervisor, record.fecha);
-                    driveSubirFotos(record, respuestasSinFotos);
+                    // Drive solo se sube manualmente con el botón
                 } catch(e) { /* silencioso */ }
 
             } catch (e) {
