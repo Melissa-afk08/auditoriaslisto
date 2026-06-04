@@ -6645,6 +6645,8 @@
             window._auditoriaEnProgreso = false;
             window.auditActual = auditRecord;
             renderAuditoriaResultado(auditRecord);
+            const btnDrive = document.getElementById('btn-drive');
+            if (btnDrive) { btnDrive.disabled = false; btnDrive.innerHTML = '☁️ Guardar en Drive'; btnDrive.style.background = '#34A853'; }
             showView('view-auditoria-resultado');
         }
 
@@ -8521,6 +8523,7 @@
                         const nombreFoto = `F${pid}_${p ? p.texto.substring(0,20).replace(/\s+/g,'_') : 'P'+pid}_${i+1}.jpg`;
                         fetch(DRIVE_SCRIPT_URL, {
                             method: 'POST',
+                            mode: 'no-cors',
                             body: JSON.stringify({ tipo: 'foto', base64, nombre: nombreFoto, carpeta }),
                         }).catch(() => {});
                     }
