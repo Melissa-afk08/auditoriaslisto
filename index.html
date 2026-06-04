@@ -3576,8 +3576,7 @@
                 <div
                     style="font-size:11px; color:#888; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
                     Supervisor(a)</div>
-                <select id="form-aud-supervisor"
-                    style="width:100%; background:#F5F5F5; border:none; border-radius:12px; padding:10px; font-size:14px; font-family:inherit; color:#1B1B1B; outline:none; appearance:none;"></select>
+                <div id="form-aud-supervisor" style="width:100%; background:#F5F5F5; border:none; border-radius:12px; padding:10px; font-size:14px; font-family:inherit; color:#1B1B1B; outline:none; font-weight:600;"></div>
             </div>
             <div style="padding-top:12px;">
                 <div
@@ -3783,8 +3782,7 @@
                                 <circle cx="12" cy="7" r="4"></circle>
                             </svg>
                         </div>
-                        <select id="form-vis-sup"
-                            style="background:#F5F5F5 url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23FC6E20%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>') no-repeat right 16px center; border:none; border-radius:12px; padding:12px 16px; font-size:14px; color:#1B1B1B; width:100%; font-family:inherit; outline:none; box-sizing:border-box; appearance:none; cursor:pointer;"></select>
+                        <div id="form-vis-sup" style="background:#F5F5F5; border:none; border-radius:12px; padding:12px 16px; font-size:14px; color:#1B1B1B; width:100%; font-family:inherit; box-sizing:border-box; font-weight:600;"></div>
                     </div>
                 </div>
                 <!-- Comentario -->
@@ -6042,11 +6040,7 @@
 
             if (timerInterval) clearInterval(timerInterval);
 
-            let sups = JSON.parse(localStorage.getItem("supervisores") || "[]");
-            let supActual = window.currentUser?.nombre || '';
-            let selHtml = "";
-            sups.forEach(s => selHtml += `<option value="${s}" ${s === supActual ? 'selected' : ''}>${s}</option>`);
-            document.getElementById("form-aud-supervisor").innerHTML = selHtml;
+            document.getElementById("form-aud-supervisor").textContent = window.currentUser?.nombre || '';
             document.getElementById("form-aud-encargado").value = "";
             document.getElementById("form-aud-ubicacion").textContent = "No disponible";
 
@@ -6067,10 +6061,7 @@
 
             if (timerInterval) clearInterval(timerInterval);
 
-            let sups = JSON.parse(localStorage.getItem("supervisores") || "[]");
-            let selHtml = "";
-            sups.forEach(s => selHtml += `<option value="${s}" ${s === borrador.supervisor ? 'selected' : ''}>${s}</option>`);
-            document.getElementById("form-aud-supervisor").innerHTML = selHtml;
+            document.getElementById("form-aud-supervisor").textContent = window.currentUser?.nombre || borrador.supervisor || '';
             document.getElementById("form-aud-encargado").value = borrador.encargado || '';
             document.getElementById("form-aud-ubicacion").textContent = "No disponible";
 
@@ -7226,7 +7217,7 @@
             }
             let selHtml = "";
             sups.forEach(s => selHtml += `<option value="${s}">${s}</option>`);
-            document.getElementById("form-vis-sup").innerHTML = selHtml;
+            document.getElementById("form-vis-sup").textContent = window.currentUser?.nombre || '';
 
             let apunteHoy = document.getElementById('vis-apunte-hoy')?.value?.trim() || '';
             document.getElementById("form-vis-comentario").value = apunteHoy;
