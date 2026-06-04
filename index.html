@@ -6380,6 +6380,26 @@
             modalCanvasInitialized = true;
         }
 
+        function subirFotoFirma(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.getElementById('firma-canvas-modal');
+                    const ctx = canvas.getContext('2d');
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    const ratio = Math.min(canvas.width / img.width, canvas.height / img.height, 1);
+                    const w = img.width * ratio, h = img.height * ratio;
+                    ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+                    document.getElementById('modal-firma-placeholder').style.display = 'none';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
         function limpiarFirmaModal() {
             const modal = document.getElementById('firma-canvas-modal');
             modal.getContext('2d').clearRect(0, 0, modal.width, modal.height);
@@ -9919,9 +9939,15 @@
                 <div id="modal-firma-placeholder" style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); color:#AAA; font-size:14px; pointer-events:none; white-space:nowrap;">Firma aquí</div>
                 <canvas id="firma-canvas-modal" width="800" height="250" style="width:100%; height:220px; display:block; touch-action:none;"></canvas>
             </div>
-            <div style="display:flex; gap:10px;">
+            <div style="display:flex; gap:10px; margin-bottom:10px;">
                 <button onclick="limpiarFirmaModal()" style="flex:1; padding:12px; border-radius:50px; background:#EEE; border:none; color:#555; font-size:13px; font-weight:700; cursor:pointer;">🗑️ Limpiar</button>
                 <button onclick="cerrarModalFirma(true)" style="flex:1; padding:12px; border-radius:50px; background:var(--naranja); border:none; color:white; font-size:13px; font-weight:700; cursor:pointer;">✅ Confirmar firma</button>
+            </div>
+            <div style="text-align:center;">
+                <label style="display:inline-block; padding:8px 18px; background:#F0F0F0; border-radius:50px; font-size:12px; font-weight:700; color:#555; cursor:pointer;">
+                    📷 Subir foto de firma
+                    <input type="file" accept="image/*" style="display:none;" onchange="subirFotoFirma(event)">
+                </label>
             </div>
         </div>
     </div>
