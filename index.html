@@ -9485,7 +9485,7 @@
                 let resp = data.respuestas[p.id];
                 if (!resp) return;
                 grupos[p.grupo].maximo += p.pmax;
-                if (resp.valor === 'SI') grupos[p.grupo].obtenido += p.pmax;
+                if (resp.valor === 'SI' || resp.valor === 1 || resp.valor === true) grupos[p.grupo].obtenido += p.pmax;
             });
             let nota = 0;
             let resultGrupos = {};
