@@ -8546,16 +8546,41 @@
                 const tiendaNombre = typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda');
                 await driveSubirPDF(pdfBlob, tiendaNombre, data.supervisor, data.fecha);
 
-                // Subir fotos usando base64 guardado
-                const recordParaFotos = { ...data, respuestas: window._auditFotosBase64 || data.respuestas };
+                // Subir fotos: usar base64 si está disponible, si no descargar desde URL
+                const respuestasParaFotos = {};
+                const respSrc = window._auditFotosBase64 || data.respuestas || {};
+                for (const pid in respSrc) {
+                    const r = respSrc[pid];
+                    const fotos = r.fotos || [];
+                    const fotosB64 = [];
+                    for (const f of fotos) {
+                        if (!f) continue;
+                        if (f.startsWith('data:')) {
+                            fotosB64.push(f);
+                        } else {
+                            // Es URL de Supabase — descargar y convertir a base64
+                            try {
+                                const resp = await fetch(f);
+                                const blob = await resp.blob();
+                                const b64 = await new Promise(res => { const rd = new FileReader(); rd.onload = () => res(rd.result); rd.readAsDataURL(blob); });
+                                fotosB64.push(b64);
+                            } catch(e) {}
+                        }
+                    }
+                    respuestasParaFotos[pid] = { ...r, fotos: fotosB64 };
+                }
+                const recordParaFotos = { ...data, respuestas: respuestasParaFotos };
                 await driveSubirFotos(recordParaFotos, {});
 
                 showToast('✓ Guardado en Drive', 'success');
+                if (btn) { btn.disabled = true; btn.innerHTML = '✓ Ya guardado en Drive'; btn.style.background = '#888'; }
             } catch(e) {
                 console.error(e);
                 showToast('Error al guardar en Drive', 'error');
             } finally {
-                if (btn) { btn.disabled = false; btn.innerHTML = '☁️ Guardar en Drive'; }
+                if (!btn?.innerHTML?.includes('Ya guardado')) {
+                    if (btn) { btn.disabled = false; btn.innerHTML = '☁️ Guardar en Drive'; }
+                }
             }
         }
 
