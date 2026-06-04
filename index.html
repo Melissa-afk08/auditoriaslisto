@@ -8597,6 +8597,7 @@
                 });
                 await fetch(DRIVE_SCRIPT_URL, {
                     method: 'POST',
+                    mode: 'no-cors',
                     body: JSON.stringify({ tipo: 'pdf', base64, nombre }),
                 });
             } catch(e) { /* silencioso */ }
@@ -8619,6 +8620,7 @@
                         const nombreFoto = `F${pid}_${p ? p.texto.substring(0,20).replace(/\s+/g,'_') : 'P'+pid}_${i+1}.jpg`;
                         fetch(DRIVE_SCRIPT_URL, {
                             method: 'POST',
+                            mode: 'no-cors',
                             body: JSON.stringify({ tipo: 'foto', base64, nombre: nombreFoto, carpeta }),
                         }).catch(() => {});
                     }
