@@ -5151,6 +5151,9 @@
                 } catch(e) {}
                 // Limpiar papelera
                 await sbClient.from('papelera').delete().neq('id', 0);
+                // Guardar fecha de reset absoluto
+                const resetTs = Date.now();
+                await sbClient.from('configuracion').upsert({ clave: 'ultimo_reset', valor: String(resetTs) });
                 // Limpiar localStorage
                 localStorage.removeItem('auditorias');
                 localStorage.removeItem('visitas');
@@ -7479,7 +7482,11 @@
                             (m.tienda?.nombre || m.tienda) === (a.tienda?.nombre || a.tienda) &&
                             m.fecha === a.fecha
                         );
-                        if (!yaExiste) syncAuditoriaSupabase(a);
+                        if (!yaExiste) {
+                            const resetData = await sbClient.from('configuracion').select('valor').eq('clave','ultimo_reset').single();
+                            const resetTs = resetData?.data?.valor ? parseInt(resetData.data.valor) : 0;
+                            if (a.id > resetTs) syncAuditoriaSupabase(a);
+                        }
                     });
                     const soloLocalesSinDuplicados = soloLocales.filter(a =>
                         !mapped.some(m =>
