@@ -6829,7 +6829,7 @@
             if (deleteZone) deleteZone.innerHTML = `<button onclick="confirmarBorrarAuditoria(${data.id})" style="width:100%;background:#FFF0F0;color:#C62828;border:1.5px solid #C62828;border-radius:50px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;">🗑️ Eliminar auditoría</button>`;
         }
 
-        async function generarReporte(share = false) {
+        async function generarReporte(share = false, returnBlob = false) {
             let btn1 = document.getElementById('btn-rep-pdf');
             let btn2 = document.getElementById('btn-rep-share');
             if (btn1) { btn1.disabled = true; btn1.innerHTML = '<div style="width:16px;height:16px;border:2px solid #fff;border-top:2px solid transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;"></div>'; }
@@ -7146,17 +7146,21 @@
                         document.getElementById('modal-enviar-wsp').href = urlWsp;
                         document.getElementById('modal-enviar-enlace').textContent = enlacePublico;
                     }
+                } else if (returnBlob) {
+                    return blob;
                 } else {
                     pdf.save(filename);
                 }
             };
 
             try {
-                await task();
+                const result = await task();
+                if (returnBlob) return result;
                 showToast("✓ Reporte generado", "success");
             } catch (error) {
                 console.error(error);
-                showToast("Error al generar reporte", "error");
+                if (!returnBlob) showToast("Error al generar reporte", "error");
+                if (returnBlob) throw error;
             } finally {
                 if (btn1) { btn1.disabled = false; btn1.innerHTML = '📄 Reporte'; }
                 if (btn2) { btn2.disabled = false; btn2.style.opacity = '1'; }
@@ -8444,145 +8448,43 @@
                 const data = window.auditActual;
                 if (!data) throw new Error('Sin datos');
 
-                // Generar PDF completo reutilizando generarReporte pero capturando el blob
-                const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                const pageWidth = 210, pageHeight = 297, margin = 15;
-                let y = margin;
-                const checkPageBreak = (h) => { if (y + h > pageHeight - margin) { pdf.addPage(); y = margin; return true; } return false; };
-                const addText = (text, size, bold, color, align = 'left', xOffset = margin) => { pdf.setFontSize(size); pdf.setFont('helvetica', bold ? 'bold' : 'normal'); pdf.setTextColor(color[0], color[1], color[2]); pdf.text(text, align === 'center' ? pageWidth / 2 : xOffset, y, { align }); };
-
-                try {
-                    const logoB64 = await new Promise((resolve, reject) => { const img = new Image(); img.crossOrigin = 'anonymous'; img.onload = () => { const c = document.createElement('canvas'); c.width = img.width; c.height = img.height; c.getContext('2d').drawImage(img, 0, 0); resolve(c.toDataURL('image/png')); }; img.onerror = reject; img.src = '/logo-primax-listo.png'; });
-                    pdf.addImage(logoB64, 'PNG', margin, y - 8, 20, 20);
-                } catch(e) {}
-                y += 18;
-
-                pdf.setFillColor(252, 110, 32);
-                pdf.roundedRect(margin, y, pageWidth - 2 * margin, 35, 3, 3, 'F');
-                y += 8;
-                addText('TIENDA', 8, true, [255,255,255], 'left', margin + 5); y += 5;
-                addText(typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || ''), 12, true, [255,255,255], 'left', margin + 5); y += 8;
-                let sx = margin + 5;
-                let hour = parseInt(data.hora.substring(0,2)); const minute = data.hora.substring(3,5); const ampm = hour >= 12 ? 'PM' : 'AM'; hour = hour % 12 || 12;
-                [['FECHA', data.fecha], ['HORA', `${hour}:${minute} ${ampm}`], ['SUPERVISOR', data.supervisor], ['ENCARGADO', data.encargado || '-']].forEach(([col, val]) => { pdf.setFontSize(7); pdf.setFont('helvetica','bold'); pdf.setTextColor(255,255,255); pdf.text(col, sx, y); pdf.setFontSize(9); pdf.setFont('helvetica','normal'); pdf.text(val, sx, y + 5); sx += 42; });
-                y += 15;
-
-                const score = data.notaFinal || data.finalScore || 0;
-                const cls = data.clasificacion || '';
-                const clsColor = cls.includes('SOBRESALIENTE') ? [39,174,96] : cls.includes('ALTO') ? [231,76,60] : [243,156,18];
-                checkPageBreak(40);
-                pdf.setFontSize(36); pdf.setFont('helvetica','bold'); pdf.setTextColor(clsColor[0], clsColor[1], clsColor[2]);
-                pdf.text(`${score.toFixed(1)}%`, pageWidth / 2, y + 20, { align: 'center' }); y += 28;
-                pdf.setFillColor(clsColor[0], clsColor[1], clsColor[2]);
-                pdf.roundedRect(pageWidth/2 - 40, y, 80, 10, 5, 5, 'F');
-                pdf.setFontSize(9); pdf.setFont('helvetica','bold'); pdf.setTextColor(255,255,255);
-                pdf.text(cls, pageWidth/2, y + 7, { align: 'center' }); y += 18;
-
-                if (data.resultadoGrupos) {
-                    checkPageBreak(10);
-                    addText('RESULTADOS POR GRUPO', 11, true, [27,27,27]); y += 7;
-                    for (const [grupo, info] of Object.entries(data.resultadoGrupos)) {
-                        checkPageBreak(12);
-                        const pct = typeof info === 'object' ? (info.pct ?? info.porcentaje ?? 0) : info;
-                        const gc = pct > 90 ? [39,174,96] : pct >= 71 ? [243,156,18] : [231,76,60];
-                        pdf.setFillColor(245,245,245); pdf.roundedRect(margin, y, pageWidth - 2*margin, 9, 2, 2, 'F');
-                        pdf.setFontSize(9); pdf.setFont('helvetica','normal'); pdf.setTextColor(27,27,27);
-                        pdf.text(grupo, margin + 3, y + 6);
-                        pdf.setFont('helvetica','bold'); pdf.setTextColor(gc[0],gc[1],gc[2]);
-                        pdf.text(`${pct.toFixed(1)}%`, pageWidth - margin - 3, y + 6, { align: 'right' });
-                        y += 11;
-                    }
-                    y += 4;
-                }
-
-                const preguntas = window.PREGUNTAS || [];
-                const respuestas = data.respuestas || {};
-                if (preguntas.length > 0) {
-                    checkPageBreak(10);
-                    addText('DETALLE DE PREGUNTAS', 11, true, [27,27,27]); y += 7;
-                    for (const p of preguntas) {
-                        const r = respuestas[p.id] || {};
-                        if (r.valor === undefined) continue;
-                        checkPageBreak(14);
-                        const ok = r.valor >= (p.puntaje || 1);
-                        const ic = ok ? [39,174,96] : [231,76,60];
-                        pdf.setFillColor(ok ? 240 : 255, ok ? 250 : 240, ok ? 240 : 240);
-                        pdf.roundedRect(margin, y, pageWidth - 2*margin, 10, 2, 2, 'F');
-                        pdf.setFontSize(8); pdf.setFont('helvetica','normal'); pdf.setTextColor(27,27,27);
-                        const txt = pdf.splitTextToSize(`${p.id}. ${p.texto}`, pageWidth - 2*margin - 20);
-                        pdf.text(txt[0], margin + 3, y + 7);
-                        pdf.setFont('helvetica','bold'); pdf.setTextColor(ic[0],ic[1],ic[2]);
-                        pdf.text(ok ? 'SI' : 'NO', pageWidth - margin - 3, y + 7, { align: 'right' });
-                        y += 12;
-                        if (r.obs) { checkPageBreak(8); pdf.setFontSize(7); pdf.setFont('helvetica','italic'); pdf.setTextColor(120,120,120); pdf.text(`Obs: ${r.obs}`, margin + 5, y); y += 7; }
-
-                        const fotosR = window._auditFotosBase64?.[p.id]?.fotos || [];
-                        for (const fotoData of fotosR) {
-                            if (!fotoData || !fotoData.startsWith('data:')) continue;
-                            try {
-                                const imgProps = pdf.getImageProperties(fotoData);
-                                const maxW = pageWidth - 2*margin - 6, maxH = 60;
-                                const ratio = Math.min(maxW/imgProps.width, maxH/imgProps.height, 1);
-                                const fw = imgProps.width*ratio, fh = imgProps.height*ratio;
-                                checkPageBreak(fh + 6);
-                                pdf.addImage(fotoData, 'JPEG', margin+3+(maxW-fw)/2, y, fw, fh, '', 'NONE');
-                                y += fh + 6;
-                            } catch(e) {}
-                        }
-                    }
-                }
-
-                const totalPages = pdf.internal.getNumberOfPages();
-                for (let pg = 1; pg <= totalPages; pg++) {
-                    pdf.setPage(pg);
-                    const fy = pageHeight - 6;
-                    pdf.setDrawColor(220,220,220); pdf.setLineWidth(0.3); pdf.line(margin, fy-5, pageWidth-margin, fy-5);
-                    pdf.setFontSize(7); pdf.setFont('helvetica','normal'); pdf.setTextColor(160,160,160);
-                    pdf.text(data.ubicacionGPS ? `Ubicacion: ${data.ubicacionGPS}` : `Auditorias Listo! - ${data.fecha}`, pageWidth/2, fy, { align: 'center' });
-                }
-
-                const pdfBlob = pdf.output('blob');
+                // Usar mismo PDF que boton Reporte
+                const pdfBlob = await generarReporte(false, true);
+                if (!pdfBlob) throw new Error('No se pudo generar el PDF');
                 const tiendaNombre = typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda');
                 await driveSubirPDF(pdfBlob, tiendaNombre, data.supervisor, data.fecha);
 
-                // Subir fotos: usar base64 si está disponible, si no descargar desde URL
+                // Subir fotos: base64 si disponible, si no descargar desde URL
                 const respuestasParaFotos = {};
                 const respSrc = window._auditFotosBase64 || data.respuestas || {};
                 for (const pid in respSrc) {
                     const r = respSrc[pid];
-                    const fotos = r.fotos || [];
                     const fotosB64 = [];
-                    for (const f of fotos) {
+                    for (const f of (r.fotos || [])) {
                         if (!f) continue;
-                        if (f.startsWith('data:')) {
-                            fotosB64.push(f);
-                        } else {
-                            // Es URL de Supabase — descargar y convertir a base64
+                        if (f.startsWith('data:')) { fotosB64.push(f); }
+                        else {
                             try {
-                                const resp = await fetch(f);
-                                const blob = await resp.blob();
-                                const b64 = await new Promise(res => { const rd = new FileReader(); rd.onload = () => res(rd.result); rd.readAsDataURL(blob); });
+                                const respFoto = await fetch(f);
+                                const blobFoto = await respFoto.blob();
+                                const b64 = await new Promise(res => { const rd = new FileReader(); rd.onload = () => res(rd.result); rd.readAsDataURL(blobFoto); });
                                 fotosB64.push(b64);
                             } catch(e) {}
                         }
                     }
                     respuestasParaFotos[pid] = { ...r, fotos: fotosB64 };
                 }
-                const recordParaFotos = { ...data, respuestas: respuestasParaFotos };
-                await driveSubirFotos(recordParaFotos, {});
+                await driveSubirFotos({ ...data, respuestas: respuestasParaFotos }, {});
 
                 showToast('✓ Guardado en Drive', 'success');
                 if (btn) { btn.disabled = true; btn.innerHTML = '✓ Ya guardado en Drive'; btn.style.background = '#888'; }
             } catch(e) {
                 console.error(e);
                 showToast('Error al guardar en Drive', 'error');
-            } finally {
-                if (!btn?.innerHTML?.includes('Ya guardado')) {
-                    if (btn) { btn.disabled = false; btn.innerHTML = '☁️ Guardar en Drive'; }
-                }
+                if (btn) { btn.disabled = false; btn.innerHTML = '☁️ Guardar en Drive'; }
             }
         }
+
 
         async function driveSubirPDF(pdfBlob, tienda, supervisor, fecha) {
             try {
@@ -8597,7 +8499,6 @@
                 });
                 await fetch(DRIVE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     body: JSON.stringify({ tipo: 'pdf', base64, nombre }),
                 });
             } catch(e) { /* silencioso */ }
@@ -8620,7 +8521,6 @@
                         const nombreFoto = `F${pid}_${p ? p.texto.substring(0,20).replace(/\s+/g,'_') : 'P'+pid}_${i+1}.jpg`;
                         fetch(DRIVE_SCRIPT_URL, {
                             method: 'POST',
-                            mode: 'no-cors',
                             body: JSON.stringify({ tipo: 'foto', base64, nombre: nombreFoto, carpeta }),
                         }).catch(() => {});
                     }
