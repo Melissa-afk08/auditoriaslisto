@@ -8523,11 +8523,13 @@
                         if (!fotoData || !fotoData.startsWith('data:')) continue;
                         const base64 = fotoData.split(',')[1];
                         const p = window.PREGUNTAS?.find(x => String(x.id) === String(pid));
-                        const nombreFoto = `F${pid}_${p ? p.texto.substring(0,20).replace(/\s+/g,'_') : 'P'+pid}_${i+1}.jpg`;
+                        const textoPregunta = p ? p.texto.substring(0,25).replace(/\s+/g,'_').replace(/[^a-zA-Z0-9_]/g,'') : 'P'+pid;
+                        const carpetaPregunta = `P${pid}_${textoPregunta}`;
+                        const nombreFoto = `F${i+1}.jpg`;
                         fetch(DRIVE_SCRIPT_URL, {
                             method: 'POST',
                             mode: 'no-cors',
-                            body: JSON.stringify({ tipo: 'foto', base64, nombre: nombreFoto, carpeta }),
+                            body: JSON.stringify({ tipo: 'foto', base64, nombre: nombreFoto, carpeta, carpetaPregunta }),
                         }).catch(() => {});
                     }
                 }
