@@ -9479,7 +9479,7 @@
             let data = window.editorAuditoriaActual;
             let grupos = {};
             for (let i = 1; i <= 5; i++) grupos[i] = { obtenido: 0, maximo: 0 };
-            let PESOS = JSON.parse(localStorage.getItem("pesos_grupos") || "null") || { 1:0.20, 2:0.25, 3:0.20, 4:0.20, 5:0.15 };
+            let PESOS = window.PESOS || JSON.parse(localStorage.getItem("pesos_custom") || "null") || JSON.parse(JSON.stringify(PESOS_DEFAULT));
             window.PREGUNTAS.forEach(p => {
                 let resp = data.respuestas[p.id];
                 if (!resp) return;
