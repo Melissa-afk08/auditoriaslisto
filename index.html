@@ -8640,7 +8640,7 @@
             // Formato: "10/2/2026, 11:17:37 a.m." o "10/2/2026, 2:14:57 p.m."
             try {
                 const [fechaParte, horaParte] = str.split(', ');
-                const [mes, dia, anio] = fechaParte.split('/').map(Number);
+                const [dia, mes, anio] = fechaParte.split('/').map(Number);
                 let [hms, ampm] = horaParte.trim().split(' ');
                 let [h, m, s] = hms.split(':').map(Number);
                 if (ampm === 'p.m.' && h !== 12) h += 12;
@@ -8687,11 +8687,11 @@
             } catch(e) { return null; }
         }
 
-        async function appsScriptBuscarCarpeta(fecha, supervisor, tienda) {
+        async function appsScriptBuscarCarpeta(idGlide) {
             try {
                 const resp = await fetch(DRIVE_SCRIPT_URL, {
                     method: 'POST',
-                    body: JSON.stringify({ tipo: 'buscar_carpeta', fecha, supervisor, tienda })
+                    body: JSON.stringify({ tipo: 'buscar_carpeta', idGlide })
                 });
                 const data = await resp.json();
                 return data.ok ? data.fotos : [];
@@ -8820,7 +8820,7 @@
                     if (errAud) throw new Error(errAud.message);
 
                     // Buscar y subir fotos de Drive
-                    const fotosDrive = await appsScriptBuscarCarpeta(fechaYYYYMMDD, row['Supervisor'], row['Tienda_Auditada']);
+                    const fotosDrive = await appsScriptBuscarCarpeta(idGlide);
                     if (fotosDrive.length === 0) {
                         sinFotos++;
                         importadorLog(`[SIN FOTOS] ${row['Tienda_Auditada']} ${fechaStr}`, 'warn');
