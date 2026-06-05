@@ -6618,7 +6618,7 @@
                 hora: document.getElementById("form-aud-hora").textContent,
                 respuestas: window.auditActual.respuestas,
                 firma: window.auditActual.firma,
-                preguntasSnapshot: window.PREGUNTAS.map(p => p.id),
+                preguntasSnapshot: window.PREGUNTAS.map(p => ({ id: p.id, pmax: p.pmax, grupo: p.grupo })),
                 ubicacionGPS: window._audDireccionGPS || null,
                 resultadoGrupos: result.grupos,
                 finalScore: result.nota_final,
@@ -9527,15 +9527,19 @@
             for (let i = 1; i <= 5; i++) grupos[i] = { obtenido: 0, maximo: 0 };
             let PESOS = window.PESOS || JSON.parse(localStorage.getItem("pesos_custom") || "null") || JSON.parse(JSON.stringify(PESOS_DEFAULT));
             const preguntasParaCalculo = data.preguntasSnapshot
-                ? window.PREGUNTAS.filter(p => data.preguntasSnapshot.includes(p.id))
+                ? (typeof data.preguntasSnapshot[0] === 'object'
+                    ? data.preguntasSnapshot
+                    : window.PREGUNTAS.filter(p => data.preguntasSnapshot.includes(p.id)))
                 : window.PREGUNTAS;
             preguntasParaCalculo.forEach(p => {
                 let resp = data.respuestas[p.id];
                 if (!resp) return;
                 const val = resp.valor;
                 if (val === 'NA' || val === 'N/A' || val === 'NO APLICA') return;
-                grupos[p.grupo].maximo += p.pmax;
-                if (val === 'SI' || val === 1 || val === true) grupos[p.grupo].obtenido += p.pmax;
+                const pmax = p.pmax;
+                const grupo = p.grupo;
+                grupos[grupo].maximo += pmax;
+                if (val === 'SI' || val === 1 || val === true) grupos[grupo].obtenido += pmax;
             });
             let nota = 0;
             let resultGrupos = {};
