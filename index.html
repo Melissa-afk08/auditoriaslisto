@@ -8740,7 +8740,7 @@
             for (let i = 0; i < jsonData.length; i++) {
                 const row = jsonData[i];
 
-                const idGlide = (row['🔒 Row ID'] || '').toString().trim();
+                const idGlide = (row['Row ID'] || row['🔒 Row ID'] || '').toString().trim();
                 if (!idGlide) continue;
 
                 document.getElementById('importador-barra').style.width = `${Math.round(((i+1)/total)*100)}%`;
