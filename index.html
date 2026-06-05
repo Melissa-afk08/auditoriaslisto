@@ -6418,6 +6418,43 @@
             reader.readAsDataURL(file);
         }
 
+        function corregirErrorOrtografia(preguntaId, faltaIdx) {
+            const errores = window._ortografiaErrores || [];
+            const e = errores.find(x => x.pregunta === preguntaId);
+            if (!e) return;
+            const falta = e.faltas[faltaIdx];
+            if (!falta) return;
+            const obs = document.getElementById(`obs-p${preguntaId}`);
+            if (obs) {
+                obs.value = obs.value.replace(falta.palabra, falta.sugerencia);
+                if (window.auditActual?.respuestas?.[preguntaId]) {
+                    window.auditActual.respuestas[preguntaId].obs = obs.value;
+                }
+            }
+            e.faltas.splice(faltaIdx, 1);
+            if (e.faltas.length === 0) window._ortografiaErrores = errores.filter(x => x.pregunta !== preguntaId);
+            // Actualizar modal
+            const btn = document.querySelector(`[onclick="corregirErrorOrtografia(${preguntaId},${faltaIdx})"]`);
+            if (btn) btn.closest('div').style.opacity = '0.4';
+        }
+
+        function corregirTodoOrtografia() {
+            const errores = window._ortografiaErrores || [];
+            errores.forEach(e => {
+                const obs = document.getElementById(`obs-p${e.pregunta}`);
+                if (!obs) return;
+                let texto = obs.value;
+                e.faltas.forEach(f => { texto = texto.replace(f.palabra, f.sugerencia); });
+                obs.value = texto;
+                if (window.auditActual?.respuestas?.[e.pregunta]) {
+                    window.auditActual.respuestas[e.pregunta].obs = texto;
+                }
+            });
+            window._ortografiaErrores = [];
+            document.getElementById('modal-ortografia').style.display = 'none';
+            showToast('✓ Todas las correcciones aplicadas', 'success');
+        }
+
         function limpiarFirmaModal() {
             const modal = document.getElementById('firma-canvas-modal');
             modal.getContext('2d').clearRect(0, 0, modal.width, modal.height);
@@ -6591,11 +6628,16 @@
                 let errores = resultados.filter(Boolean);
 
                 if (errores.length > 0) {
+                    window._ortografiaErrores = errores;
                     let listaHtml = errores.map(e => `
                         <div style="background:#FFF3E0;border-left:3px solid #FC6E20;border-radius:8px;padding:10px 12px;margin-bottom:8px;">
                             <div style="font-size:11px;color:#888;font-weight:700;margin-bottom:4px;">PREGUNTA ${e.pregunta}</div>
                             <div style="font-size:13px;color:#1B1B1B;margin-bottom:6px;">"${e.texto}"</div>
-                            ${e.faltas.map(f => `<div style="font-size:12px;color:#C62828;">✗ <strong>${f.palabra}</strong> → <span style="color:#2E7D32;">${f.sugerencia}</span></div>`).join('')}
+                            ${e.faltas.map((f, fi) => `
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                                    <span style="font-size:12px;color:#C62828;">✗ <strong>${f.palabra}</strong> → <span style="color:#2E7D32;">${f.sugerencia}</span></span>
+                                    <button onclick="corregirErrorOrtografia(${e.pregunta},${fi})" style="background:#2E7D32;color:white;border:none;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:8px;">Corregir</button>
+                                </div>`).join('')}
                         </div>
                     `).join('');
 
@@ -9994,7 +10036,8 @@
             <div style="font-size:16px; font-weight:800; color:#C62828; margin-bottom:4px;">⚠️ Errores ortográficos</div>
             <div style="font-size:13px; color:#888; margin-bottom:16px;">Se encontraron posibles errores en las observaciones. Puedes corregirlos o finalizar igual.</div>
             <div id="ortografia-lista" style="margin-bottom:20px;"></div>
-            <button onclick="document.getElementById('modal-ortografia').style.display='none'" style="background:#FC6E20;color:white;border:none;border-radius:50px;padding:14px;width:100%;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:10px;">✏️ Corregir</button>
+            <button onclick="corregirTodoOrtografia()" style="background:#2E7D32;color:white;border:none;border-radius:50px;padding:14px;width:100%;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">✅ Corregir todo</button>
+            <button onclick="document.getElementById('modal-ortografia').style.display='none'" style="background:#FC6E20;color:white;border:none;border-radius:50px;padding:14px;width:100%;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;">✏️ Corregir manualmente</button>
             <button onclick="document.getElementById('modal-ortografia').style.display='none'; finalizarAuditoriaConfirmado();" style="background:#EEE;color:#1B1B1B;border:none;border-radius:50px;padding:14px;width:100%;font-size:14px;font-weight:700;cursor:pointer;">Finalizar igual</button>
         </div>
     </div>
