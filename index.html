@@ -7679,8 +7679,16 @@
 
             if (search) auditorias = auditorias.filter(a => (a.tienda?.nombre || a.tienda || '').toLowerCase().includes(search));
             if (fSup) auditorias = auditorias.filter(a => (a.supervisor||'').toLowerCase().includes(fSup.split(' ')[0].toLowerCase()));
-            if (fAnio) auditorias = auditorias.filter(a => (a.fecha||'').split('/')[2] === fAnio);
-            if (fMes) auditorias = auditorias.filter(a => (a.fecha||'').split('/')[1] === fMes);
+            if (fAnio) auditorias = auditorias.filter(a => {
+                let f = a.fecha || '';
+                let anio = f.includes('-') && f.indexOf('-') === 4 ? f.split('-')[0] : f.split('/')[2];
+                return anio === fAnio;
+            });
+            if (fMes) auditorias = auditorias.filter(a => {
+                let f = a.fecha || '';
+                let mes = f.includes('-') && f.indexOf('-') === 4 ? f.split('-')[1] : f.split('/')[1];
+                return mes === fMes;
+            });
             if (fDia) auditorias = auditorias.filter(a => (a.fecha||'').split('/')[0] === fDia);
 
             let borradoresFiltrados = borradores.filter(b => {
