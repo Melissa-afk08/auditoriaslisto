@@ -8733,7 +8733,8 @@
             const texto = await fileInput.files[0].text();
             const lineas = texto.split('\n').map(l => l.replace(/\r$/, ''));
             const headers = lineas[0].split(';');
-            const filas = lineas.slice(1).filter(l => l.trim() && l.split(';').filter(x => x.trim()).length > 3);
+            const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+            const filas = lineas.slice(1).filter(l => uuidPattern.test((l.split(';')[0]||'').trim()));
 
             let importadas = 0, advertencias = 0, sinFotos = 0, errores = 0;
             const total = filas.length;
