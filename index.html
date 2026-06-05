@@ -6896,7 +6896,8 @@
             let grpHtml = "";
             const titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS HERRAMIENTAS Y UTENSILIOS", 4: "CONTROL Y MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
             for (let i = 1; i <= 5; i++) {
-                let v = data.resultadoGrupos[i] || 0;
+                let grpData = data.resultadoGrupos[i] || 0;
+                let v = typeof grpData === 'object' ? (grpData.maximo > 0 ? (grpData.obtenido / grpData.maximo) * 100 : 0) : (parseFloat(grpData) || 0);
                 let c = v < 70 ? "#FF3B30" : (v <= 90 ? "#FFCC00" : "#34C759");
 
                 let ptsObtenidos = 0;
