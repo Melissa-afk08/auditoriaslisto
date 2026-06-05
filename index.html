@@ -4291,7 +4291,16 @@
                     <div style="font-size:16px;font-weight:800;" id="ea-titulo"></div>
                     <button onclick="document.getElementById('modal-editor-auditoria').style.display='none'" style="background:#EEE;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;">✕</button>
                 </div>
-                <div style="font-size:12px;color:#888;margin-bottom:8px;" id="ea-fecha"></div>
+                <div style="display:flex;gap:8px;margin-bottom:12px;">
+                    <div style="flex:1;">
+                        <label style="font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px;">FECHA</label>
+                        <input id="ea-fecha-input" type="date" style="width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid #EEE;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+                    </div>
+                    <div style="flex:1;">
+                        <label style="font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px;">HORA</label>
+                        <input id="ea-hora-input" type="time" style="width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid #EEE;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;">
+                    </div>
+                </div>
                 <div style="margin-bottom:12px;">
                     <label style="font-size:11px;font-weight:700;color:#888;display:block;margin-bottom:4px;">SUPERVISOR</label>
                     <select id="ea-supervisor" style="width:100%;padding:10px 14px;border-radius:12px;border:1.5px solid #EEE;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;background:white;"></select>
@@ -9405,7 +9414,11 @@
             });
 
             document.getElementById('ea-titulo').textContent = nombre;
-            document.getElementById('ea-fecha').textContent = `${data.fecha} ${data.hora} · ${data.supervisor}`;
+            // Convertir fecha DD/MM/YYYY a YYYY-MM-DD para input date
+            const fechaParts = (data.fecha || '').split('/');
+            const fechaISO = fechaParts.length === 3 ? `${fechaParts[2]}-${fechaParts[1].padStart(2,'0')}-${fechaParts[0].padStart(2,'0')}` : '';
+            document.getElementById('ea-fecha-input').value = fechaISO;
+            document.getElementById('ea-hora-input').value = data.hora ? data.hora.substring(0,5) : '';
             // Cargar supervisores
             const sups = JSON.parse(localStorage.getItem("supervisores") || "[]");
             const eaSupEl = document.getElementById('ea-supervisor');
@@ -9498,6 +9511,19 @@
             }
             data.supervisor = document.getElementById('ea-supervisor').value;
             data.encargado = document.getElementById('ea-encargado').value.trim();
+            const fechaVal = document.getElementById('ea-fecha-input').value;
+            if (fechaVal) {
+                const fp = fechaVal.split('-');
+                data.fecha = `${fp[2]}/${fp[1]}/${fp[0]}`;
+            }
+            const horaVal = document.getElementById('ea-hora-input').value;
+            if (horaVal) {
+                let h = parseInt(horaVal.split(':')[0]);
+                const m = horaVal.split(':')[1];
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12 || 12;
+                data.hora = `${h}:${m} ${ampm}`;
+            }
             data.resultadoGrupos = resultGrupos;
             data.notaFinal = nota;
             data.finalScore = nota;
