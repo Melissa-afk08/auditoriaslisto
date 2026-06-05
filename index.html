@@ -5074,6 +5074,17 @@
             } catch(e) {}
         }
 
+        async function cargarPesosGrupos() {
+            try {
+                let { data } = await sbClient.from('configuracion').select('valor').eq('clave','pesos_grupos').single();
+                if (data?.valor) {
+                    const pesos = JSON.parse(data.valor);
+                    window.PESOS = pesos;
+                    localStorage.setItem('pesos_custom', data.valor);
+                }
+            } catch(e) {}
+        }
+
         // Mostrar sección admin si es Kleiddy
         function mostrarSeccionKleiddy() {
             let u = window.currentUser;
@@ -5380,6 +5391,7 @@
             document.getElementById("home-greeting").textContent = `Hola, ${u.nombre.split(" ")[0]}`;
             renderHomeDashboard();
             cargarPasswordAdmin();
+            cargarPesosGrupos();
 
             let inis = u.nombre.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
             document.getElementById("home-avatar").textContent = inis;
@@ -8474,6 +8486,7 @@
                 await Promise.all(newPreguntas.map(p =>
                     sbClient.from('checklist').upsert({id: p.id, grupo: p.grupo, texto: p.texto, pmax: p.pmax})
                 ));
+                await sbClient.from('configuracion').upsert({ clave: 'pesos_grupos', valor: JSON.stringify(newPesos) });
             } catch(e) {}
             showToast("Checklist actualizado", "success");
             showView('view-ajustes');
