@@ -4174,7 +4174,52 @@
                         <span class="ajustes-item-arrow">›</span>
                     </div>
                 </div>
+                <!-- ========== IMPORTADOR GLIDE - ELIMINAR DESPUÉS DE USO ========== -->
+                <div id="btn-importador-glide-container" style="margin-top:12px;">
+                    <div class="ajustes-card">
+                        <div class="ajustes-item" onclick="abrirImportadorGlide()" style="cursor:pointer;">
+                            <div class="ajustes-item-icon" style="background:#E8F5E9;">📥</div>
+                            <div class="ajustes-item-text">
+                                <div class="ajustes-item-label" style="color:#2E7D32;">Importar historial Glide</div>
+                                <div class="ajustes-item-desc">Carga las 303 auditorías históricas (uso único)</div>
+                            </div>
+                            <span class="ajustes-item-arrow">›</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- ========== FIN BLOQUE BOTÓN IMPORTADOR ========== -->
             </div>
+
+            <!-- ========== IMPORTADOR GLIDE MODAL - ELIMINAR DESPUÉS DE USO ========== -->
+            <div id="modal-importador-glide" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px;box-sizing:border-box;">
+                <div style="background:white;border-radius:24px;padding:24px;width:100%;max-width:420px;margin:auto;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+                    <div style="font-size:28px;text-align:center;margin-bottom:8px;">📥</div>
+                    <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:4px;">Importar historial Glide</div>
+                    <div style="font-size:12px;color:#888;text-align:center;margin-bottom:20px;">Solo para uso único. Las auditorías serán visibles para todos los usuarios.</div>
+                    <div id="importador-step-csv" style="">
+                        <div style="font-size:13px;font-weight:700;color:#1B1B1B;margin-bottom:8px;">1. Selecciona el archivo CSV</div>
+                        <input type="file" id="importador-csv-input" accept=".csv" style="width:100%;padding:10px;border:1.5px dashed #DDD;border-radius:12px;font-size:13px;box-sizing:border-box;margin-bottom:16px;">
+                        <div style="display:flex;gap:10px;">
+                            <button onclick="cerrarImportadorGlide()" style="flex:1;padding:12px;border-radius:50px;background:#EEE;border:none;font-size:13px;font-weight:700;cursor:pointer;">Cancelar</button>
+                            <button onclick="iniciarImportacionGlide()" style="flex:1;padding:12px;border-radius:50px;background:#2E7D32;border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;">Iniciar importación</button>
+                        </div>
+                    </div>
+                    <div id="importador-step-progreso" style="display:none;">
+                        <div style="font-size:13px;font-weight:700;color:#1B1B1B;margin-bottom:8px;">Progreso</div>
+                        <div style="background:#F5F5F5;border-radius:12px;height:12px;margin-bottom:8px;overflow:hidden;">
+                            <div id="importador-barra" style="height:100%;width:0%;background:#2E7D32;border-radius:12px;transition:width 0.3s;"></div>
+                        </div>
+                        <div id="importador-texto-progreso" style="font-size:12px;color:#888;text-align:center;margin-bottom:12px;">Iniciando...</div>
+                        <div id="importador-log" style="background:#F9F9F9;border-radius:12px;padding:12px;max-height:200px;overflow-y:auto;font-size:11px;color:#555;font-family:monospace;"></div>
+                    </div>
+                    <div id="importador-step-resumen" style="display:none;">
+                        <div style="font-size:13px;font-weight:700;color:#1B1B1B;margin-bottom:12px;">Resumen</div>
+                        <div id="importador-resumen-contenido" style="font-size:13px;color:#555;margin-bottom:16px;"></div>
+                        <button onclick="cerrarImportadorGlide()" style="width:100%;padding:12px;border-radius:50px;background:#2E7D32;border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;">Cerrar</button>
+                    </div>
+                </div>
+            </div>
+            <!-- ========== FIN MODAL IMPORTADOR GLIDE ========== -->
 
             <!-- CERRAR SESIÓN -->
             <div class="ajustes-logout" onclick="logout()">
@@ -8569,6 +8614,269 @@
         }
 
         const DRIVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwd-GQT6xW3qLY0gfj_r0yedFcpSLidZWD3mjOnHuswrVcrqTrda-6uzeu7YdcuWjri/exec';
+
+        // ========== IMPORTADOR GLIDE - ELIMINAR DESPUÉS DE USO ==========
+        function abrirImportadorGlide() {
+            document.getElementById('modal-importador-glide').style.display = 'flex';
+            document.getElementById('importador-step-csv').style.display = 'block';
+            document.getElementById('importador-step-progreso').style.display = 'none';
+            document.getElementById('importador-step-resumen').style.display = 'none';
+            document.getElementById('importador-log').innerHTML = '';
+            document.getElementById('importador-barra').style.width = '0%';
+        }
+
+        function cerrarImportadorGlide() {
+            document.getElementById('modal-importador-glide').style.display = 'none';
+        }
+
+        function importadorLog(msg, tipo) {
+            const log = document.getElementById('importador-log');
+            const color = tipo === 'error' ? '#C62828' : tipo === 'warn' ? '#E65100' : tipo === 'ok' ? '#2E7D32' : '#555';
+            log.innerHTML += `<div style="color:${color};margin-bottom:2px;">${msg}</div>`;
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function parsearFechaGlide(str) {
+            // Formato: "10/2/2026, 11:17:37 a.m." o "10/2/2026, 2:14:57 p.m."
+            try {
+                const [fechaParte, horaParte] = str.split(', ');
+                const [mes, dia, anio] = fechaParte.split('/').map(Number);
+                let [hms, ampm] = horaParte.trim().split(' ');
+                let [h, m, s] = hms.split(':').map(Number);
+                if (ampm === 'p.m.' && h !== 12) h += 12;
+                if (ampm === 'a.m.' && h === 12) h = 0;
+                return new Date(anio, mes - 1, dia, h, m, s);
+            } catch(e) { return null; }
+        }
+
+        function calcularNotaGlide(respuestas, preguntas, pesos) {
+            const grupos = {};
+            for (const p of preguntas) {
+                if (!grupos[p.grupo]) grupos[p.grupo] = { obtenido: 0, maximo: 0 };
+                const r = respuestas[p.id];
+                if (!r || r === 'NO APLICA') continue;
+                grupos[p.grupo].maximo += p.pmax;
+                if (r === 'SI') grupos[p.grupo].obtenido += p.pmax;
+            }
+            let nota = 0;
+            for (const g in grupos) {
+                const gr = grupos[g];
+                const peso = pesos[g] || 0;
+                nota += gr.maximo > 0 ? (gr.obtenido / gr.maximo) * peso : peso;
+            }
+            return { nota: Math.round(nota * 10000) / 100, grupos };
+        }
+
+        function clasificarNota(nota) {
+            if (nota <= 70) return 'ALTO RIESGO';
+            if (nota <= 90) return 'SE REQUIERE MEJORAR';
+            return 'SOBRESALIENTE';
+        }
+
+        async function descargarBase64(url) {
+            try {
+                const resp = await fetch(url);
+                if (!resp.ok) return null;
+                const blob = await resp.blob();
+                return new Promise(res => {
+                    const reader = new FileReader();
+                    reader.onload = () => res(reader.result);
+                    reader.onerror = () => res(null);
+                    reader.readAsDataURL(blob);
+                });
+            } catch(e) { return null; }
+        }
+
+        async function appsScriptBuscarCarpeta(fecha, supervisor, tienda) {
+            try {
+                const resp = await fetch(DRIVE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ tipo: 'buscar_carpeta', fecha, supervisor, tienda })
+                });
+                const data = await resp.json();
+                return data.ok ? data.fotos : [];
+            } catch(e) { return []; }
+        }
+
+        async function appsScriptGetFoto(fileId) {
+            try {
+                const resp = await fetch(DRIVE_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ tipo: 'get_foto', fileId })
+                });
+                const data = await resp.json();
+                return data.ok ? data.base64 : null;
+            } catch(e) { return null; }
+        }
+
+        async function iniciarImportacionGlide() {
+            const fileInput = document.getElementById('importador-csv-input');
+            if (!fileInput.files.length) { showToast('Selecciona un archivo CSV', 'error'); return; }
+
+            // Verificar si ya se completó
+            const { data: cfgData } = await sbClient.from('configuracion').select('valor').eq('clave', 'importacion_glide_completada').single();
+            if (cfgData?.valor === 'true') {
+                showToast('La importación ya fue completada anteriormente', 'error');
+                return;
+            }
+
+            // Cargar IDs ya procesados
+            const { data: cfgProcesados } = await sbClient.from('configuracion').select('valor').eq('clave', 'importacion_glide_procesados').single();
+            const idsProcesados = new Set(cfgProcesados?.valor ? JSON.parse(cfgProcesados.valor) : []);
+
+            document.getElementById('importador-step-csv').style.display = 'none';
+            document.getElementById('importador-step-progreso').style.display = 'block';
+
+            const preguntas = window.PREGUNTAS.length ? window.PREGUNTAS : PREGUNTAS_DEFAULT;
+            const pesos = Object.keys(window.PESOS).length ? window.PESOS : PESOS_DEFAULT;
+
+            const texto = await fileInput.files[0].text();
+            const lineas = texto.split('\n').map(l => l.replace(/\r$/, ''));
+            const headers = lineas[0].split(';');
+            const filas = lineas.slice(1).filter(l => l.trim() && l.split(';').filter(x => x.trim()).length > 3);
+
+            let importadas = 0, advertencias = 0, sinFotos = 0, errores = 0;
+            const total = filas.length;
+
+            for (let i = 0; i < filas.length; i++) {
+                const cols = filas[i].split(';');
+                const row = {};
+                headers.forEach((h, idx) => { row[h.trim()] = (cols[idx] || '').trim(); });
+
+                const idGlide = row['ID_Auditoria'];
+                if (!idGlide) continue;
+
+                document.getElementById('importador-barra').style.width = `${Math.round(((i+1)/total)*100)}%`;
+                document.getElementById('importador-texto-progreso').textContent = `Procesando ${i+1} de ${total}: ${row['Tienda_Auditada'] || ''}`;
+
+                if (idsProcesados.has(idGlide)) {
+                    importadorLog(`[SKIP] ${idGlide} ya procesado`, 'warn');
+                    importadas++;
+                    continue;
+                }
+
+                try {
+                    // Parsear fecha
+                    const fechaObj = parsearFechaGlide(row['Fecha_Hora']);
+                    if (!fechaObj) throw new Error('Fecha inválida: ' + row['Fecha_Hora']);
+                    const fechaStr = fechaObj.toISOString().split('T')[0];
+                    const horaStr = fechaObj.toTimeString().split(' ')[0];
+                    const fechaYYYYMMDD = fechaStr.replace(/-/g, '');
+
+                    // Mapear respuestas
+                    const respuestas = {};
+                    for (let n = 1; n <= 47; n++) {
+                        const val = row[`R${n}`];
+                        const obs = row[`O${n}`] || '';
+                        if (val) respuestas[n] = { valor: val, obs, fotos: [] };
+                    }
+
+                    // Calcular nota
+                    const respValores = {};
+                    for (const k in respuestas) respValores[k] = respuestas[k].valor;
+                    const { nota, grupos } = calcularNotaGlide(respValores, preguntas, pesos);
+                    const notaCSV = parseFloat(row['Nota_Final_Texto']) / 100;
+                    const diferencia = Math.abs(nota - notaCSV);
+                    if (diferencia > 2) {
+                        importadorLog(`[ADVERTENCIA] ${idGlide} nota recalculada ${nota.toFixed(2)}% vs CSV ${notaCSV.toFixed(2)}%`, 'warn');
+                        advertencias++;
+                    }
+
+                    const clasificacion = clasificarNota(nota);
+                    const resultadoGrupos = grupos;
+
+                    // Generar ID numérico único basado en timestamp
+                    const audId = Date.now() + i;
+
+                    // Subir firma
+                    let firmaUrl = null;
+                    if (row['Conformidad_Digital']) {
+                        const base64Firma = await descargarBase64(row['Conformidad_Digital']);
+                        if (base64Firma) {
+                            firmaUrl = await supabaseUploadFoto(base64Firma, audId, 'firma', 0);
+                        }
+                    }
+
+                    // Insertar auditoría
+                    const { error: errAud } = await sbClient.from('auditorias').insert({
+                        id: audId,
+                        tienda_nombre: row['Tienda_Auditada'],
+                        tienda_distrito: null,
+                        tienda_direccion: null,
+                        supervisor: row['Supervisor'],
+                        encargado: row['Encargado_Tienda'],
+                        fecha: fechaStr,
+                        hora: horaStr,
+                        respuestas,
+                        resultado_grupos: resultadoGrupos,
+                        nota_final: nota,
+                        clasificacion,
+                        firma_url: firmaUrl,
+                        ubicacion_gps: null,
+                        created_by: 'importacion_glide',
+                        es_borrador: false
+                    });
+                    if (errAud) throw new Error(errAud.message);
+
+                    // Buscar y subir fotos de Drive
+                    const fotosDrive = await appsScriptBuscarCarpeta(fechaYYYYMMDD, row['Supervisor'], row['Tienda_Auditada']);
+                    if (fotosDrive.length === 0) {
+                        sinFotos++;
+                        importadorLog(`[SIN FOTOS] ${row['Tienda_Auditada']} ${fechaStr}`, 'warn');
+                    }
+
+                    const fotosRows = [];
+                    for (const foto of fotosDrive) {
+                        const base64Foto = await appsScriptGetFoto(foto.fileId);
+                        if (!base64Foto) continue;
+                        const url = await supabaseUploadFoto('data:image/jpeg;base64,' + base64Foto, audId, foto.pregunta, foto.indice);
+                        if (url) {
+                            fotosRows.push({ auditoria_id: audId, pregunta_id: foto.pregunta, url, created_at: new Date().toISOString() });
+                            respuestas[foto.pregunta] = respuestas[foto.pregunta] || { valor: '', obs: '', fotos: [] };
+                            respuestas[foto.pregunta].fotos = respuestas[foto.pregunta].fotos || [];
+                            respuestas[foto.pregunta].fotos.push(url);
+                        }
+                    }
+
+                    if (fotosRows.length > 0) {
+                        await sbClient.from('fotos_auditoria').insert(fotosRows);
+                        // Actualizar respuestas con fotos
+                        await sbClient.from('auditorias').update({ respuestas }).eq('id', audId);
+                    }
+
+                    // Marcar como procesado
+                    idsProcesados.add(idGlide);
+                    const arrProcesados = Array.from(idsProcesados);
+                    await sbClient.from('configuracion').upsert({ clave: 'importacion_glide_procesados', valor: JSON.stringify(arrProcesados) });
+
+                    importadas++;
+                    importadorLog(`[OK] ${row['Tienda_Auditada']} ${fechaStr} — nota ${nota.toFixed(2)}%`, 'ok');
+
+                } catch(e) {
+                    errores++;
+                    importadorLog(`[ERROR] ${idGlide}: ${e.message}`, 'error');
+                }
+
+                // Pausa para no saturar APIs
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            // Marcar completado si no hubo errores
+            if (errores === 0) {
+                await sbClient.from('configuracion').upsert({ clave: 'importacion_glide_completada', valor: 'true' });
+            }
+
+            document.getElementById('importador-step-progreso').style.display = 'none';
+            document.getElementById('importador-step-resumen').style.display = 'block';
+            document.getElementById('importador-resumen-contenido').innerHTML = `
+                <div style="margin-bottom:6px;">✅ Importadas: <strong>${importadas}</strong></div>
+                <div style="margin-bottom:6px;">⚠️ Con advertencia de nota: <strong>${advertencias}</strong></div>
+                <div style="margin-bottom:6px;">📷 Sin fotos en Drive: <strong>${sinFotos}</strong></div>
+                <div style="margin-bottom:6px;">❌ Errores: <strong>${errores}</strong></div>
+                ${errores > 0 ? '<div style="color:#C62828;font-size:12px;margin-top:8px;">Hubo errores. Puedes volver a ejecutar — las ya procesadas se saltarán automáticamente.</div>' : ''}
+            `;
+        }
+        // ========== FIN IMPORTADOR GLIDE ==========
 
         async function guardarEnDrive() {
             const btn = document.getElementById('btn-drive');
