@@ -6721,6 +6721,12 @@
             return { grupos: pctGrupos, nota_final: nf, color, etiqueta: etiq };
         }
 
+        function truncarSupervisor(nombre) {
+            if (!nombre) return '';
+            const partes = nombre.trim().split(' ');
+            return partes.length <= 2 ? nombre : `${partes[0]} ${partes[1]}`;
+        }
+
         function renderAuditoriaResultado(data) {
             let btnVolver = document.getElementById('btn-volver-resultado');
             if (btnVolver) btnVolver.textContent = window.auditDesdeHistorial ? '← Volver al historial' : '← Volver al inicio';
@@ -6738,7 +6744,7 @@
             hour = hour ? hour : 12;
             document.getElementById("res-aud-hora").textContent = `${hour}:${minute} ${ampm}`;
 
-            document.getElementById("res-aud-sup").textContent = data.supervisor;
+            document.getElementById("res-aud-sup").textContent = truncarSupervisor(data.supervisor);
             document.getElementById("res-aud-enc").textContent = data.encargado || '-';
             let ubicWrap = document.getElementById("res-aud-ubicacion-wrap");
             let ubicEl = document.getElementById("res-aud-ubicacion");
@@ -6941,7 +6947,7 @@
                 let ampm = hour >= 12 ? 'PM' : 'AM';
                 hour = hour % 12; hour = hour ? hour : 12;
                 const formattedTime = `${hour}:${minute} ${ampm}`;
-                const vals = [data.fecha, formattedTime, data.supervisor, data.encargado || '-'];
+                const vals = [data.fecha, formattedTime, truncarSupervisor(data.supervisor), data.encargado || '-'];
                 for (let i = 0; i < 4; i++) {
                     pdf.setFontSize(7);
                     pdf.setFont("helvetica", "bold");
