@@ -6424,7 +6424,7 @@
             if (!e) return;
             const falta = e.faltas.find(f => f.palabra === palabra);
             if (!falta) return;
-            const obs = document.getElementById(`obs-p${preguntaId}`);
+            const obs = document.getElementById(`obs-${preguntaId}`);
             if (obs) {
                 obs.value = obs.value.replace(falta.palabra, falta.sugerencia);
                 if (window.auditActual?.respuestas?.[preguntaId]) {
@@ -6440,7 +6440,7 @@
         function corregirTodoOrtografia() {
             const errores = window._ortografiaErrores || [];
             errores.forEach(e => {
-                const obs = document.getElementById(`obs-p${e.pregunta}`);
+                const obs = document.getElementById(`obs-${e.pregunta}`);
                 if (!obs) return;
                 let texto = obs.value;
                 e.faltas.forEach(f => { texto = texto.replace(f.palabra, f.sugerencia); });
