@@ -6418,11 +6418,11 @@
             reader.readAsDataURL(file);
         }
 
-        function corregirErrorOrtografia(preguntaId, faltaIdx) {
+        function corregirErrorOrtografia(preguntaId, palabra, sugerencia) {
             const errores = window._ortografiaErrores || [];
             const e = errores.find(x => x.pregunta === preguntaId);
             if (!e) return;
-            const falta = e.faltas[faltaIdx];
+            const falta = e.faltas.find(f => f.palabra === palabra);
             if (!falta) return;
             const obs = document.getElementById(`obs-p${preguntaId}`);
             if (obs) {
@@ -6431,10 +6431,9 @@
                     window.auditActual.respuestas[preguntaId].obs = obs.value;
                 }
             }
-            e.faltas.splice(faltaIdx, 1);
+            e.faltas = e.faltas.filter(f => f.palabra !== palabra);
             if (e.faltas.length === 0) window._ortografiaErrores = errores.filter(x => x.pregunta !== preguntaId);
-            // Actualizar modal
-            const btn = document.querySelector(`[onclick="corregirErrorOrtografia(${preguntaId},${faltaIdx})"]`);
+            const btn = document.querySelector(`[onclick="corregirErrorOrtografia(${preguntaId},'${palabra}','${sugerencia}')"]`);
             if (btn) btn.closest('div').style.opacity = '0.4';
         }
 
@@ -6636,7 +6635,7 @@
                             ${e.faltas.map((f, fi) => `
                                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
                                     <span style="font-size:12px;color:#C62828;">✗ <strong>${f.palabra}</strong> → <span style="color:#2E7D32;">${f.sugerencia}</span></span>
-                                    <button onclick="corregirErrorOrtografia(${e.pregunta},${fi})" style="background:#2E7D32;color:white;border:none;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:8px;">Corregir</button>
+                                    <button onclick="corregirErrorOrtografia(${e.pregunta},'${f.palabra}','${f.sugerencia}')" style="background:#2E7D32;color:white;border:none;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;margin-left:8px;">Corregir</button>
                                 </div>`).join('')}
                         </div>
                     `).join('');
