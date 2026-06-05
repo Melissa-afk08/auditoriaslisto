@@ -4883,14 +4883,17 @@
             window.PESOS = (parsedPesos && sumPesos > 0.01) ? parsedPesos : JSON.parse(JSON.stringify(PESOS_DEFAULT));
             if (sumPesos <= 0.01) { localStorage.removeItem("pesos_custom"); }
 
-            // Default Supervisors
-            if (!localStorage.getItem("supervisores")) {
-                const sups = ["Kleiddy Cotrina", "Miriam Berna", "Luz Mery Melchor", "Shirley Valenzuela"];
-                localStorage.setItem("supervisores", JSON.stringify(sups));
-            } else {
-                let sups = JSON.parse(localStorage.getItem("supervisores") || "[]");
-                sups = sups.filter(s => !s.toLowerCase().includes("lorena"));
-                localStorage.setItem("supervisores", JSON.stringify(sups));
+            // Cargar supervisores desde Supabase
+            try {
+                const { data: usuariosData } = await sbClient.from('usuarios').select('nombre').order('nombre');
+                if (usuariosData && usuariosData.length > 0) {
+                    const sups = usuariosData.map(u => u.nombre);
+                    localStorage.setItem("supervisores", JSON.stringify(sups));
+                }
+            } catch(e) {
+                if (!localStorage.getItem("supervisores")) {
+                    localStorage.setItem("supervisores", JSON.stringify(["Kleiddy Cotrina Bustamante", "Miriam Berna Tineo", "Luz Mery Melchor Cajas", "Shirley Isabel Valenzuela Pizarro", "Lorena Sanchez"]));
+                }
             }
 
             // Inicializar arrays vacíos si no existen
@@ -9549,7 +9552,8 @@
                 resultGrupos[i] = pct;
                 nota += pct * (PESOS[i] || 0.2);
             }
-            data.supervisor = document.getElementById('ea-supervisor').value;
+            const supEditorVal = document.getElementById('ea-supervisor').value;
+            if (supEditorVal) data.supervisor = supEditorVal;
             data.encargado = document.getElementById('ea-encargado').value.trim();
             const fechaVal = document.getElementById('ea-fecha-input').value;
             if (fechaVal) {
