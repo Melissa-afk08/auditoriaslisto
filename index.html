@@ -6600,7 +6600,7 @@
             let auditRecord = {
                 id: Date.now(),
                 tienda: window.selectedStore,
-                supervisor: document.getElementById("form-aud-supervisor").value,
+                supervisor: document.getElementById("form-aud-supervisor").textContent || document.getElementById("form-aud-supervisor").value || '',
                 encargado: document.getElementById("form-aud-encargado").value,
                 fecha: document.getElementById("form-aud-fecha").textContent,
                 hora: document.getElementById("form-aud-hora").textContent,
@@ -6632,7 +6632,7 @@
 
             // Con señal: eliminar cualquier borrador de esta tienda+supervisor del localStorage y Supabase
             const tiendaNombre = typeof window.selectedStore === 'string' ? window.selectedStore : window.selectedStore?.nombre || '';
-            const supNombre = document.getElementById("form-aud-supervisor").value;
+            const supNombre = document.getElementById("form-aud-supervisor").textContent || document.getElementById("form-aud-supervisor").value || '';
             let borradores = JSON.parse(localStorage.getItem("borradores_auditorias") || "[]");
             const borradoresAEliminar = borradores.filter(b => {
                 const bt = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '';
