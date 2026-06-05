@@ -7549,7 +7549,20 @@
                 let h = a.hora || '00:00:00';
                 let partes = f.includes('-') && f.indexOf('-') === 4 ? f.split('-') : (f.split('/').length === 3 ? [f.split('/')[2], f.split('/')[1], f.split('/')[0]] : null);
                 if (!partes) return 0;
-                return new Date(`${partes[0]}-${partes[1]}-${partes[2]}T${h}`).getTime() || 0;
+                // Convertir hora AM/PM a 24h si es necesario
+                let h24 = h;
+                if (h.includes('AM') || h.includes('PM')) {
+                    const match = h.match(/(\d+):(\d+)\s*(AM|PM)/i);
+                    if (match) {
+                        let hh = parseInt(match[1]);
+                        const mm = match[2];
+                        const period = match[3].toUpperCase();
+                        if (period === 'AM' && hh === 12) hh = 0;
+                        if (period === 'PM' && hh !== 12) hh += 12;
+                        h24 = `${String(hh).padStart(2,'0')}:${mm}:00`;
+                    }
+                }
+                return new Date(`${partes[0]}-${partes[1]}-${partes[2]}T${h24}`).getTime() || 0;
             }
             auditorias.sort((a, b) => orden === 'desc' ? parseFechaHora(b) - parseFechaHora(a) : parseFechaHora(a) - parseFechaHora(b));
 
