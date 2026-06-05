@@ -7848,7 +7848,26 @@
         async function verDetalleAuditoria(id) {
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
             let data = auds.find(a => a.id === id);
-            if (!data) return;
+            if (!data) {
+                try {
+                    let { data: sbData } = await sbClient.from('auditorias').select('*').eq('id', id).single();
+                    if (!sbData) return;
+                    data = {
+                        id: sbData.id,
+                        tienda: { nombre: sbData.tienda_nombre, distrito: sbData.tienda_distrito, direccion: sbData.tienda_direccion },
+                        supervisor: sbData.supervisor,
+                        encargado: sbData.encargado,
+                        fecha: sbData.fecha,
+                        hora: sbData.hora,
+                        respuestas: sbData.respuestas || {},
+                        resultadoGrupos: sbData.resultado_grupos || {},
+                        notaFinal: sbData.nota_final,
+                        clasificacion: sbData.clasificacion,
+                        firma: sbData.firma_url,
+                        ubicacionGPS: sbData.ubicacion_gps
+                    };
+                } catch(e) { return; }
+            }
             // Si no tiene firma local, intentar cargar desde Supabase
             if (!data.firma) {
                 try {
