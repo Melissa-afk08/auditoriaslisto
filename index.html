@@ -7172,18 +7172,19 @@
                     y += 10;
 
                     if (r.obs) {
-                        checkPageBreak(16);
+                        pdf.setFontSize(11); pdf.setFont("helvetica", "italic");
+                        let splitObs = pdf.splitTextToSize(`Obs: ${r.obs}`, pageWidth - 2 * margin - 14);
+                        let obsH = splitObs.length * 6 + 8;
+                        checkPageBreak(obsH + 4);
                         pdf.setFillColor(230, 230, 230);
-                        pdf.roundedRect(margin + 3, y, pageWidth - 2 * margin - 6, 12, 2, 2, 'F');
+                        pdf.roundedRect(margin + 3, y, pageWidth - 2 * margin - 6, obsH, 2, 2, 'F');
                         pdf.setDrawColor(252, 110, 32);
                         pdf.setLineWidth(1.5);
-                        pdf.line(margin + 3, y, margin + 3, y + 12);
+                        pdf.line(margin + 3, y, margin + 3, y + obsH);
                         pdf.setLineWidth(0.3);
-                        pdf.setFontSize(11); pdf.setFont("helvetica", "italic");
                         pdf.setTextColor(60, 60, 60);
-                        let splitObs = pdf.splitTextToSize(`Obs: ${r.obs}`, pageWidth - 2 * margin - 14);
                         pdf.text(splitObs, margin + 7, y + 8);
-                        y += splitObs.length * 6 + 10;
+                        y += obsH + 4;
                     }
 
                     if (r.fotos && r.fotos.length > 0) {
