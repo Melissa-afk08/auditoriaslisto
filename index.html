@@ -7104,7 +7104,8 @@
                 y += 8;
 
                 for (let i = 1; i <= 5; i++) {
-                    let v = data.resultadoGrupos ? (data.resultadoGrupos[i] || 0) : 0;
+                    let grpRaw = data.resultadoGrupos ? (data.resultadoGrupos[i] || 0) : 0;
+                    let v = typeof grpRaw === 'object' ? (grpRaw.maximo > 0 ? (grpRaw.obtenido / grpRaw.maximo) * 100 : 0) : (parseFloat(grpRaw) || 0);
                     let c = v <= 70 ? [198, 40, 40] : (v <= 90 ? [255, 179, 0] : [52, 199, 89]);
                     let ptsObtenidos = 0; let ptsMaximos = 0;
                     window.PREGUNTAS.forEach(p => {
