@@ -6618,6 +6618,7 @@
                 hora: document.getElementById("form-aud-hora").textContent,
                 respuestas: window.auditActual.respuestas,
                 firma: window.auditActual.firma,
+                preguntasSnapshot: window.PREGUNTAS.map(p => p.id),
                 ubicacionGPS: window._audDireccionGPS || null,
                 resultadoGrupos: result.grupos,
                 finalScore: result.nota_final,
@@ -9525,7 +9526,10 @@
             let grupos = {};
             for (let i = 1; i <= 5; i++) grupos[i] = { obtenido: 0, maximo: 0 };
             let PESOS = window.PESOS || JSON.parse(localStorage.getItem("pesos_custom") || "null") || JSON.parse(JSON.stringify(PESOS_DEFAULT));
-            window.PREGUNTAS.forEach(p => {
+            const preguntasParaCalculo = data.preguntasSnapshot
+                ? window.PREGUNTAS.filter(p => data.preguntasSnapshot.includes(p.id))
+                : window.PREGUNTAS;
+            preguntasParaCalculo.forEach(p => {
                 let resp = data.respuestas[p.id];
                 if (!resp) return;
                 const val = resp.valor;
