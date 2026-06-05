@@ -10196,7 +10196,8 @@
                 // Grupos
                 let grupos = data.resultado_grupos || {};
                 let grpHtml = Object.keys(titulosGrupo).map(i => {
-                    let v = grupos[i] || 0;
+                    let grpRaw = grupos[i] || 0;
+                    let v = typeof grpRaw === 'object' ? (grpRaw.maximo > 0 ? (grpRaw.obtenido / grpRaw.maximo) * 100 : 0) : (parseFloat(grpRaw) || 0);
                     let c = v < 70 ? "#FF3B30" : v <= 90 ? "#FFCC00" : "#34C759";
                     return `<div style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
