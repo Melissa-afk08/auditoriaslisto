@@ -4198,7 +4198,7 @@
                     <div style="font-size:12px;color:#888;text-align:center;margin-bottom:20px;">Solo para uso único. Las auditorías serán visibles para todos los usuarios.</div>
                     <div id="importador-step-csv">
                         <div style="font-size:13px;font-weight:700;color:#1B1B1B;margin-bottom:8px;">1. Selecciona el archivo CSV</div>
-                        <input type="file" id="importador-csv-input" accept=".csv" style="width:100%;padding:10px;border:1.5px dashed #DDD;border-radius:12px;font-size:13px;box-sizing:border-box;margin-bottom:16px;">
+                        <input type="file" id="importador-csv-input" accept=".xlsx" style="width:100%;padding:10px;border:1.5px dashed #DDD;border-radius:12px;font-size:13px;box-sizing:border-box;margin-bottom:16px;">
                         <div style="display:flex;gap:10px;">
                             <button onclick="cerrarImportadorGlide()" style="flex:1;padding:12px;border-radius:50px;background:#EEE;border:none;font-size:13px;font-weight:700;cursor:pointer;">Cancelar</button>
                             <button onclick="iniciarImportacionGlide()" style="flex:1;padding:12px;border-radius:50px;background:#2E7D32;border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;">Iniciar importación</button>
@@ -8636,17 +8636,16 @@
             log.scrollTop = log.scrollHeight;
         }
 
-        function parsearFechaGlide(str) {
-            // Formato: "10/2/2026, 11:17:37 a.m." o "10/2/2026, 2:14:57 p.m."
+        function parsearHoraGlide(horaStr) {
+            // Formato: " 11:17:37 a.m." o " 2:14:57 p.m."
             try {
-                const [fechaParte, horaParte] = str.split(', ');
-                const [dia, mes, anio] = fechaParte.split('/').map(Number);
-                let [hms, ampm] = horaParte.trim().split(' ');
+                const str = horaStr.trim();
+                const [hms, ampm] = str.split(' ');
                 let [h, m, s] = hms.split(':').map(Number);
                 if (ampm === 'p.m.' && h !== 12) h += 12;
                 if (ampm === 'a.m.' && h === 12) h = 0;
-                return new Date(anio, mes - 1, dia, h, m, s);
-            } catch(e) { return null; }
+                return { h, m, s };
+            } catch(e) { return { h: 0, m: 0, s: 0 }; }
         }
 
         function calcularNotaGlide(respuestas, preguntas, pesos) {
@@ -8730,25 +8729,22 @@
             const preguntas = window.PREGUNTAS.length ? window.PREGUNTAS : PREGUNTAS_DEFAULT;
             const pesos = Object.keys(window.PESOS).length ? window.PESOS : PESOS_DEFAULT;
 
-            const texto = await fileInput.files[0].text();
-            const lineas = texto.split('\n').map(l => l.replace(/\r$/, ''));
-            const headers = lineas[0].split(';');
-            const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
-            const filas = lineas.slice(1).filter(l => uuidPattern.test((l.split(';')[0]||'').trim()));
+            const arrayBuffer = await fileInput.files[0].arrayBuffer();
+            const workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(sheet, { defval: '' });
 
             let importadas = 0, advertencias = 0, sinFotos = 0, errores = 0;
-            const total = filas.length;
+            const total = jsonData.length;
 
-            for (let i = 0; i < filas.length; i++) {
-                const cols = filas[i].split(';');
-                const row = {};
-                headers.forEach((h, idx) => { row[h.trim()] = (cols[idx] || '').trim(); });
+            for (let i = 0; i < jsonData.length; i++) {
+                const row = jsonData[i];
 
-                const idGlide = row['ID_Auditoria'];
+                const idGlide = (row['🔒 Row ID'] || '').toString().trim();
                 if (!idGlide) continue;
 
                 document.getElementById('importador-barra').style.width = `${Math.round(((i+1)/total)*100)}%`;
-                document.getElementById('importador-texto-progreso').textContent = `Procesando ${i+1} de ${total}: ${row['Tienda_Auditada'] || ''}`;
+                document.getElementById('importador-texto-progreso').textContent = `Procesando ${i+1} de ${total}: ${(row['Tienda_Auditada'] || '').toString()}`;
 
                 if (idsProcesados.has(idGlide)) {
                     importadorLog(`[SKIP] ${idGlide} ya procesado`, 'warn');
@@ -8757,18 +8753,20 @@
                 }
 
                 try {
-                    // Parsear fecha
-                    const fechaObj = parsearFechaGlide(row['Fecha_Hora']);
-                    if (!fechaObj) throw new Error('Fecha inválida: ' + row['Fecha_Hora']);
-                    const fechaStr = fechaObj.toISOString().split('T')[0];
-                    const horaStr = fechaObj.toTimeString().split(' ')[0];
-                    const fechaYYYYMMDD = fechaStr.replace(/-/g, '');
+                    // Parsear fecha y hora desde xlsx
+                    const fechaRaw = row['Fecha'];
+                    const horaRaw = (row['Hora'] || '').toString();
+                    if (!fechaRaw) throw new Error('Fecha vacía en fila ' + (i+1));
+                    const fechaDate = fechaRaw instanceof Date ? fechaRaw : new Date(fechaRaw);
+                    const fechaStr = fechaDate.toISOString().split('T')[0];
+                    const { h, m, s } = parsearHoraGlide(horaRaw);
+                    const horaStr = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
                     // Mapear respuestas
                     const respuestas = {};
                     for (let n = 1; n <= 47; n++) {
-                        const val = row[`R${n}`];
-                        const obs = row[`O${n}`] || '';
+                        const val = (row[`R${n}`] || '').toString().trim();
+                        const obs = (row[`O${n}`] || '').toString().trim();
                         if (val) respuestas[n] = { valor: val, obs, fotos: [] };
                     }
 
@@ -8776,7 +8774,7 @@
                     const respValores = {};
                     for (const k in respuestas) respValores[k] = respuestas[k].valor;
                     const { nota, grupos } = calcularNotaGlide(respValores, preguntas, pesos);
-                    const notaCSV = parseFloat(row['Nota_Final_Texto']) / 100;
+                    const notaCSV = parseFloat(row['Nota'] || 0);
                     const diferencia = Math.abs(nota - notaCSV);
                     if (diferencia > 2) {
                         importadorLog(`[ADVERTENCIA] ${idGlide} nota recalculada ${nota.toFixed(2)}% vs CSV ${notaCSV.toFixed(2)}%`, 'warn');
@@ -8791,8 +8789,8 @@
 
                     // Subir firma
                     let firmaUrl = null;
-                    if (row['Conformidad_Digital']) {
-                        const base64Firma = await descargarBase64(row['Conformidad_Digital']);
+                    if (row['Conformidad_Digital'] && row['Conformidad_Digital'].toString().startsWith('http')) {
+                        const base64Firma = await descargarBase64(row['Conformidad_Digital'].toString());
                         if (base64Firma) {
                             firmaUrl = await supabaseUploadFoto(base64Firma, audId, 'firma', 0);
                         }
@@ -8801,11 +8799,11 @@
                     // Insertar auditoría
                     const { error: errAud } = await sbClient.from('auditorias').insert({
                         id: audId,
-                        tienda_nombre: row['Tienda_Auditada'],
+                        tienda_nombre: (row['Tienda_Auditada'] || '').toString().trim(),
                         tienda_distrito: null,
                         tienda_direccion: null,
-                        supervisor: row['Supervisor'],
-                        encargado: row['Encargado_Tienda'],
+                        supervisor: (row['Supervisor'] || '').toString().trim(),
+                        encargado: (row['Encargado_Tienda'] || '').toString().trim(),
                         fecha: fechaStr,
                         hora: horaStr,
                         respuestas,
