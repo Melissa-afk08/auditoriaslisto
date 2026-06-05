@@ -8758,7 +8758,7 @@
                     const horaRaw = (row['Hora'] || '').toString();
                     if (!fechaRaw) throw new Error('Fecha vacía en fila ' + (i+1));
                     const fechaDate = fechaRaw instanceof Date ? fechaRaw : new Date(fechaRaw);
-                    const fechaStr = fechaDate.toISOString().split('T')[0];
+                    const fechaStr = `${fechaDate.getFullYear()}-${String(fechaDate.getMonth()+1).padStart(2,'0')}-${String(fechaDate.getDate()).padStart(2,'0')}`;
                     const { h, m, s } = parsearHoraGlide(horaRaw);
                     const horaStr = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
 
