@@ -3794,6 +3794,15 @@
                 <div style="font-size:14px; font-weight:700; color:#1B1B1B; letter-spacing:1px; margin-bottom:16px;">
                     DETALLE DE RESPUESTAS</div>
                 <div id="res-aud-detalle-preguntas"></div>
+                <div id="res-aud-firma-wrap" style="display:none;padding:0 16px 16px;">
+                    <div style="background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:20px;text-align:center;">
+                        <div style="font-size:11px;font-weight:800;color:#999;letter-spacing:1.5px;margin-bottom:14px;">FIRMA DEL ENCARGADO DE TIENDA</div>
+                        <img id="res-aud-firma-img" src="" style="max-width:200px;height:90px;object-fit:contain;border-radius:10px;background:white;border:1px solid #EEE;padding:8px;display:block;margin:0 auto;">
+                        <div style="border-top:1.5px solid #DDD;margin:16px auto 10px;width:200px;"></div>
+                        <div id="res-aud-firma-enc" style="font-size:14px;font-weight:700;color:#1B1B1B;"></div>
+                        <div id="res-aud-firma-fecha" style="font-size:12px;color:#999;margin-top:2px;"></div>
+                    </div>
+                </div>
                 <div id="res-aud-delete-zone" style="padding:0 16px 24px;"></div>
             </div>
         </div>
@@ -7041,6 +7050,16 @@
 
             document.getElementById("res-aud-sup").textContent = truncarSupervisor(data.supervisor);
             document.getElementById("res-aud-enc").textContent = data.encargado || '-';
+            let firmaUrlRes = data.firma_url || data.firma || null;
+            let firmaWrap = document.getElementById('res-aud-firma-wrap');
+            if (firmaUrlRes && firmaWrap) {
+                document.getElementById('res-aud-firma-img').src = firmaUrlRes;
+                document.getElementById('res-aud-firma-enc').textContent = data.encargado || '';
+                document.getElementById('res-aud-firma-fecha').textContent = (data.fecha || '') + '  ' + (data.hora || '');
+                firmaWrap.style.display = 'block';
+            } else if (firmaWrap) {
+                firmaWrap.style.display = 'none';
+            }
             let ubicWrap = document.getElementById("res-aud-ubicacion-wrap");
             let ubicEl = document.getElementById("res-aud-ubicacion");
             if (data.ubicacionGPS && ubicWrap && ubicEl) {
