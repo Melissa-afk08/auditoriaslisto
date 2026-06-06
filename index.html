@@ -6114,7 +6114,8 @@
             let titulosGrupo = { 1: "CUSTOMER JOURNEY", 2: "CONTROL DE CALIDAD", 3: "EQUIPOS Y UTENSILIOS", 4: "MONITOREO DE EQUIPOS", 5: "CONTROL DOCUMENTARIO" };
             let grpHtml = "";
             for (let i = 1; i <= 5; i++) {
-                let v = (data.resultadoGrupos || {})[i] || 0;
+                let vRaw = (data.resultadoGrupos || {})[i] || 0;
+                let v = (vRaw && typeof vRaw === 'object') ? (vRaw.maximo > 0 ? Math.round(vRaw.obtenido / vRaw.maximo * 100) : 0) : (parseFloat(vRaw) || 0);
                 let c = v <= 70 ? "var(--rojo)" : (v <= 90 ? "var(--amarillo)" : "var(--verde)");
                 grpHtml += `
                     <div class="ro-group-bar">
