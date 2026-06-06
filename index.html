@@ -4628,11 +4628,14 @@
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:700; color:#888; margin-bottom:4px; display:block;">ROL *</label>
-                        <select id="nu-cargo" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid #EEE; font-size:14px; box-sizing:border-box; outline:none; font-family:inherit; background:white;">
+                        <select id="nu-cargo" style="width:100%; padding:12px 14px; border-radius:12px; border:1.5px solid #EEE; font-size:14px; box-sizing:border-box; outline:none; font-family:inherit; background:white;" onchange="document.getElementById('nu-cargo-otro').style.display=this.value==='OTRO'?'block':'none';">
                             <option value="SUPERVISORA FAST FOOD">SUPERVISORA FAST FOOD</option>
                             <option value="JEFA COMERCIAL FAST FOOD">JEFA COMERCIAL FAST FOOD</option>
+                            <option value="COORDINADORA">COORDINADORA</option>
                             <option value="SOPORTE">SOPORTE</option>
+                            <option value="OTRO">OTRO...</option>
                         </select>
+                        <input type="text" id="nu-cargo-otro" placeholder="Especifica el cargo" style="display:none;width:100%;margin-top:8px;padding:12px 14px;border-radius:12px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;outline:none;font-family:inherit;">
                     </div>
                     <div>
                         <label style="font-size:12px; font-weight:700; color:#888; margin-bottom:4px; display:block;">CELULAR <span style="font-weight:400;">(opcional)</span></label>
@@ -4778,7 +4781,7 @@
                 </div>
                 <div>
                     <div style="font-size:10px;font-weight:700;color:#AAA;text-transform:uppercase;margin-bottom:4px;">Cargo</div>
-                    <input id="ep-cargo" type="text" style="width:100%;background:#F5F5F5;border:none;border-radius:12px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;" placeholder="Cargo">
+                    <input id="ep-cargo" type="text" readonly style="width:100%;background:#F0F0F0;border:none;border-radius:12px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;cursor:not-allowed;color:#999;" placeholder="Cargo">
                 </div>
                 <div>
                     <div style="font-size:10px;font-weight:700;color:#AAA;text-transform:uppercase;margin-bottom:4px;">Celular</div>
@@ -4796,22 +4799,36 @@
     </div>
 
     <div id="modal-user" class="modal-overlay" style="display:none; z-index:9999;">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeModal('modal-user')">✕</button>
-            <h3 class="bold mb-16" style="font-size: 18px;" id="mu-title">Añadir Usuario</h3>
+        <div class="modal-content" style="padding:28px 24px; border-radius:20px; max-width:360px;">
+            <button class="close-modal" onclick="closeModal('modal-user')" style="top:16px;right:16px;">✕</button>
+            <h3 id="mu-title" style="font-size:17px; font-weight:800; margin:0 0 20px 0; color:#1a1a1a;">Añadir Usuario</h3>
             <input type="hidden" id="add-user-idx" value="-1">
-            <input type="text" id="add-user-name" class="input-group w-100" placeholder="Nombre completo">
-            <input type="email" id="add-user-email" class="input-group w-100" placeholder="Correo electrónico">
-            <select id="add-user-cargo" class="input-group w-100" onchange="document.getElementById('add-user-cargo-otro').style.display = this.value === 'OTRO' ? 'block' : 'none';">
-                <option value="SUPERVISORA FAST FOOD">SUPERVISORA FAST FOOD</option>
-                <option value="JEFA COMERCIAL FAST FOOD">JEFA COMERCIAL FAST FOOD</option>
-                <option value="COORDINADORA">COORDINADORA</option>
-                <option value="SOPORTE">SOPORTE</option>
-                <option value="OTRO">OTRO...</option>
-            </select>
-            <input type="text" id="add-user-cargo-otro" class="input-group w-100 mt-8" placeholder="Especifica el cargo" style="display:none;">
-            <input type="tel" id="add-user-tel" class="input-group w-100" placeholder="Celular (opcional)">
-            <button class="btn btn-primary w-100 mt-16" onclick="saveUser()" id="mu-btn">Añadir</button>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div>
+                    <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.5px;display:block;margin-bottom:4px;">NOMBRE COMPLETO</label>
+                    <input type="text" id="add-user-name" placeholder="Ej. María García López" style="width:100%;padding:11px 14px;border-radius:12px;border:1.5px solid #EBEBEB;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;background:#FAFAFA;">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.5px;display:block;margin-bottom:4px;">CORREO ELECTRÓNICO</label>
+                    <input type="email" id="add-user-email" placeholder="correo@gmail.com" style="width:100%;padding:11px 14px;border-radius:12px;border:1.5px solid #EBEBEB;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;background:#FAFAFA;">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.5px;display:block;margin-bottom:4px;">ROL</label>
+                    <select id="add-user-cargo" onchange="document.getElementById('add-user-cargo-otro').style.display = this.value === 'OTRO' ? 'block' : 'none';" style="width:100%;padding:11px 14px;border-radius:12px;border:1.5px solid #EBEBEB;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;background:#FAFAFA;appearance:auto;">
+                        <option value="SUPERVISORA FAST FOOD">SUPERVISORA FAST FOOD</option>
+                        <option value="JEFA COMERCIAL FAST FOOD">JEFA COMERCIAL FAST FOOD</option>
+                        <option value="COORDINADORA">COORDINADORA</option>
+                        <option value="SOPORTE">SOPORTE</option>
+                        <option value="OTRO">OTRO...</option>
+                    </select>
+                    <input type="text" id="add-user-cargo-otro" placeholder="Especifica el cargo" style="display:none;width:100%;margin-top:8px;padding:11px 14px;border-radius:12px;border:1.5px solid #EBEBEB;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;background:#FAFAFA;">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:700;color:#999;letter-spacing:.5px;display:block;margin-bottom:4px;">CELULAR <span style="font-weight:400;">(opcional)</span></label>
+                    <input type="tel" id="add-user-tel" placeholder="Ej. 999 888 777" style="width:100%;padding:11px 14px;border-radius:12px;border:1.5px solid #EBEBEB;font-size:14px;font-family:inherit;outline:none;box-sizing:border-box;background:#FAFAFA;">
+                </div>
+            </div>
+            <button class="btn btn-primary w-100" onclick="saveUser()" id="mu-btn" style="margin-top:20px;">Añadir</button>
         </div>
     </div>
 
@@ -5434,6 +5451,8 @@
             document.getElementById('nu-nombre').value = '';
             document.getElementById('nu-email').value = '';
             document.getElementById('nu-cargo').value = 'SUPERVISORA FAST FOOD';
+            document.getElementById('nu-cargo-otro').style.display = 'none';
+            document.getElementById('nu-cargo-otro').value = '';
             document.getElementById('nu-tel').value = '';
             document.getElementById('modal-nuevo-usuario').style.display = 'flex';
             setTimeout(() => document.getElementById('nu-nombre').focus(), 100);
@@ -5442,7 +5461,8 @@
         async function saveNuevoUsuario() {
             let nombre = document.getElementById('nu-nombre').value.trim();
             let email = document.getElementById('nu-email').value.trim();
-            let cargo = document.getElementById('nu-cargo').value.trim();
+            let nuCargoSel = document.getElementById('nu-cargo').value;
+            let cargo = nuCargoSel === 'OTRO' ? (document.getElementById('nu-cargo-otro').value.trim()) : nuCargoSel;
             let tel = document.getElementById('nu-tel').value.trim();
 
             if (!nombre || !email || !cargo) { showToast("Completa los campos obligatorios", "error"); return; }
