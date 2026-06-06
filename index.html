@@ -5531,8 +5531,15 @@
             if (mobileAvatar) mobileAvatar.textContent = inis;
 
             // Update Ajustes Profile
-            document.getElementById("ajustes-avatar").textContent = inis;
-            document.getElementById("ajustes-avatar").className = "ajustes-perfil-avatar";
+            const ajAvEl = document.getElementById("ajustes-avatar");
+            if (u.foto_url) {
+                ajAvEl.innerHTML = `<img src="${u.foto_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                ajAvEl.style.background = 'none';
+            } else {
+                ajAvEl.textContent = inis;
+                ajAvEl.style.background = '';
+            }
+            ajAvEl.className = "ajustes-perfil-avatar";
             document.getElementById("ajustes-nombre").textContent = u.nombre;
             document.getElementById("ajustes-email").textContent = u.email;
             document.getElementById("ajustes-cargo").textContent = u.cargo;
@@ -8817,6 +8824,13 @@
             if (!isV) m.style.display = 'block';
         }
 
+        function editUserByEmail(email) {
+            let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+            const idx = users.findIndex(u => u.email === email);
+            if (idx === -1) return;
+            editUser(idx);
+        }
+
         function editUser(i) {
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
             let u = users[i];
@@ -8943,7 +8957,21 @@
                 return key ? avatarColorMap[key] : { bg: '#FC6E20', text: '#fff' };
             };
 
-            let html = users.map((u, userIdx) => {
+            // Ordenar: supervisoras primero, luego los demás por nombre
+            const ordenCargo = (cargo) => {
+                const c = (cargo || '').toLowerCase();
+                if (c.includes('supervisora') || c.includes('supervisor')) return 0;
+                if (c.includes('coordinadora') || c.includes('coordinador')) return 1;
+                if (c.includes('jefa') || c.includes('jefe')) return 2;
+                if (c.includes('soporte')) return 3;
+                return 4;
+            };
+            const usersOrdenados = [...users].sort((a, b) => {
+                const diff = ordenCargo(a.cargo) - ordenCargo(b.cargo);
+                return diff !== 0 ? diff : a.nombre.localeCompare(b.nombre);
+            });
+
+            let html = usersOrdenados.map((u) => {
                 const cargo = u.cargo || 'Supervisora';
                 const email = u.email || '';
                 const telefono = u.telefono || '';
@@ -8954,9 +8982,10 @@
                 const avatarContent = foto_url
                     ? `<img src="${foto_url}" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">`
                     : `<div style="width:40px;height:40px;border-radius:50%;background:${avatarColor.bg};color:${avatarColor.text};font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${inis}</div>`;
+                const emailEsc = email.replace(/'/g, "\\'");
 
                 return `
-        <div onclick="editUser(${userIdx})" style="display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid #F0F0F0; cursor:pointer;">
+        <div onclick="editUserByEmail('${emailEsc}')" style="display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid #F0F0F0; cursor:pointer;">
           ${avatarContent}
           <div style="flex:1;min-width:0;">
             <div style="font-size:14px;font-weight:700;color:#1B1B1B;line-height:1.3;">${u.nombre}</div>
