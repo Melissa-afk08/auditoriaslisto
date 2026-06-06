@@ -4993,10 +4993,11 @@
             window.PESOS = (parsedPesos && sumPesos > 0.01) ? parsedPesos : JSON.parse(JSON.stringify(PESOS_DEFAULT));
             if (sumPesos <= 0.01) { localStorage.removeItem("pesos_custom"); }
 
-            // Cargar supervisores desde Supabase
+            // Cargar usuarios desde Supabase y sincronizar supervisores
             try {
-                const { data: usuariosData } = await sbClient.from('usuarios').select('nombre').order('nombre');
+                const { data: usuariosData } = await sbClient.from('usuarios').select('*').order('nombre');
                 if (usuariosData && usuariosData.length > 0) {
+                    localStorage.setItem("usuarios", JSON.stringify(usuariosData));
                     const sups = usuariosData.map(u => u.nombre);
                     localStorage.setItem("supervisores", JSON.stringify(sups));
                 }
@@ -5356,15 +5357,22 @@
         }
 
         function confirmDeleteUserAdmin(i, name) {
-            document.getElementById("mc-desc").innerText = `¿Eliminar a ${name}? Sus auditorías y visitas anteriores se conservarán.`;
-            document.getElementById("mc-btn").onclick = function() {
+            document.getElementById("mc-desc").innerText = `¿Eliminar a ${name}? Sus auditorías y visitas anteriores se conservarán con su nombre.`;
+            document.getElementById("mc-btn").onclick = async function() {
                 let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+                const email = users[i]?.email;
                 users.splice(i, 1);
                 localStorage.setItem("usuarios", JSON.stringify(users));
+                // Sincronizar supervisores
+                const sups = users.map(u => u.nombre);
+                localStorage.setItem("supervisores", JSON.stringify(sups));
+                // Eliminar de Supabase
+                if (email) await sbClient.from('usuarios').delete().eq('email', email);
                 closeModal('modal-confirm');
                 renderEditorUsuarios();
                 renderUsuarios();
-                showToast("Usuario eliminado", "success");
+                renderAjustesSupervisores();
+                showToast("Usuario eliminado del sistema", "success");
             };
             document.getElementById("modal-confirm").style.display = "flex";
         }
@@ -5378,7 +5386,7 @@
             setTimeout(() => document.getElementById('nu-nombre').focus(), 100);
         }
 
-        function saveNuevoUsuario() {
+        async function saveNuevoUsuario() {
             let nombre = document.getElementById('nu-nombre').value.trim();
             let email = document.getElementById('nu-email').value.trim();
             let cargo = document.getElementById('nu-cargo').value.trim();
@@ -5390,11 +5398,22 @@
             let existe = users.find(u => u.email.toLowerCase() === email.toLowerCase());
             if (existe) { showToast("Ya existe un usuario con ese correo", "error"); return; }
 
-            users.push({ nombre, email, cargo, telefono: tel });
+            const nuevoUsuario = { nombre, email, cargo, telefono: tel };
+            // Guardar en Supabase
+            const { error } = await sbClient.from('usuarios').insert(nuevoUsuario);
+            if (error) { showToast("Error al guardar en sistema: " + error.message, "error"); return; }
+
+            // Actualizar localStorage
+            users.push(nuevoUsuario);
             localStorage.setItem("usuarios", JSON.stringify(users));
+            // Sincronizar supervisores
+            const sups = users.map(u => u.nombre);
+            localStorage.setItem("supervisores", JSON.stringify(sups));
+
             document.getElementById('modal-nuevo-usuario').style.display = 'none';
             renderEditorUsuarios();
             renderUsuarios();
+            renderAjustesSupervisores();
             showToast("✓ Usuario agregado correctamente", "success");
         }
 
@@ -8873,17 +8892,23 @@
 
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
             if (idx >= 0) {
-                users[idx] = { nombre: n, email: e, cargo: c, telefono: t };
+                users[idx] = { ...users[idx], nombre: n, email: e, cargo: c, telefono: t };
                 await sbClient.from('usuarios').update({ nombre: n, cargo: c, telefono: t }).eq('email', e);
                 showToast("Usuario actualizado", "success");
             } else {
-                users.push({ nombre: n, email: e, cargo: c, telefono: t });
-                await sbClient.from('usuarios').insert({ nombre: n, email: e, cargo: c, telefono: t });
+                const nuevoUsuario = { nombre: n, email: e, cargo: c, telefono: t };
+                users.push(nuevoUsuario);
+                await sbClient.from('usuarios').insert(nuevoUsuario);
                 showToast("Usuario añadido", "success");
             }
 
             localStorage.setItem("usuarios", JSON.stringify(users));
+            // Sincronizar supervisores
+            const sups = users.map(u => u.nombre);
+            localStorage.setItem("supervisores", JSON.stringify(sups));
+
             closeModal('modal-user');
+            renderAjustesSupervisores();
             if (document.getElementById('view-usuarios').style.display === 'block') renderUsuarios();
         }
 
