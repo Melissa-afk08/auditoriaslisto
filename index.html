@@ -5902,12 +5902,21 @@
             document.getElementById(id).style.display = "none";
         }
 
-        function openModalRoAuditoria(id) {
+        async function openModalRoAuditoria(id) {
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
             let data = auds.find(a => a.id === id);
             if (!data) return;
 
             window.auditActual = data;
+
+            let fotosMapRo = {};
+            try {
+                let { data: fds } = await sbClient.from('fotos_auditoria').select('*').eq('auditoria_id', id);
+                (fds || []).forEach(f => {
+                    if (!fotosMapRo[f.pregunta_id]) fotosMapRo[f.pregunta_id] = [];
+                    fotosMapRo[f.pregunta_id].push(f.storage_url);
+                });
+            } catch(e) {}
 
             let score = Math.round(data.notaFinal || data.finalScore);
             let colorHex = score <= 70 ? "#C62828" : score <= 90 ? "#F9A825" : "#43A047";
@@ -5940,7 +5949,7 @@
                 let resp = data.respuestas[p.id];
                 if (!resp) return;
                 let obsHtml = resp.obs ? `<div class="ro-obs">📝 ${resp.obs}</div>` : "";
-                let fotos = resp.fotos || [];
+                let fotos = [...(resp.fotos || []), ...(fotosMapRo[p.id] || [])];
                 let lbKeyRo = `lb_ro_${p.id}`;
                 window[lbKeyRo] = fotos;
                 let fotosHtml = fotos.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${fotos.map((f, fi) => `<img src="${f}" onclick="abrirLightbox(window['${lbKeyRo}'],${fi})" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #EEE;cursor:pointer;">`).join('')}</div>` : '';
@@ -6809,7 +6818,17 @@
             return partes.length <= 2 ? nombre : `${partes[0]} ${partes[1]}`;
         }
 
-        function renderAuditoriaResultado(data) {
+        async function renderAuditoriaResultado(data) {
+            let fotosMapRes = {};
+            if (data.id) {
+                try {
+                    let { data: fds } = await sbClient.from('fotos_auditoria').select('*').eq('auditoria_id', data.id);
+                    (fds || []).forEach(f => {
+                        if (!fotosMapRes[f.pregunta_id]) fotosMapRes[f.pregunta_id] = [];
+                        fotosMapRes[f.pregunta_id].push(f.storage_url);
+                    });
+                } catch(e) {}
+            }
             let btnVolver = document.getElementById('btn-volver-resultado');
             if (btnVolver) btnVolver.textContent = window.auditDesdeHistorial ? '← Volver al historial' : '← Volver al inicio';
             document.getElementById("res-aud-tienda").textContent = typeof data.tienda === 'string' ? data.tienda : data.tienda.nombre;
@@ -6930,10 +6949,11 @@
                 let ptsMaximos = (r.valor === 'NA') ? 0 : p.pmax;
 
                 let fotosHtml = "";
-                if (r.fotos && r.fotos.length > 0) {
+                let fotosRes = [...(r.fotos || []), ...(fotosMapRes[p.id] || [])];
+                if (fotosRes.length > 0) {
                     let lbKeyRes = `lb_res_${p.id}`;
-                    window[lbKeyRes] = r.fotos;
-                    fotosHtml = `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${r.fotos.map((f, fi) => `<img src="${f}" onclick="abrirLightbox(window['${lbKeyRes}'],${fi})" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #EEE;cursor:pointer;">`).join('')}</div>`;
+                    window[lbKeyRes] = fotosRes;
+                    fotosHtml = `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;">${fotosRes.map((f, fi) => `<img src="${f}" onclick="abrirLightbox(window['${lbKeyRes}'],${fi})" style="width:90px;height:90px;object-fit:cover;border-radius:10px;border:1px solid #EEE;cursor:pointer;">`).join('')}</div>`;
                 }
 
                 detHtml += `
