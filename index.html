@@ -3293,7 +3293,12 @@
                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                     </svg>
                 </button>
-                <button id="btn-add-tienda" onclick="abrirModalAgregarTienda()" style="display:none;background:#f5f5f5;border:none;border-radius:10px;width:40px;height:40px;cursor:pointer;font-size:20px;color:#555;flex-shrink:0;">+</button>
+                <button id="btn-add-tienda" class="btn-filter" onclick="abrirModalAgregarTienda()" style="display:none;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                </button>
             </div>
             <div id="dropdown-dist-view-tiendas" style="display:none;background:white;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:8px;margin-bottom:12px;">
                 <select id="select-dist-view-tiendas" onchange="selectDistrict('view-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
@@ -3304,17 +3309,42 @@
         </div>
     </div>
 
-    <!-- MODAL: AGREGAR TIENDA -->
-    <div id="modal-agregar-tienda" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9999;align-items:center;justify-content:center;">
-        <div style="background:white;border-radius:16px;padding:24px;width:90%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-            <div style="font-size:15px;font-weight:700;margin-bottom:16px;color:#1B1B1B;">Nueva tienda</div>
-            <input id="input-tienda-nombre" type="text" placeholder="Nombre *" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;outline:none;">
-            <input id="input-tienda-distrito" type="text" placeholder="Distrito *" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;outline:none;">
-            <input id="input-tienda-direccion" type="text" placeholder="Dirección" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;margin-bottom:20px;font-family:inherit;outline:none;">
-            <div style="display:flex;gap:10px;">
-                <button onclick="cerrarModalAgregarTienda()" style="flex:1;padding:11px;border-radius:10px;border:1.5px solid #EEE;background:white;font-size:14px;cursor:pointer;font-family:inherit;">Cancelar</button>
-                <button onclick="guardarNuevaTienda()" style="flex:1;padding:11px;border-radius:10px;border:none;background:#1B1B1B;color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Guardar</button>
+    <!-- MODAL: AGREGAR/EDITAR TIENDA -->
+    <div id="modal-agregar-tienda" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-end;justify-content:center;">
+        <div style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;overflow:hidden;box-shadow:0 -4px 32px rgba(0,0,0,0.15);">
+            <img src="https://gestion.pe/resizer/v2/DKHKHLQZVRBBDGAY4ZXIZ2LOTI.jpg?auth=7e5f8ca269fc3b853a62dec4b3203d6e632b2e847be691426bfebb65c1a613e7&width=1200&height=1200&quality=75&smart=true" style="width:100%;height:110px;object-fit:cover;display:block;">
+            <div style="padding:20px 20px 28px;">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                    <span id="modal-tienda-titulo" style="font-size:15px;font-weight:800;color:#1B1B1B;">Nueva tienda</span>
+                    <button onclick="cerrarModalAgregarTienda()" style="background:none;border:none;cursor:pointer;color:#999;font-size:20px;line-height:1;">✕</button>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <div style="position:relative;">
+                        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#E87722;letter-spacing:0.5px;">NOMBRE</span>
+                        <input id="input-tienda-nombre" type="text" placeholder="Ej: ES SALAVERRY 2" style="width:100%;padding:22px 14px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;font-family:inherit;outline:none;background:#FAFAFA;">
+                    </div>
+                    <div style="position:relative;">
+                        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#E87722;letter-spacing:0.5px;">DISTRITO</span>
+                        <input id="input-tienda-distrito" type="text" placeholder="Ej: MIRAFLORES" style="width:100%;padding:22px 14px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;font-family:inherit;outline:none;background:#FAFAFA;">
+                    </div>
+                    <div style="position:relative;">
+                        <span style="position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:11px;font-weight:700;color:#E87722;letter-spacing:0.5px;">DIRECCIÓN</span>
+                        <input id="input-tienda-direccion" type="text" placeholder="Ej: Av. Pardo 680" style="width:100%;padding:22px 14px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;font-family:inherit;outline:none;background:#FAFAFA;">
+                    </div>
+                </div>
+                <input type="hidden" id="input-tienda-id">
+                <button onclick="guardarNuevaTienda()" style="width:100%;margin-top:18px;padding:13px;border-radius:12px;border:none;background:#E87722;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.3px;">Guardar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL: OPCIONES TIENDA -->
+    <div id="modal-opciones-tienda" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9999;align-items:flex-end;justify-content:center;">
+        <div style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px;box-shadow:0 -4px 32px rgba(0,0,0,0.15);">
+            <div id="modal-opciones-tienda-nombre" style="font-size:13px;font-weight:700;color:#888;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.5px;"></div>
+            <button onclick="editarTiendaDesdeMenu()" style="width:100%;padding:14px;border-radius:12px;border:1.5px solid #EEE;background:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;text-align:left;">✏️ &nbsp;Editar información</button>
+            <button onclick="desactivarTiendaDesdeMenu()" style="width:100%;padding:14px;border-radius:12px;border:1.5px solid #FFE0E0;background:#FFF8F8;color:#C62828;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-align:left;">🚫 &nbsp;Desactivar tienda</button>
+            <button onclick="document.getElementById('modal-opciones-tienda').style.display='none'" style="width:100%;padding:13px;border-radius:12px;border:none;background:#F5F5F5;font-size:14px;cursor:pointer;font-family:inherit;margin-top:10px;">Cancelar</button>
         </div>
     </div>
 
@@ -5289,12 +5319,46 @@
             verificarCierreMensual();
         }
 
+        window._tiendaMenuActual = null;
+
+        function abrirMenuOpcionesTienda(tienda, e) {
+            e.stopPropagation();
+            window._tiendaMenuActual = tienda;
+            document.getElementById('modal-opciones-tienda-nombre').textContent = tienda.nombre;
+            document.getElementById('modal-opciones-tienda').style.display = 'flex';
+        }
+
+        function editarTiendaDesdeMenu() {
+            document.getElementById('modal-opciones-tienda').style.display = 'none';
+            let t = window._tiendaMenuActual;
+            if (!t) return;
+            document.getElementById('modal-tienda-titulo').textContent = 'Editar tienda';
+            document.getElementById('input-tienda-nombre').value = t.nombre;
+            document.getElementById('input-tienda-distrito').value = t.distrito;
+            document.getElementById('input-tienda-direccion').value = t.direccion || '';
+            document.getElementById('input-tienda-id').value = t.id;
+            document.getElementById('modal-agregar-tienda').style.display = 'flex';
+        }
+
+        async function desactivarTiendaDesdeMenu() {
+            document.getElementById('modal-opciones-tienda').style.display = 'none';
+            let t = window._tiendaMenuActual;
+            if (!t) return;
+            if (!confirm(`¿Desactivar "${t.nombre}"? Ya no aparecerá en la lista.`)) return;
+            const { error } = await sbClient.from('tiendas').update({ activa: false }).eq('id', t.id);
+            if (error) { showToast('Error al desactivar', 'error'); return; }
+            await cargarTiendas();
+            renderListaTiendas('view-tiendas');
+            showToast('Tienda desactivada', 'ok');
+        }
+
         function abrirModalAgregarTienda() {
+            document.getElementById('modal-tienda-titulo').textContent = 'Nueva tienda';
             document.getElementById('input-tienda-nombre').value = '';
             document.getElementById('input-tienda-distrito').value = '';
             document.getElementById('input-tienda-direccion').value = '';
-            let m = document.getElementById('modal-agregar-tienda');
-            m.style.display = 'flex';
+            document.getElementById('input-tienda-id').value = '';
+            document.getElementById('modal-agregar-tienda').style.display = 'flex';
         }
 
         function cerrarModalAgregarTienda() {
@@ -5305,23 +5369,20 @@
             let nombre = document.getElementById('input-tienda-nombre').value.trim().toUpperCase();
             let distrito = document.getElementById('input-tienda-distrito').value.trim().toUpperCase();
             let direccion = document.getElementById('input-tienda-direccion').value.trim();
+            let id = document.getElementById('input-tienda-id').value;
             if (!nombre || !distrito) { showToast('Nombre y distrito son obligatorios', 'error'); return; }
-            const { error } = await sbClient.from('tiendas').insert({ nombre, distrito, direccion });
-            if (error) { showToast('Error al guardar', 'error'); return; }
+            if (id) {
+                const { error } = await sbClient.from('tiendas').update({ nombre, distrito, direccion }).eq('id', id);
+                if (error) { showToast('Error al actualizar', 'error'); return; }
+                showToast('Tienda actualizada', 'ok');
+            } else {
+                const { error } = await sbClient.from('tiendas').insert({ nombre, distrito, direccion });
+                if (error) { showToast('Error al guardar', 'error'); return; }
+                showToast('Tienda agregada', 'ok');
+            }
             cerrarModalAgregarTienda();
             await cargarTiendas();
             renderListaTiendas('view-tiendas');
-            showToast('Tienda agregada', 'ok');
-        }
-
-        async function eliminarTienda(id) {
-            if (!window.currentUser?.nombre?.toLowerCase().includes('kleiddy')) return;
-            if (!confirm('¿Desactivar esta tienda? Ya no aparecerá en la lista.')) return;
-            const { error } = await sbClient.from('tiendas').update({ activa: false }).eq('id', id);
-            if (error) { showToast('Error al eliminar', 'error'); return; }
-            await cargarTiendas();
-            renderListaTiendas('view-tiendas');
-            showToast('Tienda desactivada', 'ok');
         }
 
         function toggleHistorialHome(el) {
@@ -5402,7 +5463,7 @@
                 let idx = window.TIENDAS.findIndex(x => x.nombre === t.nombre);
                 let action = clickAction.replace("INDEX", idx);
                 let deleteBtn = (viewId === 'view-tiendas' && isKleiddy && t.id)
-                    ? `<button onclick="event.stopPropagation();eliminarTienda(${t.id})" style="background:none;border:none;padding:8px;cursor:pointer;color:#ccc;font-size:18px;flex-shrink:0;" title="Desactivar">✕</button>`
+                    ? `<button onclick="abrirMenuOpcionesTienda(window.TIENDAS[${idx}], event)" style="background:none;border:none;padding:8px 10px;cursor:pointer;color:#BBB;font-size:20px;font-weight:700;flex-shrink:0;letter-spacing:1px;">⋯</button>`
                     : '';
                 html += `
           <div class="tienda-item" onclick="${action}">
