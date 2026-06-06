@@ -9953,11 +9953,33 @@
             let audId = item.id;
             delete item.eliminadoEn; delete item.eliminadoPor;
             try {
-                await sbClient.from('auditorias').upsert(item);
+                // Mapear formato localStorage → Supabase
+                const sbItem = {
+                    id: item.id,
+                    tienda_nombre: item.tienda?.nombre || item.tienda || '',
+                    tienda_distrito: item.tienda?.distrito || item.tienda_distrito || '',
+                    tienda_direccion: item.tienda?.direccion || item.tienda_direccion || '',
+                    supervisor: item.supervisor || '',
+                    encargado: item.encargado || '',
+                    fecha: item.fecha || '',
+                    hora: item.hora || '',
+                    respuestas: item.respuestas || {},
+                    resultado_grupos: item.resultadoGrupos || item.resultado_grupos || {},
+                    nota_final: item.notaFinal ?? item.nota_final ?? 0,
+                    clasificacion: item.clasificacion || '',
+                    firma_url: item.firma || item.firma_url || null,
+                    ubicacion_gps: item.ubicacionGPS || item.ubicacion_gps || null,
+                    es_borrador: false
+                };
+                await sbClient.from('auditorias').upsert(sbItem);
                 await sbClient.from('papelera').delete().eq('tipo','auditoria').eq('datos->>id', String(audId));
-            } catch(e) {}
+            } catch(e) { console.error('Error restaurando:', e); }
             audsPap.splice(idx, 1);
             localStorage.setItem("papelera_auditorias", JSON.stringify(audsPap));
+            // También restaurar en localStorage
+            let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
+            auds.push(item);
+            localStorage.setItem("auditorias", JSON.stringify(auds));
             showToast("✓ Auditoría restaurada", "success");
             renderPapelera();
         }
