@@ -4802,7 +4802,14 @@
             <input type="hidden" id="add-user-idx" value="-1">
             <input type="text" id="add-user-name" class="input-group w-100" placeholder="Nombre completo">
             <input type="email" id="add-user-email" class="input-group w-100" placeholder="Correo electrónico">
-            <input type="text" id="add-user-cargo" class="input-group w-100" placeholder="Cargo">
+            <select id="add-user-cargo" class="input-group w-100" onchange="document.getElementById('add-user-cargo-otro').style.display = this.value === 'OTRO' ? 'block' : 'none';">
+                <option value="SUPERVISORA FAST FOOD">SUPERVISORA FAST FOOD</option>
+                <option value="JEFA COMERCIAL FAST FOOD">JEFA COMERCIAL FAST FOOD</option>
+                <option value="COORDINADORA">COORDINADORA</option>
+                <option value="SOPORTE">SOPORTE</option>
+                <option value="OTRO">OTRO...</option>
+            </select>
+            <input type="text" id="add-user-cargo-otro" class="input-group w-100 mt-8" placeholder="Especifica el cargo" style="display:none;">
             <input type="tel" id="add-user-tel" class="input-group w-100" placeholder="Celular (opcional)">
             <button class="btn btn-primary w-100 mt-16" onclick="saveUser()" id="mu-btn">Añadir</button>
         </div>
@@ -5374,11 +5381,31 @@
             if (!u) return;
             document.getElementById("add-user-name").value = u.nombre || '';
             document.getElementById("add-user-email").value = u.email || '';
+            document.getElementById("add-user-email").readOnly = true;
+            document.getElementById("add-user-email").style.background = "#f5f5f5";
             document.getElementById("add-user-cargo").value = u.cargo || '';
             document.getElementById("add-user-tel").value = u.telefono || '';
             document.getElementById("add-user-idx").value = i;
             document.getElementById("mu-title").innerText = "Editar Usuario";
             document.getElementById("mu-btn").innerText = "Guardar cambios";
+            // Cargo: solo Kleiddy puede cambiar el rol
+            let isKleiddy = window.currentUser?.nombre?.toLowerCase().includes('kleiddy');
+            let cargoSelect = document.getElementById("add-user-cargo");
+            let cargoOtro = document.getElementById("add-user-cargo-otro");
+            cargoSelect.disabled = !isKleiddy;
+            cargoSelect.style.background = isKleiddy ? "" : "#f5f5f5";
+            // Seleccionar el valor correcto en el dropdown
+            let cargoVal = u.cargo || '';
+            let opciones = Array.from(cargoSelect.options).map(o => o.value);
+            if (opciones.includes(cargoVal)) {
+                cargoSelect.value = cargoVal;
+                cargoOtro.style.display = "none";
+            } else {
+                cargoSelect.value = "OTRO";
+                cargoOtro.value = cargoVal;
+                cargoOtro.style.display = isKleiddy ? "block" : "none";
+                if (!isKleiddy) cargoOtro.style.background = "#f5f5f5";
+            }
             document.getElementById("modal-user").style.display = "flex";
         }
 
@@ -8909,7 +8936,13 @@
         function openModalUser() {
             document.getElementById("add-user-name").value = "";
             document.getElementById("add-user-email").value = "";
-            document.getElementById("add-user-cargo").value = "";
+            document.getElementById("add-user-email").readOnly = false;
+            document.getElementById("add-user-email").style.background = "";
+            document.getElementById("add-user-cargo").value = "SUPERVISORA FAST FOOD";
+            document.getElementById("add-user-cargo").disabled = false;
+            document.getElementById("add-user-cargo").style.background = "";
+            document.getElementById("add-user-cargo-otro").style.display = "none";
+            document.getElementById("add-user-cargo-otro").value = "";
             document.getElementById("add-user-tel").value = "";
             document.getElementById("add-user-idx").value = "-1";
             document.getElementById("mu-title").innerText = "Añadir Usuario";
@@ -8924,7 +8957,8 @@
         async function saveUser() {
             let n = document.getElementById("add-user-name").value.trim();
             let e = document.getElementById("add-user-email").value.trim();
-            let c = document.getElementById("add-user-cargo").value.trim();
+            let cargoSel = document.getElementById("add-user-cargo").value;
+            let c = cargoSel === "OTRO" ? document.getElementById("add-user-cargo-otro").value.trim() : cargoSel;
             let t = document.getElementById("add-user-tel").value.trim();
             let idx = parseInt(document.getElementById("add-user-idx").value);
 
