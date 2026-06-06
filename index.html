@@ -7967,7 +7967,7 @@
 
             let partes = u.nombre.trim().split(' ');
             let primerNombre = partes[0];
-            let primerApellido = partes.find((p, i) => i > 0 && p.length > 2 && !['de','la','del'].includes(p.toLowerCase())) || partes[1] || '';
+            let primerApellido = partes[2] || partes[1] || '';
             let misMes = delMes.filter(a => a.supervisor &&
                 a.supervisor.trim().toLowerCase().includes(primerNombre.toLowerCase()) &&
                 a.supervisor.trim().toLowerCase().includes(primerApellido.toLowerCase()));
