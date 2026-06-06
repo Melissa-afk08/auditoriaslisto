@@ -5505,7 +5505,7 @@
             }
 
             let filtered = window.TIENDAS.filter(t =>
-                (t.nombre.toLowerCase().includes(searchInput) || t.direccion.toLowerCase().includes(searchInput)) &&
+                (searchInput === '' || searchInput.split(' ').filter(Boolean).every(w => t.nombre.toLowerCase().includes(w) || t.direccion.toLowerCase().includes(w))) &&
                 (distFilter === "" || t.distrito === distFilter)
             );
 
