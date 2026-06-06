@@ -4111,58 +4111,89 @@
             <span class="bold" style="color:white;font-size:16px;">ANALÍTICA</span>
         </div>
         <div style="padding:16px;">
-            <!-- FILTROS -->
-            <div style="background:white;border-radius:16px;padding:12px 16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;gap:8px;flex-wrap:wrap;">
-                <select id="analitica-filtro-mes" onchange="renderAnalitica()" style="flex:1;min-width:90px;padding:8px 10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">
-                    <option value="">Todos los meses</option>
-                    <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
-                </select>
-                <select id="analitica-filtro-anio" onchange="renderAnalitica()" style="flex:1;min-width:70px;padding:8px 10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">
-                    <option value="">Todos los años</option>
-                </select>
-                <select id="analitica-filtro-sup" onchange="renderAnalitica()" style="flex:1;min-width:120px;padding:8px 10px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;font-family:inherit;outline:none;background:white;">
-                    <option value="">Todos los supervisores</option>
-                </select>
+            <!-- TÍTULO DINÁMICO MES -->
+            <div style="margin-bottom:14px;">
+                <div id="analitica-titulo-mes" style="font-size:18px;font-weight:800;color:#1B1B1B;"></div>
+                <div style="font-size:12px;color:#aaa;margin-top:2px;">Resumen del mes en curso</div>
             </div>
-            <!-- KPI CARDS: 4 en 2x2 -->
-            <div id="analitica-kpis" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;"></div>
-            <!-- GRÁFICO PASTEL -->
+            <!-- KPI CARDS mes actual — sin filtro -->
+            <div id="analitica-kpis" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;"></div>
+
+            <!-- DISTRIBUCIÓN + FILTRO -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
                 <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:4px;">📊 Distribución de Resultados</div>
-                <div style="font-size:11px;color:#aaa;margin-bottom:16px;">Clasificación de auditorías del período</div>
+                <div style="font-size:11px;color:#aaa;margin-bottom:12px;">Clasificación de auditorías — usa los filtros para explorar</div>
+                <!-- FILTROS dentro de esta sección -->
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
+                    <select id="analitica-filtro-sup" onchange="renderDistribucion()" style="flex:1;min-width:110px;padding:7px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:12px;font-family:inherit;outline:none;background:white;">
+                        <option value="">Todos los supervisores</option>
+                    </select>
+                    <select id="analitica-filtro-anio" onchange="renderDistribucion()" style="flex:1;min-width:70px;padding:7px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:12px;font-family:inherit;outline:none;background:white;">
+                        <option value="">Año</option>
+                    </select>
+                    <select id="analitica-filtro-mes" onchange="renderDistribucion()" style="flex:1;min-width:90px;padding:7px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:12px;font-family:inherit;outline:none;background:white;">
+                        <option value="">Mes</option>
+                        <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                    </select>
+                    <select id="analitica-filtro-dia" onchange="renderDistribucion()" style="flex:1;min-width:60px;padding:7px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:12px;font-family:inherit;outline:none;background:white;">
+                        <option value="">Día</option>
+                        <option value="01">1</option><option value="02">2</option><option value="03">3</option><option value="04">4</option><option value="05">5</option><option value="06">6</option><option value="07">7</option><option value="08">8</option><option value="09">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                    </select>
+                </div>
                 <div style="display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap;">
                     <div style="position:relative;width:160px;height:160px;flex-shrink:0;">
                         <canvas id="chart-pastel" width="160" height="160"></canvas>
                         <div id="pastel-center" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none;">
                             <div id="pastel-total" style="font-size:22px;font-weight:800;color:#1B1B1B;line-height:1;"></div>
-                            <div style="font-size:10px;color:#aaa;margin-top:2px;">total</div>
+                            <div style="font-size:10px;color:#aaa;margin-top:2px;">auditorías</div>
                         </div>
                     </div>
                     <div id="pastel-leyenda" style="display:flex;flex-direction:column;gap:10px;"></div>
                 </div>
             </div>
-            <!-- ALERTA TIENDAS CON 3+ BAJOS -->
+
+            <!-- TIENDAS EN ALERTA -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div style="font-size:13px;font-weight:800;color:#C62828;margin-bottom:4px;">🔥 Tiendas en Alerta</div>
-                <div style="font-size:11px;color:#aaa;margin-bottom:12px;">3 o más resultados bajos en el período</div>
-                <div id="analitica-alerta-tiendas"></div>
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+                    <div style="font-size:13px;font-weight:800;color:#C62828;">🔥 Tiendas en Alerta</div>
+                    <select id="alerta-filtro-periodo" onchange="renderAlertaTiendas()" style="padding:4px 8px;border-radius:8px;border:1.5px solid #EEE;font-size:11px;font-family:inherit;outline:none;background:white;">
+                        <option value="semana">Esta semana</option>
+                        <option value="mes">Este mes</option>
+                        <option value="anio">Este año</option>
+                    </select>
+                </div>
+                <div id="alerta-periodo-label" style="font-size:11px;color:#aaa;margin-bottom:12px;"></div>
+                <div id="analitica-alerta-tiendas" style="max-height:280px;overflow-y:auto;"></div>
             </div>
-            <!-- TOP 5 SEMANAL -->
+
+            <!-- TOP 5 SEMANAL con navegación -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:4px;">🏆 Top 5 Tiendas — Semana Actual</div>
-                <div id="analitica-top10-label" style="font-size:11px;color:#aaa;margin-bottom:12px;"></div>
+                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:8px;">🏆 Top 5 Tiendas</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+                    <button onclick="navegarSemanaTop(-1)" style="background:none;border:1.5px solid #EEE;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">‹</button>
+                    <div id="analitica-top10-label" style="font-size:11px;color:#aaa;text-align:center;flex:1;padding:0 8px;"></div>
+                    <button id="btn-top-next" onclick="navegarSemanaTop(1)" style="background:none;border:1.5px solid #EEE;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;">›</button>
+                </div>
                 <div id="analitica-top10"></div>
             </div>
+
             <!-- RANKING SUPERVISORAS -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
-                <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:4px;">👤 Ranking de Supervisoras</div>
-                <div style="font-size:11px;color:#aaa;margin-bottom:12px;">Promedio, auditorías y visitas del período</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                    <div style="font-size:13px;font-weight:800;color:#1B1B1B;">👤 Ranking de Supervisoras</div>
+                    <select id="ranking-filtro-periodo" onchange="renderRankingSupervisoras()" style="padding:4px 8px;border-radius:8px;border:1.5px solid #EEE;font-size:11px;font-family:inherit;outline:none;background:white;">
+                        <option value="mes">Este mes</option>
+                        <option value="semana">Esta semana</option>
+                    </select>
+                </div>
+                <div style="font-size:11px;color:#aaa;margin-bottom:12px;">Promedio, auditorías y visitas</div>
                 <div id="analitica-supervisoras"></div>
             </div>
-            <!-- TOP 5 PREGUNTAS FALLIDAS -->
+
+            <!-- PREGUNTAS MÁS FALLIDAS semana actual -->
             <div style="background:white;border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);">
                 <div style="font-size:13px;font-weight:800;color:#1B1B1B;margin-bottom:4px;">❌ Preguntas más Fallidas</div>
-                <div style="font-size:11px;color:#aaa;margin-bottom:12px;">Top 5 ítems con más NO en el período</div>
+                <div id="fallidas-semana-label" style="font-size:11px;color:#aaa;margin-bottom:12px;"></div>
                 <div id="analitica-fallidas"></div>
             </div>
         </div>
@@ -4803,7 +4834,7 @@
 
             if (viewId === 'view-home') renderHomeDashboard();
             if (viewId === 'view-ajustes') mostrarSeccionKleiddy();
-            if (viewId === 'view-analitica') renderAnalitica();
+            if (viewId === 'view-analitica') { _analiticaLoaded = false; _topSemanaOffset = 0; renderAnalitica(); }
             if (viewId === 'view-usuarios') renderUsuarios();
             if (viewId === 'view-auditoria-tiendas') renderListaTiendas('auditoria');
             if (viewId === 'view-visita-tiendas') renderListaTiendas('visita');
@@ -9387,24 +9418,33 @@
 
         let _chartPastel = null;
 
-        async function renderAnalitica() {
-            // Cargar auditorías y visitas desde Supabase
-            let data = [], visitas = [];
-            try {
-                let { data: raw } = await sbClient.from('auditorias')
-                    .select('id,tienda_nombre,supervisor,fecha,nota_final,respuestas')
-                    .eq('es_borrador', false)
-                    .order('id', { ascending: false });
-                if (raw) data = raw;
-            } catch(e) {}
-            try {
-                let { data: rawV } = await sbClient.from('visitas')
-                    .select('supervisor,datetime')
-                    .order('id', { ascending: false });
-                if (rawV) visitas = rawV;
-            } catch(e) {}
+        // ── ANALÍTICA ────────────────────────────────────────────────
+        let _analiticaData = [];
+        let _analiticaVisitas = [];
+        let _analiticaLoaded = false;
+        let _topSemanaOffset = 0; // 0 = semana actual, -1 = semana anterior, etc.
 
-            // Poblar filtros
+        async function renderAnalitica() {
+            // Cargar datos solo una vez por sesión de vista
+            if (!_analiticaLoaded) {
+                try {
+                    let { data: raw } = await sbClient.from('auditorias')
+                        .select('id,tienda_nombre,supervisor,fecha,nota_final,respuestas,clasificacion')
+                        .eq('es_borrador', false)
+                        .order('id', { ascending: false });
+                    if (raw) _analiticaData = raw;
+                } catch(e) {}
+                try {
+                    let { data: rawV } = await sbClient.from('visitas')
+                        .select('supervisor,datetime')
+                        .order('id', { ascending: false });
+                    if (rawV) _analiticaVisitas = rawV;
+                } catch(e) {}
+                _analiticaLoaded = true;
+            }
+
+            // Poblar filtros de distribución
+            const data = _analiticaData;
             let anioSel = document.getElementById('analitica-filtro-anio');
             if (anioSel && anioSel.options.length <= 1) {
                 let anios = [...new Set(data.map(a => {
@@ -9416,79 +9456,123 @@
             let supSel = document.getElementById('analitica-filtro-sup');
             if (supSel && supSel.options.length <= 1) {
                 let sups = [...new Set(data.map(a => a.supervisor).filter(Boolean))].sort();
-                sups.forEach(s => { let o=document.createElement('option'); o.value=s; o.textContent=s; supSel.appendChild(o); });
+                sups.forEach(s => { let o=document.createElement('option'); o.value=s; o.textContent=s.split(' ')[0]+' '+((s.split(' ')[2])||''); supSel.appendChild(o); });
             }
 
-            let mesSel = document.getElementById('analitica-filtro-mes')?.value || '';
-            let anioSelVal = anioSel?.value || '';
-            let supSelVal = supSel?.value || '';
+            // Título dinámico
+            const hoy = new Date();
+            const mesesNombre = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+            const tituloEl = document.getElementById('analitica-titulo-mes');
+            if (tituloEl) tituloEl.textContent = `Dashboard ${mesesNombre[hoy.getMonth()]} ${hoy.getFullYear()}`;
 
-            function parseFechaA(f) {
-                if (!f) return null;
-                if (f.includes('-') && f.indexOf('-')===4) { let p=f.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
-                let p=f.split('/'); if(p.length<3) return null;
-                return new Date(+p[2],+p[1]-1,+p[0]);
-            }
+            // KPIs del mes actual (sin filtro)
+            renderKpisMes(data, hoy);
+            renderDistribucion();
+            renderAlertaTiendas();
+            renderTopSemanal();
+            renderRankingSupervisoras();
+            renderFallidasSemana();
+        }
+
+        function parseFechaA(f) {
+            if (!f) return null;
+            if (f.includes('-') && f.indexOf('-')===4) { let p=f.split('-'); return new Date(+p[0],+p[1]-1,+p[2]); }
+            let p=f.split('/'); if(p.length<3) return null;
+            return new Date(+p[2],+p[1]-1,+p[0]);
+        }
+
+        function getLunesDomingo(offset) {
+            const hoy = new Date();
+            const lunes = new Date(hoy);
+            lunes.setDate(hoy.getDate() - ((hoy.getDay()+6)%7) + (offset * 7));
+            lunes.setHours(0,0,0,0);
+            const domingo = new Date(lunes);
+            domingo.setDate(lunes.getDate()+6);
+            domingo.setHours(23,59,59,999);
+            return { lunes, domingo };
+        }
+
+        function renderKpisMes(data, hoy) {
+            const mes = String(hoy.getMonth()+1).padStart(2,'0');
+            const anio = String(hoy.getFullYear());
+            const delMes = data.filter(a => {
+                let d = parseFechaA(a.fecha); if (!d) return false;
+                return String(d.getMonth()+1).padStart(2,'0') === mes && String(d.getFullYear()) === anio;
+            });
+            const total = delMes.length;
+            const prom = total > 0 ? (delMes.reduce((s,a)=>s+(a.nota_final||0),0)/total).toFixed(1) : null;
+            const colorProm = prom ? (parseFloat(prom)>90?'#43A047':parseFloat(prom)>70?'#F9A825':'#C62828') : '#1B1B1B';
+            let tMap = {};
+            delMes.forEach(a => { let t=a.tienda_nombre||''; if(!t) return; if(!tMap[t]) tMap[t]=[]; tMap[t].push(a.nota_final||0); });
+            let mejor = Object.entries(tMap).map(([t,v])=>({ t, prom:v.reduce((s,x)=>s+x,0)/v.length })).sort((a,b)=>b.prom-a.prom)[0];
+            let supMap = {};
+            delMes.forEach(a => { let s=a.supervisor||''; if(!s) return; supMap[s]=(supMap[s]||0)+1; });
+            let masActiva = Object.entries(supMap).sort((a,b)=>b[1]-a[1])[0];
+            document.getElementById('analitica-kpis').innerHTML = `
+                <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid var(--naranja);">
+                    <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Total Auditorías</div>
+                    <div style="font-size:30px;font-weight:800;color:#1B1B1B;line-height:1;">${total}</div>
+                    <div style="font-size:11px;color:#888;margin-top:5px;">en el mes</div>
+                </div>
+                <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid ${colorProm};">
+                    <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Promedio General</div>
+                    <div style="font-size:30px;font-weight:800;color:${colorProm};line-height:1;">${prom ? prom+'%' : '—'}</div>
+                    <div style="font-size:11px;color:#888;margin-top:5px;">del equipo este mes</div>
+                </div>
+                <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid #43A047;">
+                    <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Mejor Tienda</div>
+                    <div style="font-size:13px;font-weight:800;color:#43A047;line-height:1.2;margin-bottom:2px;">${mejor ? mejor.t : '—'}</div>
+                    <div style="font-size:11px;color:#888;margin-top:5px;">${mejor ? mejor.prom.toFixed(1)+'% promedio' : 'sin datos'}</div>
+                </div>
+                <div style="background:white;border-radius:14px;padding:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid #FC6E20;">
+                    <div style="font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Más Activa</div>
+                    <div style="font-size:13px;font-weight:800;color:#FC6E20;line-height:1.2;margin-bottom:2px;">${masActiva ? masActiva[0].split(' ')[0] : '—'}</div>
+                    <div style="font-size:11px;color:#888;margin-top:5px;">${masActiva ? masActiva[1]+' auditorías este mes' : 'sin datos'}</div>
+                </div>`;
+        }
+
+        function renderDistribucion() {
+            const data = _analiticaData;
+            const mesSel = document.getElementById('analitica-filtro-mes')?.value || '';
+            const anioSelVal = document.getElementById('analitica-filtro-anio')?.value || '';
+            const supSelVal = document.getElementById('analitica-filtro-sup')?.value || '';
+            const diaSel = document.getElementById('analitica-filtro-dia')?.value || '';
+
+            // Default: mes actual si no hay filtro
+            const hoy = new Date();
+            const mesDefault = String(hoy.getMonth()+1).padStart(2,'0');
+            const anioDefault = String(hoy.getFullYear());
 
             let filtered = data.filter(a => {
                 let d = parseFechaA(a.fecha); if (!d) return false;
                 let mes = String(d.getMonth()+1).padStart(2,'0');
                 let anio = String(d.getFullYear());
-                if (mesSel && mes !== mesSel) return false;
-                if (anioSelVal && anio !== anioSelVal) return false;
+                let dia = String(d.getDate()).padStart(2,'0');
+                // Si no hay ningún filtro activo, mostrar mes actual
+                const sinFiltro = !mesSel && !anioSelVal && !supSelVal && !diaSel;
+                if (sinFiltro) { if (mes !== mesDefault || anio !== anioDefault) return false; }
+                else {
+                    if (mesSel && mes !== mesSel) return false;
+                    if (anioSelVal && anio !== anioSelVal) return false;
+                    if (diaSel && dia !== diaSel) return false;
+                }
                 if (supSelVal && a.supervisor !== supSelVal) return false;
                 return true;
             });
 
-            let hoy = new Date();
-            let totalAuds = filtered.length;
-            let sob = filtered.filter(a=>(a.nota_final||0)>90).length;
-            let req = filtered.filter(a=>(a.nota_final||0)>70 && (a.nota_final||0)<=90).length;
-            let alt = filtered.filter(a=>(a.nota_final||0)<=70).length;
+            const total = filtered.length;
+            const sob = filtered.filter(a=>(a.nota_final||0)>90).length;
+            const req = filtered.filter(a=>(a.nota_final||0)>70 && (a.nota_final||0)<=90).length;
+            const alt = filtered.filter(a=>(a.nota_final||0)<=70).length;
 
-            // KPIs
-            let promGeneral = totalAuds > 0 ? (filtered.reduce((s,a)=>s+(a.nota_final||0),0)/totalAuds).toFixed(1) : '—';
-            let colorProm = totalAuds > 0 ? (parseFloat(promGeneral)>90?'#43A047':parseFloat(promGeneral)>70?'#F9A825':'#C62828') : '#1B1B1B';
-            let tMapKpi = {};
-            filtered.forEach(a => { let t=a.tienda_nombre||''; if(!t) return; if(!tMapKpi[t]) tMapKpi[t]=[]; tMapKpi[t].push(a.nota_final||0); });
-            let mejorTienda = Object.entries(tMapKpi).map(([t,v])=>({ t, prom:v.reduce((s,x)=>s+x,0)/v.length })).sort((a,b)=>b.prom-a.prom)[0];
-            let supMapKpi = {};
-            filtered.forEach(a => { let s=a.supervisor||''; if(!s) return; supMapKpi[s]=(supMapKpi[s]||0)+1; });
-            let masAuds = Object.entries(supMapKpi).sort((a,b)=>b[1]-a[1])[0];
-            document.getElementById('analitica-kpis').innerHTML = `
-                <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid var(--naranja);">
-                    <div style="font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Total Auditorías</div>
-                    <div style="font-size:28px;font-weight:800;color:#1B1B1B;line-height:1;">${totalAuds}</div>
-                    <div style="font-size:9px;color:#aaa;margin-top:4px;">en el período</div>
-                </div>
-                <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid ${colorProm};">
-                    <div style="font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Promedio General</div>
-                    <div style="font-size:28px;font-weight:800;color:${colorProm};line-height:1;">${totalAuds>0?promGeneral+'%':'—'}</div>
-                    <div style="font-size:9px;color:#aaa;margin-top:4px;">del equipo</div>
-                </div>
-                <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid #43A047;">
-                    <div style="font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Mejor Tienda</div>
-                    <div style="font-size:13px;font-weight:800;color:#43A047;line-height:1.2;margin-bottom:2px;">${mejorTienda?mejorTienda.t:'—'}</div>
-                    <div style="font-size:9px;color:#aaa;margin-top:4px;">${mejorTienda?mejorTienda.prom.toFixed(1)+'%':''}</div>
-                </div>
-                <div style="background:white;border-radius:14px;padding:14px;box-shadow:0 2px 8px rgba(0,0,0,0.06);border-top:3px solid #FC6E20;">
-                    <div style="font-size:9px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">Más Activa</div>
-                    <div style="font-size:13px;font-weight:800;color:#FC6E20;line-height:1.2;margin-bottom:2px;">${masAuds?masAuds[0].split(' ')[0]:'—'}</div>
-                    <div style="font-size:9px;color:#aaa;margin-top:4px;">${masAuds?masAuds[1]+' auditorías':''}</div>
-                </div>`;
-
-            // GRÁFICO PASTEL
-            document.getElementById('pastel-total').textContent = totalAuds;
+            document.getElementById('pastel-total').textContent = total;
             if (_chartPastel) _chartPastel.destroy();
             const ctxP = document.getElementById('chart-pastel').getContext('2d');
-            if (totalAuds > 0) {
+            if (total > 0) {
                 _chartPastel = new Chart(ctxP, {
                     type: 'doughnut',
-                    data: {
-                        labels: ['Sobresaliente','Se Requiere Mejorar','Alto Riesgo'],
-                        datasets: [{ data: [sob, req, alt], backgroundColor: ['#43A047','#F9A825','#C62828'], borderWidth: 0, hoverOffset: 6 }]
-                    },
-                    options: { responsive: false, cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} (${totalAuds>0?((ctx.raw/totalAuds)*100).toFixed(0):0}%)` } } } }
+                    data: { labels: ['Sobresaliente','Se Requiere Mejorar','Alto Riesgo'], datasets: [{ data: [sob,req,alt], backgroundColor: ['#43A047','#F9A825','#C62828'], borderWidth: 0, hoverOffset: 6 }] },
+                    options: { responsive: false, cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} (${total>0?((ctx.raw/total)*100).toFixed(0):0}%)` } } } }
                 });
             } else {
                 ctxP.clearRect(0,0,160,160);
@@ -9503,46 +9587,82 @@
                 <div style="display:flex;align-items:center;gap:8px;">
                     <div style="width:12px;height:12px;border-radius:3px;background:${item.c};flex-shrink:0;"></div>
                     <div style="font-size:12px;color:#555;">${item.label}</div>
-                    <div style="font-size:12px;font-weight:700;color:#1B1B1B;margin-left:auto;">${item.val}</div>
+                    <div style="font-size:12px;font-weight:700;color:#1B1B1B;margin-left:auto;padding-left:12px;">${item.val}</div>
                 </div>`).join('');
+        }
 
-            // ALERTA TIENDAS CON 3+ BAJOS DEL PERÍODO
-            let tBajos = {};
-            filtered.forEach(a => {
-                let t = a.tienda_nombre||''; if(!t) return;
-                let score = a.nota_final||0;
-                if (score <= 90) {
-                    if (!tBajos[t]) tBajos[t] = { rojo:0, amarillo:0, total:0 };
-                    if (score <= 70) tBajos[t].rojo++;
-                    else tBajos[t].amarillo++;
-                    tBajos[t].total++;
-                }
+        function renderAlertaTiendas() {
+            const data = _analiticaData;
+            const periodo = document.getElementById('alerta-filtro-periodo')?.value || 'semana';
+            const hoy = new Date();
+            let desde, hasta, labelTexto;
+
+            if (periodo === 'semana') {
+                const { lunes, domingo } = getLunesDomingo(0);
+                desde = lunes; hasta = domingo;
+                labelTexto = `${lunes.toLocaleDateString('es-PE',{day:'numeric',month:'short'})} — ${domingo.toLocaleDateString('es-PE',{day:'numeric',month:'short'})}`;
+            } else if (periodo === 'mes') {
+                desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1, 0,0,0,0);
+                hasta = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0, 23,59,59,999);
+                const mesesN = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+                labelTexto = `${mesesN[hoy.getMonth()]} ${hoy.getFullYear()}`;
+            } else {
+                desde = new Date(hoy.getFullYear(), 0, 1, 0,0,0,0);
+                hasta = new Date(hoy.getFullYear(), 11, 31, 23,59,59,999);
+                labelTexto = `Año ${hoy.getFullYear()}`;
+            }
+
+            const labelEl = document.getElementById('alerta-periodo-label');
+            if (labelEl) labelEl.textContent = labelTexto;
+
+            const filtradas = data.filter(a => {
+                let d = parseFechaA(a.fecha);
+                return d && d >= desde && d <= hasta && (a.nota_final||0) <= 70;
             });
-            let alertaTiendas = Object.entries(tBajos)
-                .filter(([,d]) => d.total >= 3)
-                .sort((a,b) => b[1].rojo - a[1].rojo);
-            let alertaHtml = alertaTiendas.map(([tienda, d]) => `
+
+            let tMap = {};
+            filtradas.forEach(a => {
+                let t = a.tienda_nombre||''; if(!t) return;
+                if(!tMap[t]) tMap[t] = 0;
+                tMap[t]++;
+            });
+
+            const alertas = Object.entries(tMap).sort((a,b)=>b[1]-a[1]);
+            const html = alertas.map(([tienda, count]) => `
                 <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #F5F5F5;">
                     <span style="font-size:18px;">🔥</span>
                     <div style="flex:1;min-width:0;">
                         <div style="font-size:13px;font-weight:700;color:#1B1B1B;">${tienda}</div>
-                        <div style="display:flex;gap:6px;margin-top:3px;">
-                            ${d.rojo>0?`<span style="background:#FFEBEE;color:#C62828;font-size:10px;font-weight:700;padding:2px 7px;border-radius:50px;">${d.rojo} rojo${d.rojo>1?'s':''}</span>`:''}
-                            ${d.amarillo>0?`<span style="background:#FFF8E1;color:#F9A825;font-size:10px;font-weight:700;padding:2px 7px;border-radius:50px;">${d.amarillo} amarillo${d.amarillo>1?'s':''}</span>`:''}
-                        </div>
+                        <div style="font-size:11px;color:#888;margin-top:2px;">${count} resultado${count>1?'s':''} en Alto Riesgo</div>
                     </div>
-                    <span style="font-size:12px;font-weight:700;color:#C62828;">${d.total} resultados</span>
+                    <span style="background:#FFEBEE;color:#C62828;font-size:11px;font-weight:700;padding:3px 10px;border-radius:50px;">≤70%</span>
                 </div>`).join('');
-            document.getElementById('analitica-alerta-tiendas').innerHTML = alertaHtml || '<div style="color:#43A047;text-align:center;padding:16px;font-size:13px;">✅ Sin tiendas con 3 o más resultados bajos</div>';
+            document.getElementById('analitica-alerta-tiendas').innerHTML = html || '<div style="color:#43A047;text-align:center;padding:16px;font-size:13px;">✅ Sin tiendas en Alto Riesgo</div>';
+        }
 
-            // TOP 5 SEMANAL
-            let lunes = new Date(hoy); lunes.setDate(hoy.getDate()-((hoy.getDay()+6)%7)); lunes.setHours(0,0,0,0);
-            let domingo = new Date(lunes); domingo.setDate(lunes.getDate()+6); domingo.setHours(23,59,59,999);
-            document.getElementById('analitica-top10-label').textContent = `${lunes.toLocaleDateString('es-PE',{day:'numeric',month:'short'})} — ${domingo.toLocaleDateString('es-PE',{day:'numeric',month:'short'})}`;
-            let semAuds = data.filter(a => { let d=parseFechaA(a.fecha); return d && d>=lunes && d<=domingo; });
-            let tMapSem = {};
-            semAuds.forEach(a => { let t=a.tienda_nombre||''; if(!t) return; if(!tMapSem[t]) tMapSem[t]=[]; tMapSem[t].push(a.nota_final||0); });
-            let top5 = Object.entries(tMapSem).map(([t,v])=>({ tienda:t, prom:v.reduce((s,x)=>s+x,0)/v.length, count:v.length })).sort((a,b)=>b.prom-a.prom).slice(0,5);
+        function renderTopSemanal() {
+            const data = _analiticaData;
+            // Calcular límites: enero 2026 hasta última semana con datos
+            const limiteMin = new Date(2026, 0, 1);
+            const { lunes: lunesActual } = getLunesDomingo(0);
+            const { lunes, domingo } = getLunesDomingo(_topSemanaOffset);
+
+            // Controlar botón siguiente
+            const btnNext = document.getElementById('btn-top-next');
+            if (btnNext) btnNext.style.opacity = lunes >= lunesActual ? '0.3' : '1';
+
+            // Controlar botón anterior
+            const btnPrev = document.querySelector('[onclick="navegarSemanaTop(-1)"]');
+            if (btnPrev) btnPrev.style.opacity = lunes <= limiteMin ? '0.3' : '1';
+
+            document.getElementById('analitica-top10-label').textContent =
+                `${lunes.toLocaleDateString('es-PE',{day:'numeric',month:'short'})} — ${domingo.toLocaleDateString('es-PE',{day:'numeric',month:'short'})}`;
+
+            const semAuds = data.filter(a => { let d=parseFechaA(a.fecha); return d && d>=lunes && d<=domingo; });
+            let tMap = {};
+            semAuds.forEach(a => { let t=a.tienda_nombre||''; if(!t) return; if(!tMap[t]) tMap[t]=[]; tMap[t].push(a.nota_final||0); });
+            const top5 = Object.entries(tMap).map(([t,v])=>({ tienda:t, prom:v.reduce((s,x)=>s+x,0)/v.length, count:v.length })).sort((a,b)=>b.prom-a.prom).slice(0,5);
+
             document.getElementById('analitica-top10').innerHTML = top5.map((item,i) => {
                 let c = item.prom>90?'#43A047':item.prom>70?'#F9A825':'#C62828';
                 let medal = i===0?'🥇':i===1?'🥈':i===2?'🥉':`${i+1}.`;
@@ -9553,31 +9673,52 @@
                     <span style="background:${c};color:white;font-size:12px;font-weight:700;padding:3px 10px;border-radius:50px;">${item.prom.toFixed(1)}%</span>
                 </div>`;
             }).join('') || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin auditorías esta semana</div>';
+        }
 
-            // RANKING SUPERVISORAS + VISITAS
+        function navegarSemanaTop(dir) {
+            const limiteMin = new Date(2026, 0, 1);
+            const { lunes: lunesActual } = getLunesDomingo(0);
+            const { lunes } = getLunesDomingo(_topSemanaOffset);
+            if (dir === -1 && lunes <= limiteMin) return;
+            if (dir === 1 && lunes >= lunesActual) return;
+            _topSemanaOffset += dir;
+            renderTopSemanal();
+        }
+
+        function renderRankingSupervisoras() {
+            const data = _analiticaData;
+            const visitas = _analiticaVisitas;
+            const periodo = document.getElementById('ranking-filtro-periodo')?.value || 'mes';
+            const hoy = new Date();
+            let desde, hasta;
+
+            if (periodo === 'semana') {
+                const { lunes, domingo } = getLunesDomingo(0);
+                desde = lunes; hasta = domingo;
+            } else {
+                desde = new Date(hoy.getFullYear(), hoy.getMonth(), 1, 0,0,0,0);
+                hasta = new Date(hoy.getFullYear(), hoy.getMonth()+1, 0, 23,59,59,999);
+            }
+
+            const filtradas = data.filter(a => { let d=parseFechaA(a.fecha); return d && d>=desde && d<=hasta; });
             let supMap = {};
-            filtered.forEach(a => {
+            filtradas.forEach(a => {
                 let s=a.supervisor||''; if(!s) return;
                 if(!supMap[s]) supMap[s]={vals:[],auds:0,vis:0};
                 supMap[s].vals.push(a.nota_final||0); supMap[s].auds++;
             });
-            // Filtrar visitas por mismo período
             visitas.forEach(v => {
                 let s=v.supervisor||''; if(!s) return;
-                if(!supMap[s]) supMap[s]={vals:[],auds:0,vis:0};
                 let d = v.datetime ? new Date(v.datetime) : null;
-                if (!d) return;
-                let mes = String(d.getMonth()+1).padStart(2,'0');
-                let anio = String(d.getFullYear());
-                if (mesSel && mes !== mesSel) return;
-                if (anioSelVal && anio !== anioSelVal) return;
+                if (!d || d<desde || d>hasta) return;
+                if(!supMap[s]) supMap[s]={vals:[],auds:0,vis:0};
                 supMap[s].vis++;
             });
-            let supRanking = Object.entries(supMap)
-                .filter(([,d])=>d.auds>0)
+            const ranking = Object.entries(supMap).filter(([,d])=>d.auds>0)
                 .map(([s,d])=>({ sup:s, prom:d.vals.reduce((a,v)=>a+v,0)/d.vals.length, auds:d.auds, vis:d.vis }))
                 .sort((a,b)=>b.prom-a.prom);
-            document.getElementById('analitica-supervisoras').innerHTML = supRanking.map(item => {
+
+            document.getElementById('analitica-supervisoras').innerHTML = ranking.map(item => {
                 let c=item.prom>90?'#43A047':item.prom>70?'#F9A825':'#C62828';
                 let inis=item.sup.split(' ').map(n=>n[0]||'').join('').substring(0,2).toUpperCase();
                 return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #F5F5F5;">
@@ -9585,36 +9726,51 @@
                     <div style="flex:1;min-width:0;">
                         <div style="font-size:13px;font-weight:700;color:#1B1B1B;">${item.sup}</div>
                         <div style="display:flex;gap:8px;margin-top:2px;">
-                            <span style="font-size:10px;color:#FC6E20;font-weight:600;">📋 ${item.auds} aud.</span>
-                            <span style="font-size:10px;color:#888;font-weight:600;">📍 ${item.vis} vis.</span>
+                            <span style="font-size:11px;color:#FC6E20;font-weight:600;">📋 ${item.auds} aud.</span>
+                            <span style="font-size:11px;color:#888;font-weight:600;">📍 ${item.vis} vis.</span>
                         </div>
                     </div>
                     <span style="background:${c};color:white;font-size:12px;font-weight:700;padding:3px 10px;border-radius:50px;">${item.prom.toFixed(1)}%</span>
                 </div>`;
             }).join('') || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos</div>';
+        }
 
-            // TOP 5 PREGUNTAS FALLIDAS
+        function renderFallidasSemana() {
+            const data = _analiticaData;
+            const { lunes, domingo } = getLunesDomingo(0);
+            const semAuds = data.filter(a => { let d=parseFechaA(a.fecha); return d && d>=lunes && d<=domingo; });
+            const labelEl = document.getElementById('fallidas-semana-label');
+            if (labelEl) labelEl.textContent = `Semana ${lunes.toLocaleDateString('es-PE',{day:'numeric',month:'short'})} — ${domingo.toLocaleDateString('es-PE',{day:'numeric',month:'short'})}`;
+
+            const GRUPOS = {1:'G1 — Customer Journey',2:'G2 — Control de Calidad',3:'G3 — Equipos y Utensilios',4:'G4 — Monitoreo de Equipos',5:'G5 — Control Documentario'};
             let fallidasMap = {};
-            filtered.forEach(a => {
+            semAuds.forEach(a => {
                 let resp = a.respuestas||{};
                 Object.entries(resp).forEach(([pid,r]) => { if(r && r.valor==='NO') fallidasMap[pid]=(fallidasMap[pid]||0)+1; });
             });
-            let top5f = Object.entries(fallidasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+            const top5f = Object.entries(fallidasMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+            const total = semAuds.length;
+
             document.getElementById('analitica-fallidas').innerHTML = top5f.map(([pid,count]) => {
                 let p = window.PREGUNTAS?.find(x=>String(x.id)===String(pid));
                 let texto = p ? p.texto : `Pregunta ${pid}`;
-                let pct = totalAuds>0 ? Math.min(((count/totalAuds)*100),100).toFixed(0) : 0;
+                let grupo = p ? (GRUPOS[p.grupo] || `Grupo ${p.grupo}`) : '';
+                let pct = total>0 ? Math.min(((count/total)*100),100).toFixed(0) : 0;
                 return `<div style="padding:10px 0;border-bottom:1px solid #F5F5F5;">
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-                        <div style="font-size:12px;font-weight:700;color:#C62828;flex:1;padding-right:8px;">${texto.length>60?texto.substring(0,60)+'...':texto}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+                        <div style="flex:1;padding-right:8px;">
+                            <div style="font-size:12px;font-weight:700;color:#C62828;">${texto.length>60?texto.substring(0,60)+'...':texto}</div>
+                            ${grupo ? `<div style="font-size:10px;color:#aaa;margin-top:2px;">${grupo}</div>` : ''}
+                        </div>
                         <span style="background:#FFEBEE;color:#C62828;font-size:11px;font-weight:700;padding:2px 8px;border-radius:50px;flex-shrink:0;">${count} NO</span>
                     </div>
                     <div style="background:#F5F5F5;border-radius:50px;height:5px;">
                         <div style="background:#C62828;border-radius:50px;height:5px;width:${pct}%;"></div>
                     </div>
                 </div>`;
-            }).join('') || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos</div>';
+            }).join('') || '<div style="color:#aaa;text-align:center;padding:16px;font-size:13px;">Sin datos esta semana</div>';
         }
+        // ── FIN ANALÍTICA ────────────────────────────────────────────
 
         function exportarHistorialVisitasExcel() {
             let viss = JSON.parse(localStorage.getItem("visitas") || "[]");
