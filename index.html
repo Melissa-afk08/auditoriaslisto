@@ -8264,7 +8264,7 @@
                 const hora = v.datetime ? v.datetime.substring(11,16) : '';
                 html += `
                 <div style="background:white;border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;gap:12px;cursor:pointer;border:2px solid ${seleccionado?'#FC6E20':'transparent'};"
-                    onclick="window._miSelModeVis ? (()=>{if(window._miSelVis.has(${v.id}))window._miSelVis.delete(${v.id});else window._miSelVis.add(${v.id});renderMisVisitas();})() : null"
+                    onclick="window._miSelModeVis ? (()=>{if(window._miSelVis.has(${v.id}))window._miSelVis.delete(${v.id});else window._miSelVis.add(${v.id});renderMisVisitas();})() : verDetalleVisita(${v.id})"
                     ontouchstart="window._miLpVisF=false;window._miLpVis=setTimeout(()=>{window._miLpVisF=true;window._miSelModeVis=true;window._miSelVis.add(${v.id});renderMisVisitas();},700)"
                     ontouchend="clearTimeout(window._miLpVis)"
                     onmousedown="window._miLpVis=setTimeout(()=>{window._miLpVisF=true;window._miSelModeVis=true;window._miSelVis.add(${v.id});renderMisVisitas();},700)"
@@ -8272,6 +8272,7 @@
                     ${window._miSelModeVis ? `<div style="width:22px;height:22px;border-radius:50%;border:2px solid ${seleccionado?'#FC6E20':'#ccc'};background:${seleccionado?'#FC6E20':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${seleccionado?'<span style="color:white;font-size:13px;">✓</span>':''}</div>` : ''}
                     <div style="flex:1;min-width:0;">
                         <div style="font-size:14px;font-weight:700;color:#1B1B1B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.tienda||'—'}</div>
+                        <div style="font-size:12px;color:#FC6E20;font-weight:600;margin-top:2px;">${v.supervisor||''}</div>
                         <div style="font-size:12px;color:#888;margin-top:2px;">${fecha} ${hora}</div>
                         ${v.comentario ? `<div style="font-size:12px;color:#555;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.comentario}</div>` : ''}
                     </div>
