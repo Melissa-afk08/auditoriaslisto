@@ -3293,7 +3293,7 @@
                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                     </svg>
                 </button>
-                <button id="btn-add-tienda" class="btn-filter" onclick="abrirModalAgregarTienda()" style="display:none;">
+                <button id="btn-add-tienda" class="btn-filter" onclick="abrirMenuAccionesTienda()" style="display:none;">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="5" x2="12" y2="19"></line>
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -3335,6 +3335,27 @@
                 <input type="hidden" id="input-tienda-id">
                 <button onclick="guardarNuevaTienda()" style="width:100%;margin-top:18px;padding:13px;border-radius:12px;border:none;background:#E87722;color:white;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.3px;">Guardar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL: MENÚ ACCIONES + -->
+    <div id="modal-menu-add-tienda" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9999;align-items:flex-end;justify-content:center;">
+        <div style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px;box-shadow:0 -4px 32px rgba(0,0,0,0.15);">
+            <div style="font-size:13px;font-weight:700;color:#888;margin-bottom:16px;text-transform:uppercase;letter-spacing:0.5px;">Tiendas</div>
+            <button onclick="document.getElementById('modal-menu-add-tienda').style.display='none';abrirModalAgregarTienda();" style="width:100%;padding:14px;border-radius:12px;border:1.5px solid #EEE;background:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px;text-align:left;">➕ &nbsp;Nueva tienda</button>
+            <button onclick="document.getElementById('modal-menu-add-tienda').style.display='none';abrirDesactivadas();" style="width:100%;padding:14px;border-radius:12px;border:1.5px solid #EEE;background:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-align:left;">🗂️ &nbsp;Ver tiendas desactivadas</button>
+            <button onclick="document.getElementById('modal-menu-add-tienda').style.display='none'" style="width:100%;padding:13px;border-radius:12px;border:none;background:#F5F5F5;font-size:14px;cursor:pointer;font-family:inherit;margin-top:10px;">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- MODAL: TIENDAS DESACTIVADAS -->
+    <div id="modal-desactivadas" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9999;align-items:flex-end;justify-content:center;">
+        <div style="background:white;border-radius:20px 20px 0 0;width:100%;max-width:480px;max-height:80vh;overflow-y:auto;box-shadow:0 -4px 32px rgba(0,0,0,0.15);">
+            <div style="padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:15px;font-weight:800;color:#1B1B1B;">Tiendas desactivadas</span>
+                <button onclick="document.getElementById('modal-desactivadas').style.display='none'" style="background:none;border:none;cursor:pointer;color:#999;font-size:20px;">✕</button>
+            </div>
+            <div id="lista-desactivadas" style="padding:16px 20px 28px;display:flex;flex-direction:column;gap:10px;"></div>
         </div>
     </div>
 
@@ -5317,6 +5338,37 @@
             await cargarTiendas();
             showView("view-home");
             verificarCierreMensual();
+        }
+
+        function abrirMenuAccionesTienda() {
+            document.getElementById('modal-menu-add-tienda').style.display = 'flex';
+        }
+
+        async function abrirDesactivadas() {
+            const { data, error } = await sbClient.from('tiendas').select('*').eq('activa', false).order('nombre');
+            const lista = document.getElementById('lista-desactivadas');
+            if (!data || data.length === 0) {
+                lista.innerHTML = '<div style="color:#999;font-size:14px;text-align:center;padding:20px;">No hay tiendas desactivadas</div>';
+            } else {
+                lista.innerHTML = data.map(t => `
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:12px;border:1.5px solid #EEE;">
+                        <div>
+                            <div style="font-size:14px;font-weight:700;color:#1B1B1B;">${t.nombre}</div>
+                            <div style="font-size:12px;color:#E87722;font-weight:600;">${t.distrito}</div>
+                        </div>
+                        <button onclick="reactivarTienda(${t.id})" style="padding:8px 14px;border-radius:10px;border:none;background:#E87722;color:white;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;">Reactivar</button>
+                    </div>`).join('');
+            }
+            document.getElementById('modal-desactivadas').style.display = 'flex';
+        }
+
+        async function reactivarTienda(id) {
+            const { error } = await sbClient.from('tiendas').update({ activa: true }).eq('id', id);
+            if (error) { showToast('Error al reactivar', 'error'); return; }
+            showToast('Tienda reactivada', 'ok');
+            await abrirDesactivadas();
+            await cargarTiendas();
+            renderListaTiendas('view-tiendas');
         }
 
         window._tiendaMenuActual = null;
