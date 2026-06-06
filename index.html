@@ -3293,6 +3293,7 @@
                         <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                     </svg>
                 </button>
+                <button id="btn-add-tienda" onclick="abrirModalAgregarTienda()" style="display:none;background:#f5f5f5;border:none;border-radius:10px;width:40px;height:40px;cursor:pointer;font-size:20px;color:#555;flex-shrink:0;">+</button>
             </div>
             <div id="dropdown-dist-view-tiendas" style="display:none;background:white;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,0.12);padding:8px;margin-bottom:12px;">
                 <select id="select-dist-view-tiendas" onchange="selectDistrict('view-tiendas', this.value)" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
@@ -3300,6 +3301,20 @@
                 </select>
             </div>
             <div id="list-tiendas"></div>
+        </div>
+    </div>
+
+    <!-- MODAL: AGREGAR TIENDA -->
+    <div id="modal-agregar-tienda" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9999;align-items:center;justify-content:center;">
+        <div style="background:white;border-radius:16px;padding:24px;width:90%;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+            <div style="font-size:15px;font-weight:700;margin-bottom:16px;color:#1B1B1B;">Nueva tienda</div>
+            <input id="input-tienda-nombre" type="text" placeholder="Nombre *" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;outline:none;">
+            <input id="input-tienda-distrito" type="text" placeholder="Distrito *" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;margin-bottom:10px;font-family:inherit;outline:none;">
+            <input id="input-tienda-direccion" type="text" placeholder="Dirección" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:14px;box-sizing:border-box;margin-bottom:20px;font-family:inherit;outline:none;">
+            <div style="display:flex;gap:10px;">
+                <button onclick="cerrarModalAgregarTienda()" style="flex:1;padding:11px;border-radius:10px;border:1.5px solid #EEE;background:white;font-size:14px;cursor:pointer;font-family:inherit;">Cancelar</button>
+                <button onclick="guardarNuevaTienda()" style="flex:1;padding:11px;border-radius:10px;border:none;background:#1B1B1B;color:white;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;">Guardar</button>
+            </div>
         </div>
     </div>
 
@@ -4570,209 +4585,17 @@
             { nombre: "Lorena Sanchez", email: "lorenaprimax2023@gmail.com", cargo: "JEFA COMERCIAL FAST FOOD" }
         ];
 
-        const TIENDAS = [
-            { nombre: "ES SALAVERRY 2", distrito: "MAGDALENA", direccion: "Jiron Salaverry N° 478 - 480 - Magdalena del Mar" },
-            { nombre: "LISTO SCHELL", distrito: "MIRAFLORES", direccion: "CALLE SHELL NRO 324" },
-            { nombre: "MARKET EL TREN", distrito: "LURIN", direccion: "CARRETERA PANAMERICANA SUR KM 24" },
-            { nombre: "MARKET PETROSUR", distrito: "LURIN", direccion: "PANAMERICANA SUR KM 19.200" },
-            { nombre: "ES GAMARRA 2", distrito: "SAN MIGUEL", direccion: "Av. La Paz nro 1480-1498 - San Miguel" },
-            { nombre: "ES CERRO AZUL", distrito: "CAÑETE", direccion: "Altura del Km. 129.2 de la autopista Panamericana Sur - Cerro Azul" },
-            { nombre: "ES ASIA", distrito: "ASIA", direccion: "CARRETERA PANAMERICANA SUR 97.5 Lote 40" },
-            { nombre: "ES MARINA", distrito: "LA MARINA", direccion: "AV LA MARINA NRO 2185" },
-            { nombre: "ES SAN CARLOS", distrito: "LURIN", direccion: "CARRETERA PANAMERICANA SUR KM. 29" },
-            { nombre: "ES ARMENDARIZ", distrito: "MIRAFLORES", direccion: "AV ARMENDARIS NRO 575" },
-            { nombre: "ES SAN ANTONIO", distrito: "MIRAFLORES", direccion: "AV PASEO DE LA REPÚBLICA" },
-            { nombre: "ES SUCRE", distrito: "JESUS MARIA", direccion: "Av. Sucre 1070 - Jesus Maria" },
-            { nombre: "LISTO PARDO 1", distrito: "MIRAFLORES", direccion: "AV PARDO NRO 680" },
-            { nombre: "LISTO PARDO 2", distrito: "MIRAFLORES", direccion: "AV.JOSE PARDO 434" },
-            { nombre: "ES ESCARDO", distrito: "SAN MIGUEL", direccion: "Calle Rafael Escardo 250 Urb. Maranga - San Miguel" },
-            { nombre: "ES EJERCITO", distrito: "MIRAFLORES", direccion: "Av. Del Ejercito Esq. Calle Tovar - Miraflores" },
-            { nombre: "ES PANSUR", distrito: "LURIN", direccion: "CARRETERA PANAMERICANA SUR KM 30 Lurin" },
-            { nombre: "LISTO BARRANCO", distrito: "BARRANCO", direccion: "PASAJE SANCHEZ CARRIÓN NRO 195" },
-            { nombre: "LISTO BENAVIDES 2", distrito: "MIRAFLORES", direccion: "AV BENAVIDES NRO 433" },
-            { nombre: "LISTO ARENALES", distrito: "LIMA", direccion: "Jr. Eugenio Larrabure y Unanue N° 196 - LIMA" },
-            { nombre: "LISTO ARAMBURU 1", distrito: "SAN ISIDRO", direccion: "AV. ARAMBURU 355" },
-            { nombre: "LISTO TIKI", distrito: "SAN ISIDRO", direccion: "AV JOSE GALVEZ BARNECHEA 520 - SAN ISIDRO" },
-            { nombre: "LISTO GARZON", distrito: "LINCE", direccion: "AV GENERAL GARZON 1380 - JESUS MARIA" },
-            { nombre: "LISTO MINKA", distrito: "CALLAO", direccion: "Av. Argentina N° 3093 - Centro Comercial Minka - Callao" },
-            { nombre: "LISTO SAN MIGUEL", distrito: "SAN MIGUEL", direccion: "AV. LA MARINA N° 2000 - LA MARINA" },
-            { nombre: "ES PAZ 1", distrito: "SAN MIGUEL", direccion: "Av. La Paz 925, San Miguel" },
-            { nombre: "ES PERLA", distrito: "CALLAO", direccion: "AV LA PAZ 2326 LA PERLA - CALLAO" },
-            { nombre: "ES TINGO MARIA", distrito: "LIMA", direccion: "Av. Tingo Maria 1190, Lima - Cercado de Lima" },
-            { nombre: "ES PASEO DE LA REPUBLICA", distrito: "MIRAFLORES", direccion: "Av. Paseo de la Republica 5545 - Miraflores" },
-            { nombre: "LISTO ICPNA SAN MIGUEL", distrito: "SAN MIGUEL", direccion: "Av La Marina 2469 - San Miguel" },
-            { nombre: "LISTO UPN BREÑA", distrito: "LIMA", direccion: "AV TINGO MARIA 1122 - LIMA" },
-            { nombre: "ES OVALO 2", distrito: "CALLAO", direccion: "Av la marina #115 esquina con av. santa Rosa #135 - Callao" },
-            { nombre: "ES CHARACATO", distrito: "AREQUIPA", direccion: "H9RV+VQX, Tiabaya 04000" },
-            { nombre: "ES LANIFICIO", distrito: "AREQUIPA", direccion: "Av. Perú 37, José Luis Bustamante y Rivero 04009" },
-            { nombre: "ES OVALO", distrito: "AREQUIPA", direccion: "Av. Andrés Avelino Cáceres Mz. C Lote 1 - José Luis Bustamante y Rivero" },
-            { nombre: "ES RESERVORIO", distrito: "AREQUIPA", direccion: "Av Pizarro 141, José Luis Bustamante y Rivero" },
-            { nombre: "ES SUR PERU", distrito: "AREQUIPA", direccion: "Ca. Jacinto Ibañez, Cercado De Arequipa 04001" },
-            { nombre: "ES YANAHURA", distrito: "AREQUIPA", direccion: "Av. Ejército 504, Yanahuara 04017" },
-            { nombre: "ES EL VELOZ", distrito: "AREQUIPA", direccion: "Av. Aviación Km 6, Cerro Colorado 04017" },
-            { nombre: "ES UMACOLLO", distrito: "AREQUIPA", direccion: "Prolongación Av. Ejército N° 710, Cerro Colorado" },
-            { nombre: "ES CASTANOS", distrito: "SAN ISIDRO", direccion: "AV JAVIER PRADO OESTE NRO 1895 - SAN ISIDRO" },
-            { nombre: "ES FLORA TRISTAN", distrito: "MAGDALENA", direccion: "Av. Javier Prado Oeste 2504 - Magdalena del Mar" },
-            { nombre: "ES WIRACOCHA", distrito: "JESUS MARIA", direccion: "AV GREGORIO ESCOBEDO - JESUS MARIA" },
-            { nombre: "ES ORRANTIA", distrito: "MAGDALENA", direccion: "AV DEL EJERCITO NRO 965 - 967 - MAGDALENA" },
-            { nombre: "ES DUEÑAS", distrito: "CENTRO DE LIMA", direccion: "Av. Argentina 1815 - Cercado de Lima" },
-            { nombre: "ES EL CARMELO", distrito: "SAN MIGUEL", direccion: "Av. La Marina 3112 Urb. Maranga - San Miguel" },
-            { nombre: "ES FAUCETT", distrito: "SAN MIGUEL", direccion: "Elmer Faucett 384 - San Miguel" },
-            { nombre: "ES IGARZA", distrito: "SAN MARTIN DE PORRES", direccion: "Av. Tomas Valle 1981 - San Martin de Porres" },
-            { nombre: "ES MAGDALENA", distrito: "MAGDALENA", direccion: "AV BRASIL NRO 4191 - 4193 ESQ" },
-            { nombre: "ES PERSHING", distrito: "JESUS MARIA", direccion: "Av. Jose Faustino Sanchez Carrión N° 471 - Jesus Maria" },
-            { nombre: "ES QUILCA", distrito: "CALLAO", direccion: "Av. Quilca 531, Callao 15106" },
-            { nombre: "ES SALAVERRY 1", distrito: "LINCE", direccion: "AV GENERAL CESAR CANEVARO" },
-            { nombre: "ES COLLIQUE", distrito: "COMAS", direccion: "Av. Universitaria Esq. Av. Mexico - Comas" },
-            { nombre: "ES MARBELLA", distrito: "MAGDALENA", direccion: "Av. Augusto Perez Aranibar 2199" },
-            { nombre: "ES TRAPICHE 1", distrito: "COMAS", direccion: "Av. Heroes del Alto Cenepa N° 697 - Comas" },
-            { nombre: "LISTO TRAPICHE 2", distrito: "COMAS", direccion: "Av. Heroes del Alto Cenepa N° 1881 - Comas" },
-            { nombre: "LISTO PLAZA NORTE", distrito: "TOMAS VALLE", direccion: "AV ALFREDO MENDIOLA NRO 1400 - CENTRO COMERCIAL PLAZA NORTE" },
-            { nombre: "LISTO UNIVERSITARIA 2", distrito: "SAN MIGUEL", direccion: "Av. Universitaria Norte 1783 - Cercado de Lima" },
-            { nombre: "ES BOLIVAR", distrito: "PUEBLO LIBRE", direccion: "Av. Bolivar 1020 - Pueblo Libre" },
-            { nombre: "ES TOMAS VALLE", distrito: "TOMAS VALLE", direccion: "Av. Tomas Valle Esq. Av. Beta - Los Olivos" },
-            { nombre: "LISTO AEROPUERTO", distrito: "CALLAO", direccion: "Av. Elmer Fauccet S/N - Hall Llegadas internacionales - Callao" },
-            { nombre: "LISTO SALAVERRY 3", distrito: "LIMA", direccion: "AV. SALAVERRY 2417 - JESUS MARIA" },
-            { nombre: "ES COLONIAL 2", distrito: "LIMA", direccion: "Av. Mariscal Oscar R. Benavides 300 - Cercado de Lima" },
-            { nombre: "ES SUDAMERICANO", distrito: "LIMA", direccion: "Av. Colonial 871 - Cercado de Lima" },
-            { nombre: "ES AULY", distrito: "SAN JUAN DE LURIGANCHO", direccion: "Av. Proceres de la Independencia Mz. K1 - San Carlos - SJL" },
-            { nombre: "ES LURIGANCHO", distrito: "SAN JUAN DE LURIGANCHO", direccion: "AV LURIGANCHO 1175 - SAN JUAN DE LURIGANCHO" },
-            { nombre: "ES ZARATE", distrito: "SAN JUAN DE LURIGANCHO", direccion: "Malecon Checa Cdra. 1 Esq. Proc. Independencia - SJL" },
-            { nombre: "ES PANDO", distrito: "SAN MIGUEL", direccion: "Av. La Marina N° 2001 Urb. Pando - San Miguel" },
-            { nombre: "LISTO UNI CAYETANO HEREDIA", distrito: "SAN MARTIN DE PORRES", direccion: "Av. Honorio Delgado 430 - San Martin de Porres" },
-            { nombre: "LISTO CESAR VALLEJO OLIVOS", distrito: "LOS OLIVOS", direccion: "Av Alfredo Mendiola 6232 - Los Olivos" },
-            { nombre: "LISTO CESAR VALLEJO SJL", distrito: "SAN JUAN DE LURIGANCHO", direccion: "El Parque N° 640 Urb. Canto Grande - SJL" },
-            { nombre: "LISTO UPN LOS OLIVOS", distrito: "LOS OLIVOS", direccion: "Av. Alfredo Mendiola 6060 - Los Olivos" },
-            { nombre: "LISTO AEROPUERTO 2", distrito: "CALLAO", direccion: "Av. Nestor Gambeta N°1570 - Primer Nivel Zona Pública - CALLAO" },
-            { nombre: "ES BALDI", distrito: "CHICLAYO", direccion: "Carretera Panamericana Norte Km. 696 - La Libertad" },
-            { nombre: "ES INTERNACIONAL", distrito: "CHICLAYO", direccion: "Panamericana Nte. 777, Chiclayo 14011" },
-            { nombre: "ES SANTA ELENA", distrito: "CHICLAYO", direccion: "Juan Tomis Stack 205" },
-            { nombre: "ES SANTA VICTORIA", distrito: "CHICLAYO", direccion: "Av. Garcilaso de la Vega 561" },
-            { nombre: "ES PALMERAS", distrito: "CHICLAYO", direccion: "Av. Francisco Bolognesi 38" },
-            { nombre: "ES SANTO TORIBIO", distrito: "CHICLAYO", direccion: "José Leonardo Ortiz" },
-            { nombre: "ES PACASMAYO", distrito: "CHICLAYO", direccion: "Av. Gonzalo Ugas Salcedo 5, Pacasmayo" },
-            { nombre: "ES CANADA", distrito: "LA VICTORIA", direccion: "AV CANADA CUADRA 11 ESQUINA - LA VICTORIA" },
-            { nombre: "ES FERRERO", distrito: "LA MOLINA", direccion: "AV ALAMEDA DEL CORREGIDOR - LA MOLINA" },
-            { nombre: "ES UNIVERSIDAD", distrito: "LA MOLINA", direccion: "AV LA UNIVERSIDAD NRO 1275 - LA MOLINA" },
-            { nombre: "ES NAVAL", distrito: "SAN BORJA", direccion: "AV SAN LUIS NRO 2480 - SAN BORJA" },
-            { nombre: "ES CASTILLA 3", distrito: "LA VICTORIA", direccion: "AV NICOLÁS ARRIOLA NRO 295 - LA VICTORIA" },
-            { nombre: "ES JAVIER PRADO", distrito: "LA VICTORIA", direccion: "Av. Javier Prado 1059 - La Victoria" },
-            { nombre: "ES ARRIOLA", distrito: "LA VICTORIA", direccion: "Av. Nicolas Arriola 740 - La Victoria" },
-            { nombre: "ES FRUTALES", distrito: "LA MOLINA", direccion: "Av. Los Frutales 994 Urb. Camino Real - La Molina" },
-            { nombre: "ES HIPODROMO", distrito: "SURCO", direccion: "AV JAVIER PRADO ESTE NRO 4350 - SURCO" },
-            { nombre: "ES MOLINA", distrito: "LA MOLINA", direccion: "Av. Javier Prado Este 610 - La Molina" },
-            { nombre: "ES MONTERRICO", distrito: "LA MOLINA", direccion: "Av. La Molina 580 - LA MOLINA" },
-            { nombre: "ES ÑAÑA", distrito: "CHACLACAYO", direccion: "Av. Nicolas Ayllon 1500 Ñaña Km 19.5 - Chaclacayo" },
-            { nombre: "ES SAN LUIS 1", distrito: "SAN LUIS", direccion: "Av. Nicolas Ayllon 1340 - San Luis" },
-            { nombre: "LISTO CAMACHO", distrito: "SURCO", direccion: "Av. Prolongación Javier Prado Este 4885 - La Molina" },
-            { nombre: "LISTO EL PINO", distrito: "SAN LUIS", direccion: "Jr. Manuel Echeandia 586 Urb. El Pino - San Luis" },
-            { nombre: "LISTO FONTANA", distrito: "LA MOLINA", direccion: "AV CORONEL JUAN PASCAL PRINGLE" },
-            { nombre: "LISTO PANORAMA", distrito: "SURCO", direccion: "AV. CIRCUNVALACIÓN DEL GOLF 134" },
-            { nombre: "LISTO SANTA ANITA", distrito: "SANTA ANITA", direccion: "AV NICOLÁS AYLLÓN NRO 15008" },
-            { nombre: "LISTO UNI UDLIMA 1", distrito: "SURCO", direccion: "AV JAVIER PRADO ESTE 4600 - SURCO PRIMER PISO" },
-            { nombre: "LISTO UNI UDLIMA 2", distrito: "SURCO", direccion: "Av. Javier Prado 4600 Torre I - Santiago de Surco" },
-            { nombre: "LISTO DERBY", distrito: "SURCO", direccion: "Av. Derby N° 118 Mz. A lt 5 Urb. El Derby" },
-            { nombre: "ES FERRARI", distrito: "SURCO", direccion: "AV TOMAS MARSANO NRO 5010 - SURCO" },
-            { nombre: "ES SAN BORJA", distrito: "SAN BORJA", direccion: "Av. Agustín de la Rosa Toro 1312 Urb. Jacaranda II - San Borja" },
-            { nombre: "ES VALLE HERMOSO", distrito: "SURCO", direccion: "AV PRIMAVERA NRO 1159" },
-            { nombre: "LISTO UNI CESAR VALLEJO ATE", distrito: "ATE", direccion: "Av Nicolas Ayllon Lote 120 - Fundo la estrella - Ate" },
-            { nombre: "LISTO SANNA", distrito: "SAN BORJA", direccion: "Av Guardia Civil 337 - San Borja" },
-            { nombre: "ES ATE 2", distrito: "ATE", direccion: "Carretera Central Km. 16 - Ate Vitarte" },
-            { nombre: "LISTO PARIACHI", distrito: "ATE", direccion: "Av. Separadora Industrial 1920 - Ate Vitarte" },
-            { nombre: "ES TOMAS MARSANO", distrito: "SURCO", direccion: "Av. Tomas Marsano Esq. Con Av. Surco - Santiago de Surco" },
-            { nombre: "LISTO ICPNA SURCO", distrito: "SURCO", direccion: "Alameda Domingo Tristan y Moscoso - Santiago de Surco" },
-            { nombre: "LISTO ICPNA LA MOLINA", distrito: "LA MOLINA", direccion: "Av Javier Prado Este 4625 - La Molina" },
-            { nombre: "LISTO CRUZ DEL SUR", distrito: "LA VICTORIA", direccion: "AV JAVIER PRADO ESTE #1109 URB EL PALOMAR - LA VICTORIA" },
-            { nombre: "LISTO UNI CAYETANO LA MOLINA", distrito: "LA MOLINA", direccion: "Jr Antonio N° 338 Urb. Parque Monterrico" },
-            { nombre: "LISTO UNI USM SANTA ANITA", distrito: "SANTA ANITA", direccion: "Jr. Las Calandrias 151 - Santa Anita" },
-            { nombre: "ES JAVIER PRADO 2", distrito: "LA VICTORIA", direccion: "Av Javier prado Este 6170 MZ B LT 03 - La Molina" },
-            { nombre: "ES AMERICA DEL NORTE 1", distrito: "TRUJILLO", direccion: "WX29+XX8, Trujillo 13001" },
-            { nombre: "ES AMERICA DEL NORTE 2", distrito: "TRUJILLO", direccion: "WX4H+27G, Trujillo 13001" },
-            { nombre: "ES CASTILLA 1", distrito: "PIURA", direccion: "Av. Luis Montero S/N Urb. Miraflores" },
-            { nombre: "ES ESPAÑA 1", distrito: "TRUJILLO", direccion: "Avenida España, Trujillo" },
-            { nombre: "ES LA PERLA", distrito: "TRUJILLO", direccion: "Av. América Sur 2677, Trujillo" },
-            { nombre: "ES LARCO", distrito: "TRUJILLO", direccion: "Av. Víctor Larco Herrera 1132" },
-            { nombre: "ES LOS POSTES", distrito: "TRUJILLO", direccion: "Av. Condorcanqui 2492" },
-            { nombre: "ES MOCHE", distrito: "TRUJILLO", direccion: "AV. Panamericana N 556, Trujillo" },
-            { nombre: "ES SANTO DOMINGUITO", distrito: "TRUJILLO", direccion: "Jirón Pizarro y Jirón Bolognesi - Zona Monumental de Trujillo" },
-            { nombre: "ES ULTRACOM HUANCHAQUITO", distrito: "TRUJILLO", direccion: "Mz. A Lote 1-A, A.H. Huanchaquito Bajo" },
-            { nombre: "ES UNION 1", distrito: "TRUJILLO", direccion: "Av. Prolongación Unión 1914 - Moche, La Libertad" },
-            { nombre: "ES CALIFORNIA", distrito: "TRUJILLO", direccion: "Av. Nicolás de Piérola 1390, Trujillo 13011" },
-            { nombre: "ES MOCHICA", distrito: "TRUJILLO", direccion: "Av. América Sur 2614" },
-            { nombre: "ES SANTA AMALIA", distrito: "TRUJILLO", direccion: "Trujillo 13008" },
-            { nombre: "LISTO UPN TRUJILLO EL MOLINO", distrito: "TRUJILLO", direccion: "Campus UPN El Molino, Trujillo" },
-            { nombre: "LISTO UPN SAN ISIDRO", distrito: "TRUJILLO", direccion: "Universidad Privada del Norte UPN Sede San Isidro" },
-            { nombre: "LISTO UNI CESAR VALLEJO TRUJILLO", distrito: "TRUJILLO", direccion: "Av. Larco 1770, Trujillo 13001" },
-            { nombre: "ES OVALO GRAU", distrito: "PIURA", direccion: "Jr. Huancavelica 728, Piura 20001" },
-            { nombre: "ES CALLE DERECHA", distrito: "HUARAL", direccion: "Grifo Pinazo, Av García Alonso 195, Huaral 15201" },
-            { nombre: "ES DONALD", distrito: "PIURA", direccion: "R8MX+XMH, Piura 20009" },
-            { nombre: "ES GASCOP PIURA", distrito: "PIURA", direccion: "R8H8+3W7, Autop. del Sol, Piura 20008" },
-            { nombre: "ES GRAU", distrito: "PIURA", direccion: "R946+JR8, Av. Grau, Piura 20001" },
-            { nombre: "ES LUKAS", distrito: "PIURA", direccion: "Av. Sullana 102, Piura 20001" },
-            { nombre: "ES MACARENA", distrito: "PIURA", direccion: "R982+QX9, Av. Andrés Avelino Cáceres, Piura 20001" },
-            { nombre: "ES MEGA", distrito: "PIURA", direccion: "R999+4HC, Av. Ramón Mugica, Piura 20009" },
-            { nombre: "ES PERU", distrito: "PIURA", direccion: "R973+VG9, Av. Sánchez Cerro, Piura 20001" },
-            { nombre: "ES PIURA", distrito: "PIURA", direccion: "Av. Progreso 1702, Piura 20003" },
-            { nombre: "ES SAN JOSE", distrito: "PIURA", direccion: "Av. Grau 1602, Piura 20001" },
-            { nombre: "ES SULLANA", distrito: "PIURA", direccion: "Marcelino Champagnat 1110, Sullana 20102" },
-            { nombre: "ES TALARA", distrito: "PIURA", direccion: "CPFM+CC4, Talara 20811" },
-            { nombre: "ES EJIDOS", distrito: "PIURA", direccion: "Ejidos del Norte frente al km2" },
-            { nombre: "ES OVALO SULLANA", distrito: "PIURA", direccion: "38X2+9V4, Sullana 20103" },
-            { nombre: "ES PIURA FUTURA", distrito: "PIURA", direccion: "R8R4+FVM, Autop. del Sol, Piura 20000" },
-            { nombre: "ES SAN MIGUEL SULLANA", distrito: "PIURA", direccion: "38X3+WX3, Sullana 20103" },
-            { nombre: "LISTO UNI CESAR VALLEJO PIURA", distrito: "PIURA", direccion: "Raúl Mata La Cruz s/n, Piura 20001" },
-            { nombre: "ES GUADALUPE", distrito: "ICA", direccion: "Señora de Guadalupe con, Ctra. Panamericana Sur 1075, Ica 11501" },
-            { nombre: "ES PRIMAVERA 2", distrito: "ICA", direccion: "V7WM+23R, Pueblo Nuevo 11000" },
-            { nombre: "ES AREQUIPA 1", distrito: "SAN ISIDRO", direccion: "AV AREQUIPA NRO 3325 - SAN ISIDRO" },
-            { nombre: "ES SAN LUIS 2", distrito: "SAN BORJA", direccion: "AV SAN LUIS NRO 2605 - SAN BORJA" },
-            { nombre: "ES LA CALERA", distrito: "SURQUILLO", direccion: "AV AVIACIÓN NRO 4524 - SURQUILLO" },
-            { nombre: "ES MONTREAL", distrito: "SURCO", direccion: "AV CAMINOS DEL INCA NRO 2017 - SURCO" },
-            { nombre: "LISTO SURQUILLO", distrito: "SURQUILLO", direccion: "Republica de Panama 5185 - Surquillo" },
-            { nombre: "ES EL ROSARIO", distrito: "SURQUILLO", direccion: "AV TOMAS MARSANO NRO 1008" },
-            { nombre: "ES PRIMAVERA", distrito: "SURQUILLO", direccion: "Av. Angamos Este 2398 - Surquillo" },
-            { nombre: "ES REPÚBLICA", distrito: "SAN ISIDRO", direccion: "Av. Paseo de la Republica 3890 - San Isidro" },
-            { nombre: "ES SAN ISIDRO", distrito: "SAN ISIDRO", direccion: "Esq. Aramburu con Republica de Panama 3690 - San Isidro" },
-            { nombre: "LISTO RICARDO PALMA", distrito: "MIRAFLORES", direccion: "AV RICARDO PALMA NRO 294-A" },
-            { nombre: "ES RISSO", distrito: "LINCE", direccion: "Av. Arenales 2100 - Lince" },
-            { nombre: "LISTO ARAMBURU 2", distrito: "SURQUILLO", direccion: "AV ARAMBURU 770" },
-            { nombre: "LISTO AVIACIÓN", distrito: "SAN BORJA", direccion: "AV AVIACIÓN NRO 2380" },
-            { nombre: "LISTO MANUEL SEGURA", distrito: "LINCE", direccion: "Av Arequipa 1513 - Lince" },
-            { nombre: "ES RICARDO PALMA", distrito: "MIRAFLORES", direccion: "Av. Mcal. Andres A. Caceres 110 - Miraflores" },
-            { nombre: "ES ALEGRIA", distrito: "MIRAFLORES", direccion: "AV BENAVIDES NRO 2116" },
-            { nombre: "ES SURCO", distrito: "SURCO", direccion: "AV. CIRCUNVALACION 377 - SURCO" },
-            { nombre: "ES GRANADA", distrito: "SURCO", direccion: "AV MARISCAL CASTILLA NRO 905" },
-            { nombre: "LISTO PACHACUTEC", distrito: "SAN JUAN DE MIRAFLORES", direccion: "Av Salvador Allende, San Juan de Miraflores 15803" },
-            { nombre: "ES EL CHORRILLANO", distrito: "CHORRILLOS", direccion: "AV LOS DEFENSORES DEL MORRO 360" },
-            { nombre: "ES TAVIRSA", distrito: "CHORRILLOS", direccion: "Av. Camino del Inca 110 - 134 S.J.B De Villa - Chorrillos" },
-            { nombre: "LISTO HIGUERETA", distrito: "SURCO", direccion: "Av. Benavides 4295 - Santiago de Surco" },
-            { nombre: "ES CHILCA", distrito: "CHILCA", direccion: "Car. Panamericana Sur Km. 63.5 - Chilca" },
-            { nombre: "ES PRINCIPAL", distrito: "SAN BORJA", direccion: "Av. Jose Galvez Barrenechea 1105, Urb. Corpac - San Borja" },
-            { nombre: "ES PUNTA HERMOSA", distrito: "PUNTA HERMOSA", direccion: "CARRETERA PANAMERICANA SUR KM. 40 - Punta Hermosa" },
-            { nombre: "ES SARAPAMPA 1", distrito: "ASIA", direccion: "Altura del Km. 106 de la Panamericana Sur - Asia (DIRECCIÓN SUR)" },
-            { nombre: "ES SARAPAMPA 2", distrito: "ASIA", direccion: "Panamericana Sur Km 106 - Asia (DIRECCIÓN NORTE)" },
-            { nombre: "LISTO UNI UTEC", distrito: "BARRANCO", direccion: "Jirón Medrano Silva 165 - Barranco" },
-            { nombre: "LISTO UNI CIENTIFICA VILLA 1", distrito: "VILLA EL SALVADOR", direccion: "Av Panamericana Sur Km 19 - Villa el Salvador CAMPUS 2" },
-            { nombre: "LISTO UNI CIENTIFICA VILLA 2", distrito: "VILLA EL SALVADOR", direccion: "Av Panamericana Sur Km 19 - Villa el Salvador CAMPUS 1" },
-            { nombre: "ES AURORA", distrito: "MIRAFLORES", direccion: "CALLE ARIAS SCHEREIBER NRO 124 - MIRAFLORES" },
-            { nombre: "ES LURIN", distrito: "LURIN", direccion: "P43V+4P5, Lurín 15823" },
-            { nombre: "LISTO UNI UTP VILLA 1", distrito: "VILLA EL SALVADOR", direccion: "Ctra. Panamericana Sur km 16 - Villa El Salvador PRIMER PISO" },
-            { nombre: "LISTO UNI UTP VILLA 2", distrito: "VILLA EL SALVADOR", direccion: "Ctra. Panamericana Sur km 16 - Villa El Salvador NOVENO PISO" },
-            { nombre: "ESPAÑA 2", distrito: "TRUJILLO", direccion: "Av. España 1099 - Trujillo" },
-            { nombre: "ES GARDENIAS", distrito: "SURCO", direccion: "Jr. Batalla San Juan" },
-            { nombre: "LISTO UTP TORRE AREQUIPA", distrito: "CENTRO DE LIMA", direccion: "Av Arequipa 265 Cercado de Lima" },
-            { nombre: "ES RIVER FRONT", distrito: "PIURA", direccion: "Malecón María Auxiliadora Lote 34, Urb. Miraflores, Castilla, Piura" },
-            { nombre: "LISTO UTP CASONA", distrito: "CENTRO DE LIMA", direccion: "Av. Petit Thouars 116" },
-            { nombre: "LISTO UTP PETIT THOUARS", distrito: "CENTRO DE LIMA", direccion: "Av. Petit Thouars 385" },
-            { nombre: "LISTO UTP PACIFICO", distrito: "CENTRO DE LIMA", direccion: "Av Arequipa 660" },
-            { nombre: "LISTO UTP SJL", distrito: "SAN JUAN DE LURIGANCHO", direccion: "San Juan de Lurigancho" },
-            { nombre: "LISTO UNI USMP SANTA ANITA", distrito: "SANTA ANITA", direccion: "Santa Anita" },
-            { nombre: "LISTO UTP ICA", distrito: "ICA", direccion: "Ica" },
-            { nombre: "LISTO UTP CRUZ DEL SUR", distrito: "ICA", direccion: "Ica" },
-            { nombre: "LISTO UTP TACNA Y ARICA", distrito: "AREQUIPA", direccion: "Arequipa" },
-            { nombre: "LISTO UTP PARRA 2", distrito: "AREQUIPA", direccion: "Arequipa" },
-            { nombre: "LISTO ICPNA MIRAFLORES", distrito: "MIRAFLORES", direccion: "Miraflores" },
-            { nombre: "LISTO AEROPUERTO 3", distrito: "CALLAO", direccion: "Av. Nestor Gambeta N°1570 - Segundo Nivel Zona Pública - CALLAO" }
-        ];
+        async function cargarTiendas() {
+            const { data, error } = await sbClient
+                .from('tiendas')
+                .select('id, nombre, distrito, direccion')
+                .eq('activa', true)
+                .order('nombre');
+            if (!error && data) {
+                window.TIENDAS = data;
+                populateFilters();
+            }
+        }
 
         const PREGUNTAS_DEFAULT = [
             { id: 1, texto: "La entrada de la tienda se encuentra limpia (pisos, mampara)", grupo: 1, pmax: 2 },
@@ -4835,6 +4658,7 @@
         window.PREGUNTAS = [];
         window.PESOS = {};
         window.currentUser = null;
+        window.TIENDAS = [];
         window.selectedStore = null;
         window.auditActual = {
             respuestas: {}, // { id: { valor: 'SI'|'NO'|'NA', obs: '', fotos: [] } }
@@ -4872,7 +4696,11 @@
             if (viewId === 'view-usuarios') renderUsuarios();
             if (viewId === 'view-auditoria-tiendas') renderListaTiendas('auditoria');
             if (viewId === 'view-visita-tiendas') renderListaTiendas('visita');
-            if (viewId === 'view-tiendas') renderListaTiendas('catalogo');
+            if (viewId === 'view-tiendas') {
+                renderListaTiendas('catalogo');
+                let btnAdd = document.getElementById('btn-add-tienda');
+                if (btnAdd) btnAdd.style.display = (window.currentUser?.nombre?.toLowerCase().includes('kleiddy')) ? 'flex' : 'none';
+            }
             if (viewId === 'view-historial-auditorias') renderHistorialAuditorias();
             if (viewId === 'view-historial-visitas') renderHistorialVisitas();
             if (viewId === 'view-auditoria-detalle') renderDetalleAuditoria();
@@ -5456,9 +5284,44 @@
             // Panel admin visible para todos via contraseña
 
             renderAjustesSupervisores();
-            populateFilters();
+            await cargarTiendas();
             showView("view-home");
             verificarCierreMensual();
+        }
+
+        function abrirModalAgregarTienda() {
+            document.getElementById('input-tienda-nombre').value = '';
+            document.getElementById('input-tienda-distrito').value = '';
+            document.getElementById('input-tienda-direccion').value = '';
+            let m = document.getElementById('modal-agregar-tienda');
+            m.style.display = 'flex';
+        }
+
+        function cerrarModalAgregarTienda() {
+            document.getElementById('modal-agregar-tienda').style.display = 'none';
+        }
+
+        async function guardarNuevaTienda() {
+            let nombre = document.getElementById('input-tienda-nombre').value.trim().toUpperCase();
+            let distrito = document.getElementById('input-tienda-distrito').value.trim().toUpperCase();
+            let direccion = document.getElementById('input-tienda-direccion').value.trim();
+            if (!nombre || !distrito) { showToast('Nombre y distrito son obligatorios', 'error'); return; }
+            const { error } = await sbClient.from('tiendas').insert({ nombre, distrito, direccion });
+            if (error) { showToast('Error al guardar', 'error'); return; }
+            cerrarModalAgregarTienda();
+            await cargarTiendas();
+            renderListaTiendas('view-tiendas');
+            showToast('Tienda agregada', 'ok');
+        }
+
+        async function eliminarTienda(id) {
+            if (!window.currentUser?.nombre?.toLowerCase().includes('kleiddy')) return;
+            if (!confirm('¿Desactivar esta tienda? Ya no aparecerá en la lista.')) return;
+            const { error } = await sbClient.from('tiendas').update({ activa: false }).eq('id', id);
+            if (error) { showToast('Error al eliminar', 'error'); return; }
+            await cargarTiendas();
+            renderListaTiendas('view-tiendas');
+            showToast('Tienda desactivada', 'ok');
         }
 
         function toggleHistorialHome(el) {
@@ -5471,7 +5334,7 @@
         window.activeFilters = { 'view-auditoria-tiendas': '', 'view-visita-tiendas': '', 'view-tiendas': '' };
 
         function populateFilters() {
-            let distritos = [...new Set(TIENDAS.map(t => t.distrito))].sort();
+            let distritos = [...new Set(window.TIENDAS.map(t => t.distrito))].sort();
             let optionsHtml = '<option value="">Todos los distritos</option>' + distritos.map(d => `<option value="${d}">${d}</option>`).join('');
             ['view-auditoria-tiendas', 'view-visita-tiendas', 'view-tiendas'].forEach(viewId => {
                 let sel = document.getElementById(`select-dist-${viewId}`);
@@ -5528,15 +5391,19 @@
                 clickAction = "goToTiendaDetalle(TIENDAS[INDEX], 'catalogo')";
             }
 
-            let filtered = TIENDAS.filter(t =>
+            let filtered = window.TIENDAS.filter(t =>
                 (t.nombre.toLowerCase().includes(searchInput) || t.direccion.toLowerCase().includes(searchInput)) &&
                 (distFilter === "" || t.distrito === distFilter)
             );
 
+            let isKleiddy = window.currentUser?.nombre?.toLowerCase().includes('kleiddy');
             let html = "";
             filtered.forEach(t => {
-                let idx = TIENDAS.findIndex(x => x.nombre === t.nombre);
+                let idx = window.TIENDAS.findIndex(x => x.nombre === t.nombre);
                 let action = clickAction.replace("INDEX", idx);
+                let deleteBtn = (viewId === 'view-tiendas' && isKleiddy && t.id)
+                    ? `<button onclick="event.stopPropagation();eliminarTienda(${t.id})" style="background:none;border:none;padding:8px;cursor:pointer;color:#ccc;font-size:18px;flex-shrink:0;" title="Desactivar">✕</button>`
+                    : '';
                 html += `
           <div class="tienda-item" onclick="${action}">
             <img src="https://gestion.pe/resizer/v2/DKHKHLQZVRBBDGAY4ZXIZ2LOTI.jpg?auth=7e5f8ca269fc3b853a62dec4b3203d6e632b2e847be691426bfebb65c1a613e7&width=1200&height=1200&quality=75&smart=true" class="tienda-img">
@@ -5544,7 +5411,7 @@
               <div class="tienda-info-name">${t.nombre}</div>
               <div class="tienda-info-dist">${t.distrito}</div>
             </div>
-            <div class="tienda-item-arrow">›</div>
+            ${deleteBtn}<div class="tienda-item-arrow">›</div>
           </div>
         `;
             });
@@ -8644,6 +8511,15 @@
         }
 
         const DRIVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwd-GQT6xW3qLY0gfj_r0yedFcpSLidZWD3mjOnHuswrVcrqTrda-6uzeu7YdcuWjri/exec';
+
+        function formatFecha(f) {
+            if (!f) return '';
+            if (/^\d{4}-\d{2}-\d{2}$/.test(f)) {
+                const [y, m, d] = f.split('-');
+                return `${d}/${m}/${y}`;
+            }
+            return f;
+        }
 
         // ========== IMPORTADOR GLIDE - ELIMINAR DESPUÉS DE USO ==========
         function abrirImportadorGlide() {
