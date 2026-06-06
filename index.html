@@ -6166,7 +6166,7 @@
                 <div>${resHtml}</div>
                 `;
             document.getElementById("content-ro-auditoria").innerHTML = htmlRoAuditoria;
-            document.getElementById("content-ro-auditoria").innerHTML += `<button onclick="confirmarBorrarAuditoria(${data.id})" style="width:100%;background:#FFF0F0;color:#C62828;border:1.5px solid #C62828;border-radius:50px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:16px;">🗑️ Eliminar auditoría</button>`;
+            
             document.getElementById("modal-ro-auditoria").style.display = "flex";
         }
 
@@ -6202,7 +6202,7 @@
                     <p style="font-size:14px; line-height:1.5;">${v.comentario || 'N/A'}</p>
                 </div>
             `;
-            let deleteBtn = `<button onclick="confirmarBorrarVisita(${v.id})" style="width:100%;background:#FFF0F0;color:#C62828;border:1.5px solid #C62828;border-radius:50px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:16px;">🗑️ Eliminar visita</button>`;
+            
             document.getElementById("content-ro-visita").innerHTML += deleteBtn;
             document.getElementById("modal-ro-visita").style.display = "flex";
         }
@@ -7145,7 +7145,7 @@
             });
             document.getElementById("res-aud-detalle-preguntas").innerHTML = detHtml;
             let deleteZone = document.getElementById('res-aud-delete-zone');
-            if (deleteZone) deleteZone.innerHTML = `<button onclick="confirmarBorrarAuditoria(${data.id})" style="width:100%;background:#FFF0F0;color:#C62828;border:1.5px solid #C62828;border-radius:50px;padding:12px;font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;">🗑️ Eliminar auditoría</button>`;
+            
         }
 
         async function generarReporte(share = false, returnBlob = false) {
