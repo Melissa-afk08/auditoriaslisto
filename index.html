@@ -3141,6 +3141,14 @@
                             </svg>
                             Visitas
                         </button>
+                        <button class="btn-home-historial" onclick="showView('view-mis-auditorias')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="8" r="4"></circle>
+                                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"></path>
+                            </svg>
+                            Mis Auditorías
+                        </button>
                     </div>
                     <div class="action-card" onclick="showView('view-analitica')">
                         <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -3166,7 +3174,7 @@
             <!-- PANEL LATERAL (solo desktop) -->
             <div id="home-panel-lateral">
                 <div class="panel-card">
-                    <div class="panel-title">🕐 Últimas Auditorías</div>
+                    <div class="panel-title" onclick="showView('view-mis-auditorias')" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;">🕐 Últimas Auditorías <span style="font-size:11px;color:#FC6E20;font-weight:700;">Ver todas →</span></div>
                     <div id="panel-ultimas-auditorias">
                         <div style="font-size:12px;color:#bbb;text-align:center;padding:16px 0;">Sin registros aún</div>
                     </div>
@@ -3940,6 +3948,58 @@
             </div>
 
             <div id="lista-historial-auditorias"></div>
+        </div>
+    </div>
+
+    <!-- VIEW: MIS AUDITORÍAS -->
+    <div id="view-mis-auditorias" class="view fade-in">
+        <div class="header-dark" style="background:var(--naranja);">
+            <button onclick="showView('view-home')" style="color:white;">←</button>
+            <span class="bold" style="color:white; font-size:16px;">MIS AUDITORÍAS</span>
+        </div>
+        <div class="p-16">
+            <div class="flex gap-8 mb-16">
+                <div class="tiendas-search-container"
+                    style="flex:1; background:white; border-radius:50px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--naranja)" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="mis-aud-search" placeholder="Buscar tienda..."
+                        oninput="renderMisAuditorias()">
+                </div>
+                <button style="display:flex;align-items:center;gap:6px;background:white;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:50px;padding:0 16px;height:40px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;"
+                    onclick="toggleFiltroMis()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    Filtrar
+                </button>
+            </div>
+            <div id="panel-filtro-mis" style="display:none; background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <select id="filtro-mis-anio-sel" onchange="renderMisAuditorias()" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                        <option value="">Año</option>
+                    </select>
+                    <div style="display:flex;gap:8px;">
+                        <select id="filtro-mis-mes-sel" onchange="renderMisAuditorias()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Mes</option>
+                            <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                        </select>
+                        <select id="filtro-mis-dia-sel" onchange="renderMisAuditorias()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Día</option>
+                            <option value="01">1</option><option value="02">2</option><option value="03">3</option><option value="04">4</option><option value="05">5</option><option value="06">6</option><option value="07">7</option><option value="08">8</option><option value="09">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                        </select>
+                        <select id="filtro-mis-orden-sel" onchange="renderMisAuditorias()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="desc">Más reciente</option>
+                            <option value="asc">Más antiguo</option>
+                        </select>
+                    </div>
+                    <button onclick="limpiarFiltroMis()" style="width:100%;padding:10px;border-radius:50px;background:transparent;border:1.5px solid #ddd;color:#888;font-size:13px;font-weight:700;cursor:pointer;">Borrar filtros</button>
+                </div>
+            </div>
+            <div id="lista-mis-auditorias"></div>
         </div>
     </div>
 
@@ -4754,6 +4814,7 @@
             }
             if (viewId === 'view-historial-auditorias') renderHistorialAuditorias();
             if (viewId === 'view-historial-visitas') renderHistorialVisitas();
+            if (viewId === 'view-mis-auditorias') { window._miSelModeAud=false; window._miSelAud=new Set(); renderMisAuditorias(); }
             if (viewId === 'view-auditoria-detalle') renderDetalleAuditoria();
             if (viewId === 'view-visita-detalle') renderDetalleVisita();
             if (viewId === 'view-tienda-detalle') renderDetalleTienda();
@@ -7850,6 +7911,215 @@
             };
             document.getElementById("modal-confirm").style.display = "flex";
         }
+
+        // ── MIS AUDITORÍAS ─────────────────────────────────────────
+        function toggleFiltroMis() {
+            let panel = document.getElementById('panel-filtro-mis');
+            let visible = panel.style.display !== 'none';
+            if (!visible) {
+                let auds = JSON.parse(localStorage.getItem('auditorias') || '[]');
+                let bors = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]');
+                let todos = [...auds, ...bors];
+                let anios = [...new Set(todos.map(a => (a.fecha||'').split('/')[2]).filter(Boolean))].sort((a,b)=>b-a);
+                let anioSel = document.getElementById('filtro-mis-anio-sel');
+                if (anioSel) {
+                    let current = anioSel.value;
+                    anioSel.innerHTML = '<option value="">Año</option>';
+                    anios.forEach(y => anioSel.innerHTML += `<option value="${y}" ${current===y?'selected':''}>${y}</option>`);
+                }
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function limpiarFiltroMis() {
+            let a = document.getElementById('filtro-mis-anio-sel'); if(a) a.value='';
+            let m = document.getElementById('filtro-mis-mes-sel'); if(m) m.value='';
+            let d = document.getElementById('filtro-mis-dia-sel'); if(d) d.value='';
+            let o = document.getElementById('filtro-mis-orden-sel'); if(o) o.value='desc';
+            renderMisAuditorias();
+        }
+
+        async function renderMisAuditorias() {
+            const contenedor = document.getElementById('lista-mis-auditorias');
+            if (!contenedor) return;
+            const user = window.currentUser;
+            if (!user) return;
+            const miNombre = user.nombre || '';
+
+            // Cargar desde Supabase
+            let auditorias = [];
+            try {
+                let { data: raw } = await sbClient.from('auditorias')
+                    .select('*').eq('es_borrador', false).order('id', { ascending: false });
+                if (raw) {
+                    auditorias = raw
+                        .filter(a => (a.supervisor||'').trim().toLowerCase() === miNombre.trim().toLowerCase() ||
+                                     miNombre.toLowerCase().split(' ').some(p => p.length > 2 && (a.supervisor||'').toLowerCase().includes(p)))
+                        .map(a => ({
+                            id: a.id, _src: 'supabase',
+                            tienda: { nombre: a.tienda_nombre, distrito: a.tienda_distrito, direccion: a.tienda_direccion },
+                            supervisor: a.supervisor, encargado: a.encargado,
+                            fecha: a.fecha, hora: a.hora,
+                            respuestas: a.respuestas || {}, resultadoGrupos: a.resultado_grupos || {},
+                            notaFinal: parseFloat(a.nota_final), clasificacion: a.clasificacion,
+                            firma: a.firma_url
+                        }));
+                }
+            } catch(e) {}
+
+            let borradores = JSON.parse(localStorage.getItem('borradores_auditorias') || '[]')
+                .filter(b => (b.supervisor||'').trim().toLowerCase() === miNombre.trim().toLowerCase() ||
+                             miNombre.toLowerCase().split(' ').some(p => p.length > 2 && (b.supervisor||'').toLowerCase().includes(p)));
+
+            const search = (document.getElementById('mis-aud-search')?.value || '').toLowerCase();
+            const fAnio = document.getElementById('filtro-mis-anio-sel')?.value || '';
+            const fMes = document.getElementById('filtro-mis-mes-sel')?.value || '';
+            const fDia = document.getElementById('filtro-mis-dia-sel')?.value || '';
+            const orden = document.getElementById('filtro-mis-orden-sel')?.value || 'desc';
+
+            function parseFechaMis(a) {
+                let f = a.fecha || '';
+                let h = a.hora || '00:00:00';
+                let partes = f.includes('-') && f.indexOf('-') === 4 ? f.split('-') : (f.split('/').length === 3 ? [f.split('/')[2], f.split('/')[1], f.split('/')[0]] : null);
+                if (!partes) return 0;
+                let h24 = h;
+                if (h.includes('AM') || h.includes('PM')) {
+                    const match = h.match(/(\d+):(\d+)\s*(AM|PM)/i);
+                    if (match) {
+                        let hh = parseInt(match[1]);
+                        const mm = match[2];
+                        const period = match[3].toUpperCase();
+                        if (period === 'AM' && hh === 12) hh = 0;
+                        if (period === 'PM' && hh !== 12) hh += 12;
+                        h24 = `${String(hh).padStart(2,'0')}:${mm}:00`;
+                    }
+                }
+                return new Date(`${partes[0]}-${partes[1]}-${partes[2]}T${h24}`).getTime() || 0;
+            }
+
+            if (search) {
+                auditorias = auditorias.filter(a => (a.tienda?.nombre || '').toLowerCase().includes(search));
+                borradores = borradores.filter(b => (typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '').toLowerCase().includes(search));
+            }
+            if (fAnio) {
+                auditorias = auditorias.filter(a => (a.fecha||'').split('/')[2] === fAnio);
+                borradores = borradores.filter(b => (b.fecha||'').split('/')[2] === fAnio);
+            }
+            if (fMes) {
+                auditorias = auditorias.filter(a => (a.fecha||'').split('/')[1] === fMes);
+                borradores = borradores.filter(b => (b.fecha||'').split('/')[1] === fMes);
+            }
+            if (fDia) {
+                auditorias = auditorias.filter(a => (a.fecha||'').split('/')[0] === fDia);
+                borradores = borradores.filter(b => (b.fecha||'').split('/')[0] === fDia);
+            }
+
+            window._miSelModeAud = window._miSelModeAud || false;
+            window._miSelAud = window._miSelAud || new Set();
+
+            const todosItems = [
+                ...borradores.map(b => ({ ...b, _tipo: 'borrador', _fechaHora: parseFechaMis(b) })),
+                ...auditorias.map(a => ({ ...a, _tipo: 'auditoria', _fechaHora: parseFechaMis(a) }))
+            ].sort((a, b) => orden === 'desc' ? b._fechaHora - a._fechaHora : a._fechaHora - b._fechaHora);
+
+            if (todosItems.length === 0) {
+                contenedor.innerHTML = '<div style="text-align:center;padding:40px;color:#999;font-size:14px;">No tienes auditorías registradas.</div>';
+                return;
+            }
+
+            window._miAudSelIds = auditorias.map(a => a.id);
+
+            const barraSel = window._miSelModeAud ? `
+                <div style="position:sticky;top:0;z-index:99;background:white;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.1);padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;">
+                    <button onclick="window._miSelAud.size===window._miAudSelIds.length?window._miSelAud.clear():window._miAudSelIds.forEach(id=>window._miSelAud.add(id));renderMisAuditorias();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
+                    <span style="font-size:13px;color:#888;">${window._miSelAud.size} seleccionados</span>
+                    <div style="display:flex;gap:8px;">
+                        <button onclick="window._miSelModeAud=false;window._miSelAud=new Set();renderMisAuditorias();" style="background:#F5F5F5;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Cancelar</button>
+                        <button onclick="eliminarSeleccionMis()" style="background:#FF3B30;border:none;color:white;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">🗑 Eliminar</button>
+                    </div>
+                </div>` : '';
+
+            contenedor.innerHTML = barraSel + todosItems.map(item => {
+                if (item._tipo === 'borrador') {
+                    const b = item;
+                    const nombre = typeof b.tienda === 'string' ? b.tienda : b.tienda?.nombre || '';
+                    return `
+                <div style="background:#FFF8E1;border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;border-left:4px solid #F9A825;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;" onclick="continuarBorradorDesdeHistorial('${b.id}')">
+                        <div style="font-size:12px;color:${b._pendienteVerificacion ? '#E53935' : '#F9A825'};font-weight:700;">${b._pendienteVerificacion ? '📶 SIN SEÑAL · PENDIENTE' : '⏸ EN PROGRESO'}</div>
+                        <span style="background:${b._pendienteVerificacion ? '#E53935' : '#F9A825'};color:white;border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">${b._pendienteVerificacion ? 'FINALIZAR' : 'BORRADOR'}</span>
+                    </div>
+                    <div style="font-size:15px;font-weight:800;color:#1B1B1B;margin-top:4px;cursor:pointer;" onclick="continuarBorradorDesdeHistorial('${b.id}')">${nombre}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                        <div style="font-size:12px;color:#888;cursor:pointer;" onclick="continuarBorradorDesdeHistorial('${b.id}')">${b.fecha || ''} ${b.hora || ''} · Toca para continuar</div>
+                        <button onclick="eliminarBorrador('${b.id}')" style="background:none;border:none;color:#FF3B30;font-size:12px;font-weight:700;cursor:pointer;padding:4px 8px;">🗑 Eliminar</button>
+                    </div>
+                </div>`;
+                }
+                const a = item;
+                const pct = a.notaFinal || 0;
+                const colorPast = pct <= 70 ? '#FF3B30' : pct <= 90 ? '#FFCC00' : '#34C759';
+                const textColor = pct <= 90 && pct > 70 ? '#1B1B1B' : '#fff';
+                const seleccionado = window._miSelAud.has(a.id);
+                const tiendaNombre = a.tienda?.nombre || a.tienda || '';
+                return `
+              <div
+                id="mi-aud-item-${a.id}"
+                onclick="window._miSelModeAud ? (()=>{if(window._miSelAud.has(${a.id}))window._miSelAud.delete(${a.id});else window._miSelAud.add(${a.id});renderMisAuditorias();})() : verDetalleAuditoria(${a.id})"
+                ontouchstart="window._miLpFired=false;window._miTouchStartY=event.touches[0].clientY;window._miLp=setTimeout(()=>{window._miLpFired=true;window._miSelModeAud=true;window._miSelAud.add(${a.id});renderMisAuditorias();},700)"
+                onmousedown="window._miLp=setTimeout(()=>{window._miLpFired=true;window._miSelModeAud=true;window._miSelAud.add(${a.id});renderMisAuditorias();},700)"
+                onmouseup="clearTimeout(window._miLp)" onmouseleave="clearTimeout(window._miLp)"
+                ontouchmove="if(Math.abs(event.touches[0].clientY-window._miTouchStartY)>10){clearTimeout(window._miLp);}"
+                ontouchend="clearTimeout(window._miLp);" ontouchcancel="clearTimeout(window._miLp)"
+                style="background:${seleccionado?'#FFF0E6':'white'};border:2px solid ${seleccionado?'#FC6E20':'transparent'};border-radius:16px;box-shadow:0 2px 10px rgba(0,0,0,0.07);padding:14px 16px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.15s;">
+                ${window._miSelModeAud ? `<div style="width:22px;height:22px;border-radius:50%;border:2px solid ${seleccionado?'#FC6E20':'#ccc'};background:${seleccionado?'#FC6E20':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${seleccionado?'<span style="color:white;font-size:13px;">✓</span>':''}</div>` : ''}
+                <div style="flex:1;">
+                  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                    <div style="font-size:15px;font-weight:800;color:#1B1B1B;">${tiendaNombre}</div>
+                    <span style="background:${colorPast};color:${textColor};border-radius:50px;padding:3px 10px;font-size:11px;font-weight:700;">${pct.toFixed(0)}%</span>
+                  </div>
+                  <div style="font-size:12px;color:#888;margin-top:4px;">${a.fecha || ''}, ${a.hora || ''}</div>
+                </div>
+              </div>`;
+            }).join('');
+        }
+
+        async function eliminarSeleccionMis() {
+            if (window._miSelAud.size === 0) return;
+            const n = window._miSelAud.size;
+            document.getElementById("mc-desc").innerText = `¿Mover ${n} auditoría${n>1?'s':''} a la papelera? Podrás recuperarla desde Ajustes.`;
+            document.getElementById("mc-btn").onclick = async function() {
+                const idsToDelete = Array.from(window._miSelAud);
+                const user = window.currentUser?.nombre || '';
+                let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
+                let papelera = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
+                idsToDelete.forEach(id => {
+                    const idx = auds.findIndex(a => a.id === id);
+                    if (idx !== -1) {
+                        papelera.push({ ...auds[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: user });
+                        auds.splice(idx, 1);
+                    }
+                });
+                localStorage.setItem("auditorias", JSON.stringify(auds));
+                localStorage.setItem("papelera_auditorias", JSON.stringify(papelera));
+                window._miSelModeAud = false;
+                window._miSelAud = new Set();
+                closeModal('modal-confirm');
+                showToast(`${n} auditoría${n>1?'s':''} enviada${n>1?'s':''} a papelera`, 'success');
+                try { await sbClient.from('auditorias').delete().in('id', idsToDelete); } catch(e) {}
+                try {
+                    await Promise.all(papelera.slice(-idsToDelete.length).map(item =>
+                        sbClient.from('papelera').insert({ tipo: 'auditoria', datos: item, eliminado_por: user })
+                    ));
+                } catch(e) {}
+                renderMisAuditorias();
+                renderHistorialAuditorias();
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
+        }
+        // ── FIN MIS AUDITORÍAS ──────────────────────────────────────
 
         function eliminarBorrador(borradorId) {
             document.getElementById("mc-desc").innerText = "¿Eliminar esta auditoría en progreso? Se perderá todo el avance.";
