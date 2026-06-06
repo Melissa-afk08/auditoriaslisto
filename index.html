@@ -5538,23 +5538,42 @@
             if (type === 'catalogo') showView('view-tienda-detalle');
         }
 
-        function renderDetalleAuditoria() {
+        async function renderDetalleAuditoria() {
             let tienda = window.selectedStore;
             if (!tienda) return;
             document.getElementById('aud-det-nombre').textContent = tienda.nombre;
             document.getElementById('aud-det-distrito').textContent = tienda.distrito;
             document.getElementById('aud-det-direccion').textContent = tienda.direccion;
-            // Resumen preparación
 
-            // Resumen preparación
             let prep = document.getElementById('aud-prep-section');
             if (!prep) return;
-            let auds = JSON.parse(localStorage.getItem('auditorias')||'[]')
-                .filter(a => (a.tienda?.nombre||a.tienda) === tienda.nombre)
-                .sort((a,b) => b.id - a.id);
-            let visitas = JSON.parse(localStorage.getItem('visitas')||'[]')
-                .filter(v => (v.tienda?.nombre||v.tienda) === tienda.nombre)
-                .sort((a,b) => new Date(b.datetime||0) - new Date(a.datetime||0));
+
+            prep.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;">Cargando...</div>';
+
+            let auds = [], visitas = [];
+            try {
+                const { data: audData } = await sbClient
+                    .from('auditorias')
+                    .select('id,supervisor,fecha,hora,nota_final,resultado_grupos,respuestas,es_borrador')
+                    .eq('tienda_nombre', tienda.nombre)
+                    .eq('es_borrador', false)
+                    .order('id', { ascending: false });
+                auds = (audData || []).map(r => ({
+                    ...r,
+                    notaFinal: r.nota_final || 0,
+                    finalScore: r.nota_final || 0,
+                    resultadoGrupos: r.resultado_grupos
+                }));
+            } catch(e) {}
+            try {
+                const { data: visData } = await sbClient
+                    .from('visitas')
+                    .select('*')
+                    .eq('tienda_nombre', tienda.nombre)
+                    .order('id', { ascending: false });
+                visitas = visData || [];
+            } catch(e) {}
+
 
             const mapsQ0 = encodeURIComponent(tienda.direccion + ', Lima, Peru');
             const mapsEmbed0 = `https://maps.google.com/maps?q=${mapsQ0}&output=embed&z=16`;
@@ -5616,7 +5635,8 @@
             let rgHtml = '';
             if (ultima.resultadoGrupos) {
                 rgHtml = Object.entries(grupos).map(([k, nombre]) => {
-                    let v = ultima.resultadoGrupos[k] || 0;
+                    let raw = ultima.resultadoGrupos[k] || 0;
+                    let v = typeof raw === 'object' ? (raw.maximo > 0 ? (raw.obtenido / raw.maximo) * 100 : 0) : (parseFloat(raw) || 0);
                     let c = v >= 90 ? '#43A047' : v >= 70 ? '#F9A825' : '#C62828';
                     return `
                     <div class="diag-group-bar">
@@ -5637,7 +5657,8 @@
                 window.PREGUNTAS.forEach(p => {
                     let r = ultima.respuestas[p.id];
                     if (!r || r.valor !== 'NO') return;
-                    let pctGrupo = (ultima.resultadoGrupos && ultima.resultadoGrupos[p.grupo]) || 0;
+                    let raw = (ultima.resultadoGrupos && ultima.resultadoGrupos[p.grupo]) || 0;
+                    let pctGrupo = typeof raw === 'object' ? (raw.maximo > 0 ? (raw.obtenido / raw.maximo) * 100 : 0) : (parseFloat(raw) || 0);
                     let grupoNombre = grupos[p.grupo] || `Grupo ${p.grupo}`;
                     alertas.push({ grupoNombre, pregunta: p.texto, obs: r.obs, critico: pctGrupo < 70 });
                 });
