@@ -5472,9 +5472,20 @@
             if (existe) { showToast("Ya existe un usuario con ese correo", "error"); return; }
 
             const nuevoUsuario = { nombre, email, cargo, telefono: tel };
-            // Guardar en Supabase
-            const { error } = await sbClient.from('usuarios').insert(nuevoUsuario);
-            if (error) { showToast("Error al guardar en sistema: " + error.message, "error"); return; }
+
+            // Llamar endpoint /api/invite (envía email + guarda en Supabase)
+            showToast("Enviando invitación...", "info");
+            try {
+                const resp = await fetch('/api/invite', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, nombre, cargo })
+                });
+                const result = await resp.json();
+                if (!resp.ok) { showToast("Error: " + (result.error || 'No se pudo enviar la invitación'), "error"); return; }
+            } catch(e) {
+                showToast("Error de conexión al enviar invitación", "error"); return;
+            }
 
             // Actualizar localStorage
             users.push(nuevoUsuario);
@@ -5487,7 +5498,7 @@
             renderEditorUsuarios();
             renderUsuarios();
             renderAjustesSupervisores();
-            showToast("✓ Usuario agregado correctamente", "success");
+            showToast("✓ Invitación enviada a " + email, "success");
         }
 
         async function logout() {
