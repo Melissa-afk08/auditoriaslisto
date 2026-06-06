@@ -6093,6 +6093,15 @@
                 });
             } catch(e) {}
 
+            // Cargar firma_url desde Supabase si no está en data local
+            let firmaRoUrl = data.firma_url || data.firma || null;
+            if (!firmaRoUrl) {
+                try {
+                    let { data: sbFirma } = await sbClient.from('auditorias').select('firma_url').eq('id', id).single();
+                    if (sbFirma?.firma_url) firmaRoUrl = sbFirma.firma_url;
+                } catch(e) {}
+            }
+
             let score = Math.round(data.notaFinal || data.finalScore);
             let colorHex = score <= 70 ? "#C62828" : score <= 90 ? "#F9A825" : "#43A047";
             let tiendaNombre = typeof data.tienda === 'string' ? data.tienda : data.tienda.nombre;
@@ -6164,6 +6173,14 @@
                 <div style="margin-bottom:24px;">${grpHtml}</div>
                 <div style="font-size:13px;font-weight:800;color:#1B1B1B;letter-spacing:1px;margin-bottom:14px;">DETALLE DE RESPUESTAS</div>
                 <div>${resHtml}</div>
+                ${firmaRoUrl ? `
+                <div style="margin-top:28px;padding:20px 16px 24px;background:#FAFAFA;border-radius:16px;border:1px solid #EEE;text-align:center;">
+                    <div style="font-size:11px;font-weight:800;color:#999;letter-spacing:1.5px;margin-bottom:14px;">FIRMA DEL ENCARGADO DE TIENDA</div>
+                    <img src="${firmaRoUrl}" style="max-width:200px;height:90px;object-fit:contain;border-radius:10px;background:white;border:1px solid #EEE;padding:8px;display:block;margin:0 auto;">
+                    <div style="border-top:1.5px solid #DDD;margin:16px auto 10px;width:200px;"></div>
+                    <div style="font-size:14px;font-weight:700;color:#1B1B1B;">${data.encargado || ''}</div>
+                    <div style="font-size:12px;color:#999;margin-top:2px;">${data.fecha || ''}&nbsp;&nbsp;${data.hora || ''}</div>
+                </div>` : ''}
                 `;
             document.getElementById("content-ro-auditoria").innerHTML = htmlRoAuditoria;
             
