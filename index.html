@@ -4299,31 +4299,10 @@
                 </div>
             </div>
 
-            <!-- USUARIOS -->
-            <div class="ajustes-section-title">Equipo</div>
+            <!-- SUPERVISORES / USUARIOS -->
+            <div class="ajustes-section-title">Usuarios</div>
             <div class="ajustes-card" style="margin-bottom:12px;">
-                <div class="ajustes-item" onclick="showView('view-usuarios')" style="cursor:pointer;">
-                    <div class="ajustes-item-icon" style="background:#FFF0E6;">👥</div>
-                    <div class="ajustes-item-text">
-                        <div class="ajustes-item-label">Usuarios</div>
-                        <div class="ajustes-item-desc">Ver información del equipo</div>
-                    </div>
-                    <span class="ajustes-item-arrow">›</span>
-                </div>
-            </div>
-
-            <!-- SUPERVISORES -->
-            <div class="ajustes-section-title">Configuración</div>
-            <div class="ajustes-card">
-                <div class="ajustes-item" style="cursor:default;">
-                    <div class="ajustes-item-icon" style="background:#FFF0E6;">👥</div>
-                    <div class="ajustes-item-text">
-                        <div class="ajustes-item-label">Supervisores</div>
-                        <div class="ajustes-item-desc">Gestiona el equipo de supervisores</div>
-                    </div>
-                    
-                </div>
-                <div id="list-supervisores" style="padding:0 20px 12px 20px;"></div>
+                <div id="list-supervisores" style="padding:4px 16px 8px 16px;"></div>
             </div>
 
             <!-- PANEL ADMINISTRACIÓN -->
@@ -4402,7 +4381,7 @@
                     </div>
                 </div>
                 <!-- ========== IMPORTADOR GLIDE - ELIMINAR DESPUÉS DE USO ========== -->
-                <div id="btn-importador-glide-container" style="margin-top:12px;">
+                <div id="btn-importador-glide-container" style="display:none; margin-top:12px;">
                     <div class="ajustes-card">
                         <div class="ajustes-item" onclick="abrirImportadorGlide()" style="cursor:pointer;">
                             <div class="ajustes-item-icon" style="background:#E8F5E9;">📥</div>
@@ -8858,13 +8837,58 @@
         // --- AJUSTES SUPERVISORES ---
         function renderAjustesSupervisores() {
             let sups = JSON.parse(localStorage.getItem("supervisores") || "[]");
-            let html = sups.map((s, i) => `
-        <div class="flex justify-between items-center mb-8" style="padding: 12px 0; border-bottom: 1px solid #EEE; position:relative;">
-          <span style="font-size: 14px; color:#1B1B1B; font-weight:600;">${s}</span>
-          
+            let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
+
+            const rolColors = {
+                'admin':        { bg: '#7B2D00', text: '#fff' },
+                'supervisora':  { bg: '#FFF0E6', text: '#FC6E20' },
+                'supervisor':   { bg: '#FFF0E6', text: '#FC6E20' },
+                'soporte':      { bg: '#E8F5E9', text: '#2E7D32' },
+                'coordinadora': { bg: '#E3F2FD', text: '#1565C0' },
+                'coordinador':  { bg: '#E3F2FD', text: '#1565C0' },
+            };
+            const getRolColor = (cargo) => {
+                if (!cargo) return { bg: '#F5F5F5', text: '#888' };
+                const key = Object.keys(rolColors).find(k => cargo.toLowerCase().includes(k));
+                return key ? rolColors[key] : { bg: '#F5F5F5', text: '#888' };
+            };
+
+            const avatarColorMap = {
+                'Kleiddy': { bg: '#7B2D00', text: '#fff' },
+                'Soporte':  { bg: '#78350F', text: '#fff' },
+                'Miriam':   { bg: '#4A5240', text: '#fff' },
+                'Luz':      { bg: '#1E3A4A', text: '#fff' },
+                'Shirley':  { bg: '#6B2737', text: '#fff' },
+                'Lorena':   { bg: '#8B3A2A', text: '#fff' },
+            };
+            const getAvatarColor = (nombre) => {
+                const key = Object.keys(avatarColorMap).find(k => nombre.startsWith(k));
+                return key ? avatarColorMap[key] : { bg: '#FC6E20', text: '#fff' };
+            };
+
+            let html = sups.map((s, i) => {
+                const userData = users.find(u => u.nombre && (u.nombre.includes(s.split(' ')[0]) || s.includes(u.nombre.split(' ')[0])));
+                const cargo = userData?.cargo || 'Supervisora';
+                const email = userData?.email || '';
+                const telefono = userData?.telefono || '';
+                const inis = s.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const avatarColor = getAvatarColor(s);
+                const rolColor = getRolColor(cargo);
+
+                return `
+        <div style="display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid #F0F0F0;">
+          <div style="width:40px;height:40px;border-radius:50%;background:${avatarColor.bg};color:${avatarColor.text};font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${inis}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:14px;font-weight:700;color:#1B1B1B;line-height:1.3;">${s}</div>
+            ${email ? `<div style="font-size:11px;color:#AAA;margin-top:1px;">${email}</div>` : ''}
+            ${telefono ? `<div style="font-size:11px;color:#AAA;">📱 ${telefono}</div>` : ''}
+          </div>
+          <span style="background:${rolColor.bg};color:${rolColor.text};font-size:10px;font-weight:700;padding:3px 10px;border-radius:50px;white-space:nowrap;flex-shrink:0;">${cargo}</span>
         </div>
-      `).join("");
-            document.getElementById("list-supervisores").innerHTML = html;
+        `;
+            }).join("");
+
+            document.getElementById("list-supervisores").innerHTML = html || '<p style="font-size:13px;color:#AAA;padding:12px 4px;">No hay supervisoras registradas</p>';
         }
 
         function editarMiPerfil() {
