@@ -4364,12 +4364,22 @@
                 <div class="ajustes-section-title">Administración</div>
                 <div class="ajustes-card" style="margin-bottom:12px;">
                     <div class="ajustes-item" onclick="solicitarPasswordAdmin('reset-global')" style="cursor:pointer;">
-                        <div class="ajustes-item-icon" style="background:#FFF0F0;">🗑️</div>
+                        <div class="ajustes-item-icon" style="background:#FFF0F0;">🗜️</div>
                         <div class="ajustes-item-text">
-                            <div class="ajustes-item-label" style="color:#C62828;">⚠️ Resetear todos los datos</div>
-                            <div class="ajustes-item-desc">Elimina todos los registros de Supabase y este dispositivo</div>
+                            <div class="ajustes-item-label" style="color:#C62828;">🗜️ Liberar espacio de fotos</div>
+                            <div class="ajustes-item-desc">Elimina todas las fotos del sistema para ahorrar almacenamiento</div>
                         </div>
                         <span class="ajustes-item-arrow">›</span>
+                    </div>
+                    <div id="storage-info-bar" style="padding:12px 16px 4px 16px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-size:11px;font-weight:700;color:#AAA;text-transform:uppercase;">Almacenamiento usado</span>
+                            <span id="storage-info-text" style="font-size:11px;font-weight:700;color:#FC6E20;">Calculando...</span>
+                        </div>
+                        <div style="background:#F0F0F0;border-radius:50px;height:6px;overflow:hidden;">
+                            <div id="storage-info-bar-fill" style="height:100%;background:linear-gradient(90deg,#FC6E20,#e55a0a);border-radius:50px;width:0%;transition:width 0.5s ease;"></div>
+                        </div>
+                        <div style="font-size:10px;color:#CCC;margin-top:4px;">Bucket: fotos-auditorias · Límite: 1 GB</div>
                     </div>
                     <div class="ajustes-item" onclick="solicitarPasswordAdmin('cambiar-password')" style="cursor:pointer;border-top:1px solid #F5F5F5;">
                         <div class="ajustes-item-icon" style="background:#FFF0E6;">🔑</div>
@@ -4926,7 +4936,7 @@
             }
 
             if (viewId === 'view-home') renderHomeDashboard();
-            if (viewId === 'view-ajustes') mostrarSeccionKleiddy();
+            if (viewId === 'view-ajustes') { mostrarSeccionKleiddy(); calcularAlmacenamiento(); }
             if (viewId === 'view-analitica') { _analiticaLoaded = false; _topSemanaOffset = 0; renderAnalitica(); }
             if (viewId === 'view-usuarios') renderUsuarios();
             if (viewId === 'view-auditoria-tiendas') renderListaTiendas('auditoria');
@@ -5260,41 +5270,57 @@
         }
 
         async function confirmarResetGlobal() {
-            if (!confirm('⚠️ ADVERTENCIA: Esta acción eliminará TODOS los registros de auditorías, visitas y fotos de forma permanente e irreversible.\n\n¿Estás segura de continuar?')) return;
-            if (!confirm('Segunda confirmación: ¿Eliminar absolutamente todos los datos?')) return;
-            showToast('Eliminando todos los datos...', 'success');
+            if (!confirm('🗜️ LIBERAR ESPACIO: Esta acción eliminará TODAS las fotos del sistema de forma permanente.\n\nLas auditorías y visitas se conservan intactas.\n\n¿Continuar?')) return;
+            if (!confirm('Segunda confirmación: ¿Eliminar todas las fotos del bucket?')) return;
+            showToast('Eliminando fotos...', 'success');
             try {
-                // Eliminar auditorías
-                await sbClient.from('auditorias').delete().neq('id', 0);
-                // Eliminar visitas
-                await sbClient.from('visitas').delete().neq('id', 0);
-                // Eliminar fotos
-                try {
-                    let { data: folders } = await sbClient.storage.from('fotos-auditorias').list();
-                    if (folders && folders.length > 0) {
-                        for (let folder of folders) {
-                            let { data: files } = await sbClient.storage.from('fotos-auditorias').list(folder.name);
-                            if (files && files.length > 0) {
-                                let paths = files.map(f => `${folder.name}/${f.name}`);
-                                await sbClient.storage.from('fotos-auditorias').remove(paths);
-                            }
+                let totalEliminadas = 0;
+                // Eliminar fotos del bucket carpeta por carpeta
+                const { data: folders } = await sbClient.storage.from('fotos-auditorias').list();
+                if (folders && folders.length > 0) {
+                    for (let folder of folders) {
+                        // Ignorar carpeta perfiles
+                        if (folder.name === 'perfiles') continue;
+                        const { data: files } = await sbClient.storage.from('fotos-auditorias').list(folder.name);
+                        if (files && files.length > 0) {
+                            const paths = files.map(f => `${folder.name}/${f.name}`);
+                            await sbClient.storage.from('fotos-auditorias').remove(paths);
+                            totalEliminadas += paths.length;
                         }
                     }
-                } catch(e) {}
-                // Limpiar papelera
-                await sbClient.from('papelera').delete().neq('id', 0);
-                // Guardar fecha de reset absoluto
-                const resetTs = Date.now();
-                await sbClient.from('configuracion').upsert({ clave: 'ultimo_reset', valor: String(resetTs) });
-                // Limpiar localStorage
-                localStorage.removeItem('auditorias');
-                localStorage.removeItem('visitas');
-                localStorage.removeItem('borradores');
-                localStorage.removeItem('papelera_auditorias');
-                localStorage.removeItem('papelera_visitas');
-                showToast('✅ Todos los datos eliminados correctamente', 'success');
+                }
+                // Limpiar foto_url en auditorias de Supabase
+                await sbClient.from('auditorias').update({ fotos: [] }).neq('id', 0);
+                showToast(`✅ ${totalEliminadas} fotos eliminadas. Auditorías conservadas.`, 'success');
+                calcularAlmacenamiento();
             } catch(e) {
-                showToast('Error al eliminar datos. Intenta de nuevo.', 'error');
+                showToast('Error al eliminar fotos: ' + e.message, 'error');
+            }
+        }
+
+        async function calcularAlmacenamiento() {
+            const textEl = document.getElementById('storage-info-text');
+            const barEl = document.getElementById('storage-info-bar-fill');
+            if (!textEl || !barEl) return;
+            try {
+                let totalBytes = 0;
+                const { data: folders } = await sbClient.storage.from('fotos-auditorias').list();
+                if (folders && folders.length > 0) {
+                    for (let folder of folders) {
+                        const { data: files } = await sbClient.storage.from('fotos-auditorias').list(folder.name, { limit: 1000 });
+                        if (files) files.forEach(f => { totalBytes += f.metadata?.size || 0; });
+                    }
+                }
+                const mb = (totalBytes / (1024 * 1024)).toFixed(1);
+                const gb = (totalBytes / (1024 * 1024 * 1024));
+                const pct = Math.min((gb / 1) * 100, 100).toFixed(1);
+                const color = gb > 0.8 ? '#C62828' : gb > 0.5 ? '#F9A825' : '#FC6E20';
+                textEl.textContent = `${mb} MB / 1 GB (${pct}%)`;
+                textEl.style.color = color;
+                barEl.style.width = pct + '%';
+                barEl.style.background = `linear-gradient(90deg, ${color}, ${color}cc)`;
+            } catch(e) {
+                textEl.textContent = 'No disponible';
             }
         }
 
@@ -5310,7 +5336,7 @@
                 let protegido = u.cargo === 'SOPORTE' || u.cargo === 'JEFA COMERCIAL FAST FOOD';
                 return `
                 <div style="background:white; border-radius:16px; padding:16px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,0.06); display:flex; align-items:center; gap:14px; position:relative;">
-                    <div style="width:44px; height:44px; border-radius:50%; background:var(--naranja); color:white; font-weight:800; font-size:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${inis}</div>
+                    <div style="width:44px; height:44px; border-radius:50%; background:${u.foto_url ? 'transparent' : 'var(--naranja)'}; color:white; font-weight:800; font-size:16px; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;">${u.foto_url ? `<img src="${u.foto_url}" style="width:100%;height:100%;object-fit:cover;">` : inis}</div>
                     <div style="flex:1; min-width:0;">
                         <div style="font-size:14px; font-weight:700; color:#1B1B1B;">${u.nombre}</div>
                         <div style="font-size:11px; color:#FC6E20; font-weight:600;">${u.cargo}</div>
