@@ -6110,7 +6110,7 @@
                     if (sbFirma?.firma_url) firmaRoUrl = sbFirma.firma_url;
                 } catch(e) { console.error('Error firma:', e); }
             }
-            console.log('ID:', id, 'firmaRoUrl:', firmaRoUrl, 'data.firma_url:', data.firma_url, 'data.firma:', data.firma ? 'base64' : null);
+            
 
             let score = Math.round(data.notaFinal || data.finalScore);
             let colorHex = score <= 70 ? "#C62828" : score <= 90 ? "#F9A825" : "#43A047";
