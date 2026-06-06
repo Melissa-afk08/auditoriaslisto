@@ -4730,14 +4730,58 @@
         </div>
     </div>
 
-    <!-- MODAL VER USUARIO (solo lectura) -->
+    <!-- MODAL VER USUARIO -->
     <div id="modal-ver-usuario" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:white; border-radius:24px; padding:24px; width:100%; max-width:340px; box-shadow:0 8px 32px rgba(0,0,0,0.15);">
+        <div style="background:white; border-radius:24px; padding:24px; width:100%; max-width:360px; box-shadow:0 8px 32px rgba(0,0,0,0.15); max-height:90vh; overflow-y:auto;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-                <div style="font-size:15px; font-weight:800;">Información</div>
+                <div style="font-size:15px; font-weight:800;" id="modal-ver-usuario-titulo">Perfil</div>
                 <button onclick="document.getElementById('modal-ver-usuario').style.display='none'" style="background:#EEE; border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:16px;">✕</button>
             </div>
             <div id="modal-ver-usuario-content"></div>
+            <div id="modal-ver-usuario-acciones" style="margin-top:16px;"></div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR PERFIL PROPIO -->
+    <div id="modal-editar-perfil" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:10000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:white; border-radius:24px; padding:24px; width:100%; max-width:360px; box-shadow:0 8px 32px rgba(0,0,0,0.15); max-height:90vh; overflow-y:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div style="font-size:15px; font-weight:800;">✏️ Editar perfil</div>
+                <button onclick="document.getElementById('modal-editar-perfil').style.display='none'" style="background:#EEE; border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; font-size:16px;">✕</button>
+            </div>
+            <!-- Foto de perfil -->
+            <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:20px;">
+                <div style="position:relative; width:80px; height:80px; margin-bottom:10px;">
+                    <div id="ep-avatar" style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#FC6E20,#e55a0a);color:white;font-weight:800;font-size:26px;display:flex;align-items:center;justify-content:center;overflow:hidden;"></div>
+                    <label for="ep-foto-input" style="position:absolute;bottom:0;right:0;background:#FC6E20;border-radius:50%;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+                        <span style="font-size:13px;">📷</span>
+                        <input type="file" id="ep-foto-input" accept="image/*" style="display:none;" onchange="previsualizarFotoPerfil(event)">
+                    </label>
+                </div>
+                <div id="ep-foto-estado" style="font-size:11px;color:#AAA;">Toca 📷 para cambiar foto</div>
+            </div>
+            <!-- Campos -->
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div>
+                    <div style="font-size:10px;font-weight:700;color:#AAA;text-transform:uppercase;margin-bottom:4px;">Nombre completo</div>
+                    <input id="ep-nombre" type="text" style="width:100%;background:#F5F5F5;border:none;border-radius:12px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;" placeholder="Nombre completo">
+                </div>
+                <div>
+                    <div style="font-size:10px;font-weight:700;color:#AAA;text-transform:uppercase;margin-bottom:4px;">Cargo</div>
+                    <input id="ep-cargo" type="text" style="width:100%;background:#F5F5F5;border:none;border-radius:12px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;" placeholder="Cargo">
+                </div>
+                <div>
+                    <div style="font-size:10px;font-weight:700;color:#AAA;text-transform:uppercase;margin-bottom:4px;">Celular</div>
+                    <input id="ep-telefono" type="tel" style="width:100%;background:#F5F5F5;border:none;border-radius:12px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;" placeholder="Ej: 999 888 777">
+                </div>
+                <div>
+                    <div style="font-size:10px;font-weight:700;color:#AAA;text-transform:uppercase;margin-bottom:4px;">Correo electrónico</div>
+                    <div id="ep-email-display" style="width:100%;background:#F0F0F0;border-radius:12px;padding:12px 14px;font-size:14px;color:#AAA;"></div>
+                </div>
+            </div>
+            <input type="hidden" id="ep-foto-url-nueva">
+            <button onclick="guardarPerfil()" style="margin-top:20px;width:100%;background:#FC6E20;color:white;border:none;border-radius:50px;padding:14px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">Guardar cambios</button>
+            <div id="ep-error" style="display:none;margin-top:8px;font-size:12px;color:#C62828;text-align:center;"></div>
         </div>
     </div>
 
@@ -8758,9 +8802,14 @@
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
             let u = users[i];
             let inis = u.nombre.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
+            const esPropioPerfl = window.currentUser && window.currentUser.email === u.email;
+            const avatarHtml = u.foto_url
+                ? `<img src="${u.foto_url}" style="width:72px;height:72px;object-fit:cover;border-radius:50%;">`
+                : `<span style="font-size:24px;font-weight:800;">${inis}</span>`;
+            document.getElementById("modal-ver-usuario-titulo").textContent = esPropioPerfl ? 'Mi perfil' : 'Perfil';
             document.getElementById("modal-ver-usuario-content").innerHTML = `
                 <div style="display:flex; flex-direction:column; align-items:center; gap:8px; margin-bottom:20px;">
-                    <div style="width:64px; height:64px; border-radius:50%; background:var(--naranja); color:white; font-weight:800; font-size:22px; display:flex; align-items:center; justify-content:center;">${inis}</div>
+                    <div style="width:72px;height:72px;border-radius:50%;background:${u.foto_url ? 'transparent' : 'var(--naranja)'};color:white;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 4px 12px rgba(0,0,0,0.15);">${avatarHtml}</div>
                     <div style="font-size:17px; font-weight:800; color:#1B1B1B; text-align:center;">${u.nombre}</div>
                     <span style="background:#FFF0E6; color:var(--naranja); font-size:11px; font-weight:700; padding:4px 12px; border-radius:50px;">${u.cargo}</span>
                 </div>
@@ -8775,6 +8824,10 @@
                     </div>
                 </div>
             `;
+            // Botón editar solo si es el propio perfil
+            document.getElementById("modal-ver-usuario-acciones").innerHTML = esPropioPerfl
+                ? `<button onclick="document.getElementById('modal-ver-usuario').style.display='none'; editarMiPerfil();" style="width:100%;margin-top:4px;background:#FC6E20;color:white;border:none;border-radius:50px;padding:13px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">✏️ Editar mi perfil</button>`
+                : '';
             document.getElementById("modal-ver-usuario").style.display = "flex";
         }
 
@@ -8867,17 +8920,23 @@
             };
 
             let html = sups.map((s, i) => {
-                const userData = users.find(u => u.nombre && (u.nombre.includes(s.split(' ')[0]) || s.includes(u.nombre.split(' ')[0])));
+                const userIdx = users.findIndex(u => u.nombre && (u.nombre.includes(s.split(' ')[0]) || s.includes(u.nombre.split(' ')[0])));
+                const userData = userIdx !== -1 ? users[userIdx] : null;
                 const cargo = userData?.cargo || 'Supervisora';
                 const email = userData?.email || '';
                 const telefono = userData?.telefono || '';
+                const foto_url = userData?.foto_url || '';
                 const inis = s.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
                 const avatarColor = getAvatarColor(s);
                 const rolColor = getRolColor(cargo);
+                const avatarContent = foto_url
+                    ? `<img src="${foto_url}" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">`
+                    : `<div style="width:40px;height:40px;border-radius:50%;background:${avatarColor.bg};color:${avatarColor.text};font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${inis}</div>`;
+                const clickFn = userIdx !== -1 ? `editUser(${userIdx})` : '';
 
                 return `
-        <div style="display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid #F0F0F0;">
-          <div style="width:40px;height:40px;border-radius:50%;background:${avatarColor.bg};color:${avatarColor.text};font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${inis}</div>
+        <div onclick="${clickFn}" style="display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid #F0F0F0; cursor:${clickFn ? 'pointer' : 'default'};">
+          ${avatarContent}
           <div style="flex:1;min-width:0;">
             <div style="font-size:14px;font-weight:700;color:#1B1B1B;line-height:1.3;">${s}</div>
             ${email ? `<div style="font-size:11px;color:#AAA;margin-top:1px;">${email}</div>` : ''}
@@ -8895,9 +8954,117 @@
             let u = window.currentUser;
             if (!u) return;
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
-            let idx = users.findIndex(x => x.email === u.email);
-            if (idx === -1) return;
-            editUser(idx);
+            let userData = users.find(x => x.email === u.email) || u;
+            // Precargar modal editar perfil
+            document.getElementById('ep-nombre').value = userData.nombre || '';
+            document.getElementById('ep-cargo').value = userData.cargo || '';
+            document.getElementById('ep-telefono').value = userData.telefono || '';
+            document.getElementById('ep-email-display').textContent = userData.email || '';
+            document.getElementById('ep-foto-url-nueva').value = '';
+            document.getElementById('ep-error').style.display = 'none';
+            // Avatar preview
+            const av = document.getElementById('ep-avatar');
+            if (userData.foto_url) {
+                av.innerHTML = `<img src="${userData.foto_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+            } else {
+                const inis = (userData.nombre || 'U').split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+                av.innerHTML = inis;
+                av.style.background = 'linear-gradient(135deg,#FC6E20,#e55a0a)';
+            }
+            document.getElementById('ep-foto-estado').textContent = 'Toca 📷 para cambiar foto';
+            document.getElementById('modal-editar-perfil').style.display = 'flex';
+        }
+
+        function previsualizarFotoPerfil(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 3 * 1024 * 1024) {
+                document.getElementById('ep-foto-estado').textContent = '⚠️ La foto no debe superar 3MB';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const av = document.getElementById('ep-avatar');
+                av.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+                av.style.background = 'none';
+                document.getElementById('ep-foto-estado').textContent = '✅ Foto lista para guardar';
+                window._epFotoFile = file;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function guardarPerfil() {
+            const u = window.currentUser;
+            if (!u) return;
+            const nombre = document.getElementById('ep-nombre').value.trim();
+            const cargo = document.getElementById('ep-cargo').value.trim();
+            const telefono = document.getElementById('ep-telefono').value.trim();
+            const errEl = document.getElementById('ep-error');
+            if (!nombre || !cargo) { errEl.textContent = 'Nombre y cargo son obligatorios'; errEl.style.display='block'; return; }
+            errEl.style.display = 'none';
+
+            let foto_url = null;
+            // Subir foto si se seleccionó una nueva
+            if (window._epFotoFile) {
+                document.getElementById('ep-foto-estado').textContent = '⏳ Subiendo foto...';
+                const ext = window._epFotoFile.name.split('.').pop();
+                const path = `perfiles/${u.email.replace(/[@.]/g,'_')}_${Date.now()}.${ext}`;
+                const { data: upData, error: upErr } = await sbClient.storage
+                    .from('fotos-auditorias')
+                    .upload(path, window._epFotoFile, { upsert: true, contentType: window._epFotoFile.type });
+                if (upErr) { errEl.textContent = 'Error al subir foto: ' + upErr.message; errEl.style.display='block'; return; }
+                const { data: urlData } = sbClient.storage.from('fotos-auditorias').getPublicUrl(path);
+                foto_url = urlData.publicUrl;
+                window._epFotoFile = null;
+            }
+
+            // Actualizar Supabase
+            const updateData = { nombre, cargo, telefono };
+            if (foto_url) updateData.foto_url = foto_url;
+            await sbClient.from('usuarios').update(updateData).eq('email', u.email);
+
+            // Actualizar localStorage
+            let users = JSON.parse(localStorage.getItem('usuarios') || '[]');
+            const idx = users.findIndex(x => x.email === u.email);
+            if (idx !== -1) {
+                users[idx] = { ...users[idx], nombre, cargo, telefono };
+                if (foto_url) users[idx].foto_url = foto_url;
+                localStorage.setItem('usuarios', JSON.stringify(users));
+            }
+
+            // Actualizar currentUser
+            window.currentUser = { ...u, nombre, cargo, telefono };
+            if (foto_url) window.currentUser.foto_url = foto_url;
+
+            // Refrescar UI en todo el sistema
+            const inis = nombre.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
+            // Avatares home
+            const setAvatar = (id, fotoUrl, iniciales) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (fotoUrl) { el.innerHTML = `<img src="${fotoUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; el.style.background='none'; }
+                else { el.textContent = iniciales; }
+            };
+            setAvatar('home-avatar', foto_url, inis);
+            setAvatar('home-avatar-mobile', foto_url, inis);
+            // Greeting
+            document.getElementById('home-greeting').textContent = `Hola, ${nombre.split(' ')[0]}`;
+            const mg = document.getElementById('home-greeting-mobile');
+            if (mg) mg.textContent = `Hola, ${nombre.split(' ')[0]}`;
+            // Ajustes perfil card
+            const ajAv = document.getElementById('ajustes-avatar');
+            if (ajAv) {
+                if (foto_url) { ajAv.innerHTML = `<img src="${foto_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`; ajAv.style.background='none'; }
+                else { ajAv.textContent = inis; }
+            }
+            document.getElementById('ajustes-nombre').textContent = nombre;
+            document.getElementById('ajustes-cargo').textContent = cargo;
+            // Listas
+            renderAjustesSupervisores();
+            if (document.getElementById('view-usuarios').style.display === 'block') renderUsuarios();
+
+            document.getElementById('modal-editar-perfil').style.display = 'none';
+            showToast('Perfil actualizado ✅', 'ok');
         }
 
         function editSupervidor(nombreSup, supIdx) {
