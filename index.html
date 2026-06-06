@@ -3149,6 +3149,15 @@
                             </svg>
                             Mis Auditorías
                         </button>
+                        <button class="btn-home-historial" onclick="showView('view-mis-visitas')">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"></path>
+                                <path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"></path>
+                                <line x1="1" y1="1" x2="23" y2="23"></line>
+                            </svg>
+                            Mis Visitas
+                        </button>
                     </div>
                     <div class="action-card" onclick="showView('view-analitica')">
                         <div class="action-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
@@ -4003,6 +4012,58 @@
         </div>
     </div>
 
+    <!-- VIEW: MIS VISITAS -->
+    <div id="view-mis-visitas" class="view fade-in">
+        <div class="header-dark" style="background:var(--naranja);">
+            <button onclick="showView('view-home')" style="color:white;">←</button>
+            <span class="bold" style="color:white; font-size:16px;">MIS VISITAS</span>
+        </div>
+        <div class="p-16">
+            <div class="flex gap-8 mb-16">
+                <div class="tiendas-search-container"
+                    style="flex:1; background:white; border-radius:50px; box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--naranja)" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
+                    <input type="text" id="mis-vis-search" placeholder="Buscar tienda..."
+                        oninput="renderMisVisitas()">
+                </div>
+                <button style="display:flex;align-items:center;gap:6px;background:white;border:1.5px solid var(--naranja);color:var(--naranja);border-radius:50px;padding:0 16px;height:40px;font-size:13px;font-weight:700;cursor:pointer;flex-shrink:0;"
+                    onclick="toggleFiltroMisVis()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+                    </svg>
+                    Filtrar
+                </button>
+            </div>
+            <div id="panel-filtro-mis-vis" style="display:none; background:white; border-radius:16px; padding:16px; margin-bottom:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <select id="filtro-mis-vis-anio-sel" onchange="renderMisVisitas()" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                        <option value="">Año</option>
+                    </select>
+                    <div style="display:flex;gap:8px;">
+                        <select id="filtro-mis-vis-mes-sel" onchange="renderMisVisitas()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Mes</option>
+                            <option value="01">Enero</option><option value="02">Febrero</option><option value="03">Marzo</option><option value="04">Abril</option><option value="05">Mayo</option><option value="06">Junio</option><option value="07">Julio</option><option value="08">Agosto</option><option value="09">Septiembre</option><option value="10">Octubre</option><option value="11">Noviembre</option><option value="12">Diciembre</option>
+                        </select>
+                        <select id="filtro-mis-vis-dia-sel" onchange="renderMisVisitas()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="">Día</option>
+                            <option value="01">1</option><option value="02">2</option><option value="03">3</option><option value="04">4</option><option value="05">5</option><option value="06">6</option><option value="07">7</option><option value="08">8</option><option value="09">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option><option value="16">16</option><option value="17">17</option><option value="18">18</option><option value="19">19</option><option value="20">20</option><option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option><option value="29">29</option><option value="30">30</option><option value="31">31</option>
+                        </select>
+                        <select id="filtro-mis-vis-orden-sel" onchange="renderMisVisitas()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #EEE;font-size:13px;box-sizing:border-box;font-family:inherit;outline:none;background:white;">
+                            <option value="desc">Más reciente</option>
+                            <option value="asc">Más antiguo</option>
+                        </select>
+                    </div>
+                    <button onclick="limpiarFiltroMisVis()" style="width:100%;padding:10px;border-radius:50px;background:transparent;border:1.5px solid #ddd;color:#888;font-size:13px;font-weight:700;cursor:pointer;">Borrar filtros</button>
+                </div>
+            </div>
+            <div id="lista-mis-visitas"></div>
+        </div>
+    </div>
+
     <!-- VIEW: HISTORIAL VISITAS -->
     <div id="view-historial-visitas" class="view fade-in">
         <div class="header-dark" style="background:var(--naranja);">
@@ -4846,6 +4907,7 @@
             if (viewId === 'view-historial-auditorias') renderHistorialAuditorias();
             if (viewId === 'view-historial-visitas') renderHistorialVisitas();
             if (viewId === 'view-mis-auditorias') { window._miSelModeAud=false; window._miSelAud=new Set(); renderMisAuditorias(); }
+            if (viewId === 'view-mis-visitas') { window._miSelModeVis=false; window._miSelVis=new Set(); renderMisVisitas(); }
             if (viewId === 'view-auditoria-detalle') renderDetalleAuditoria();
             if (viewId === 'view-visita-detalle') renderDetalleVisita();
             if (viewId === 'view-tienda-detalle') renderDetalleTienda();
@@ -8116,6 +8178,134 @@
             document.getElementById("modal-confirm").style.display = "flex";
         }
         // ── FIN MIS AUDITORÍAS ──────────────────────────────────────
+
+        // ── MIS VISITAS ──────────────────────────────────────────────
+        function toggleFiltroMisVis() {
+            let panel = document.getElementById('panel-filtro-mis-vis');
+            let visible = panel.style.display !== 'none';
+            if (!visible) {
+                let anioSel = document.getElementById('filtro-mis-vis-anio-sel');
+                if (anioSel && anioSel.options.length <= 1) {
+                    let anios = [2026, 2025, 2024];
+                    anios.forEach(y => anioSel.innerHTML += `<option value="${y}">${y}</option>`);
+                }
+                panel.style.display = 'block';
+            } else {
+                panel.style.display = 'none';
+            }
+        }
+
+        function limpiarFiltroMisVis() {
+            let a = document.getElementById('filtro-mis-vis-anio-sel'); if(a) a.value='';
+            let m = document.getElementById('filtro-mis-vis-mes-sel'); if(m) m.value='';
+            let d = document.getElementById('filtro-mis-vis-dia-sel'); if(d) d.value='';
+            let o = document.getElementById('filtro-mis-vis-orden-sel'); if(o) o.value='desc';
+            renderMisVisitas();
+        }
+
+        async function renderMisVisitas() {
+            const contenedor = document.getElementById('lista-mis-visitas');
+            if (!contenedor) return;
+            const user = window.currentUser;
+            if (!user) return;
+            const miNombre = user.nombre || '';
+
+            contenedor.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;">Cargando...</div>';
+
+            let visitas = [];
+            try {
+                let { data: raw } = await sbClient.from('visitas')
+                    .select('*').order('id', { ascending: false });
+                if (raw) {
+                    visitas = raw.filter(v => {
+                        const sup = (v.supervisor||'').trim().toLowerCase();
+                        const nom = miNombre.trim().toLowerCase();
+                        return sup === nom || nom.split(' ').some(p => p.length > 2 && sup.includes(p));
+                    });
+                }
+            } catch(e) {}
+
+            const search = (document.getElementById('mis-vis-search')?.value || '').toLowerCase();
+            const fAnio = document.getElementById('filtro-mis-vis-anio-sel')?.value || '';
+            const fMes = document.getElementById('filtro-mis-vis-mes-sel')?.value || '';
+            const fDia = document.getElementById('filtro-mis-vis-dia-sel')?.value || '';
+            const orden = document.getElementById('filtro-mis-vis-orden-sel')?.value || 'desc';
+
+            if (search) visitas = visitas.filter(v => (v.tienda||'').toLowerCase().includes(search));
+            if (fAnio) visitas = visitas.filter(v => (v.datetime||'').substring(0,4) === fAnio);
+            if (fMes) visitas = visitas.filter(v => (v.datetime||'').substring(5,7) === fMes);
+            if (fDia) visitas = visitas.filter(v => (v.datetime||'').substring(8,10) === fDia.padStart(2,'0'));
+
+            visitas.sort((a,b) => orden === 'asc'
+                ? (a.datetime||'').localeCompare(b.datetime||'')
+                : (b.datetime||'').localeCompare(a.datetime||''));
+
+            window._miSelModeVis = window._miSelModeVis || false;
+            window._miSelVis = window._miSelVis || new Set();
+            window._miVisSelIds = visitas.map(v => v.id);
+
+            if (visitas.length === 0) {
+                contenedor.innerHTML = '<div style="text-align:center;padding:40px;color:#aaa;font-size:14px;">No hay visitas registradas</div>';
+                return;
+            }
+
+            const barraSel = window._miSelModeVis ? `
+                <div style="display:flex;align-items:center;gap:10px;padding:10px 0 14px;">
+                    <button onclick="window._miSelVis.size===window._miVisSelIds.length?window._miSelVis.clear():window._miVisSelIds.forEach(id=>window._miSelVis.add(id));renderMisVisitas();" style="background:none;border:1px solid #FC6E20;color:#FC6E20;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Seleccionar todo</button>
+                    <span style="font-size:13px;color:#888;">${window._miSelVis.size} seleccionados</span>
+                    <button onclick="eliminarSeleccionMisVis()" style="margin-left:auto;background:#C62828;color:white;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">🗑 Papelera</button>
+                    <button onclick="window._miSelModeVis=false;window._miSelVis=new Set();renderMisVisitas();" style="background:#F5F5F5;border:none;border-radius:50px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Cancelar</button>
+                </div>` : '';
+
+            let html = barraSel;
+            visitas.forEach(v => {
+                const seleccionado = window._miSelVis.has(v.id);
+                const fecha = v.datetime ? v.datetime.substring(0,10).split('-').reverse().join('/') : '';
+                const hora = v.datetime ? v.datetime.substring(11,16) : '';
+                html += `
+                <div style="background:white;border-radius:16px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;gap:12px;cursor:pointer;border:2px solid ${seleccionado?'#FC6E20':'transparent'};"
+                    onclick="window._miSelModeVis ? (()=>{if(window._miSelVis.has(${v.id}))window._miSelVis.delete(${v.id});else window._miSelVis.add(${v.id});renderMisVisitas();})() : null"
+                    ontouchstart="window._miLpVisF=false;window._miLpVis=setTimeout(()=>{window._miLpVisF=true;window._miSelModeVis=true;window._miSelVis.add(${v.id});renderMisVisitas();},700)"
+                    ontouchend="clearTimeout(window._miLpVis)"
+                    onmousedown="window._miLpVis=setTimeout(()=>{window._miLpVisF=true;window._miSelModeVis=true;window._miSelVis.add(${v.id});renderMisVisitas();},700)"
+                    onmouseup="clearTimeout(window._miLpVis)">
+                    ${window._miSelModeVis ? `<div style="width:22px;height:22px;border-radius:50%;border:2px solid ${seleccionado?'#FC6E20':'#ccc'};background:${seleccionado?'#FC6E20':'white'};display:flex;align-items:center;justify-content:center;flex-shrink:0;">${seleccionado?'<span style="color:white;font-size:13px;">✓</span>':''}</div>` : ''}
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:14px;font-weight:700;color:#1B1B1B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.tienda||'—'}</div>
+                        <div style="font-size:12px;color:#888;margin-top:2px;">${fecha} ${hora}</div>
+                        ${v.comentario ? `<div style="font-size:12px;color:#555;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${v.comentario}</div>` : ''}
+                    </div>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>`;
+            });
+            contenedor.innerHTML = html;
+        }
+
+        async function eliminarSeleccionMisVis() {
+            if (window._miSelVis.size === 0) return;
+            const n = window._miSelVis.size;
+            document.getElementById("mc-desc").innerText = `¿Mover ${n} visita${n>1?'s':''} a la papelera? Podrás recuperarla desde Ajustes.`;
+            document.getElementById("mc-btn").onclick = async function() {
+                const idsToDelete = Array.from(window._miSelVis);
+                window._miSelModeVis = false;
+                window._miSelVis = new Set();
+                closeModal('modal-confirm');
+                showToast(`Moviendo ${n} visita${n>1?'s':''} a papelera...`, 'success');
+                await Promise.all(idsToDelete.map(async id => {
+                    try {
+                        const { data: vis } = await sbClient.from('visitas').select('*').eq('id', id).single();
+                        if (vis) {
+                            await sbClient.from('papelera').insert({ tipo: 'visita', datos: vis, eliminado_por: window.currentUser?.nombre || '' });
+                            await sbClient.from('visitas').delete().eq('id', id);
+                        }
+                    } catch(e) {}
+                }));
+                showToast(`${n} visita${n>1?'s':''} enviada${n>1?'s':''} a papelera`, 'success');
+                renderMisVisitas();
+            };
+            document.getElementById("modal-confirm").style.display = "flex";
+        }
+        // ── FIN MIS VISITAS ──────────────────────────────────────────
 
         function eliminarBorrador(borradorId) {
             document.getElementById("mc-desc").innerText = "¿Eliminar esta auditoría en progreso? Se perderá todo el avance.";
