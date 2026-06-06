@@ -8914,7 +8914,6 @@
 
         // --- AJUSTES SUPERVISORES ---
         function renderAjustesSupervisores() {
-            let sups = JSON.parse(localStorage.getItem("supervisores") || "[]");
             let users = JSON.parse(localStorage.getItem("usuarios") || "[]");
 
             const rolColors = {
@@ -8944,26 +8943,23 @@
                 return key ? avatarColorMap[key] : { bg: '#FC6E20', text: '#fff' };
             };
 
-            let html = sups.map((s, i) => {
-                const userIdx = users.findIndex(u => u.nombre && (u.nombre.includes(s.split(' ')[0]) || s.includes(u.nombre.split(' ')[0])));
-                const userData = userIdx !== -1 ? users[userIdx] : null;
-                const cargo = userData?.cargo || 'Supervisora';
-                const email = userData?.email || '';
-                const telefono = userData?.telefono || '';
-                const foto_url = userData?.foto_url || '';
-                const inis = s.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-                const avatarColor = getAvatarColor(s);
+            let html = users.map((u, userIdx) => {
+                const cargo = u.cargo || 'Supervisora';
+                const email = u.email || '';
+                const telefono = u.telefono || '';
+                const foto_url = u.foto_url || '';
+                const inis = u.nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+                const avatarColor = getAvatarColor(u.nombre);
                 const rolColor = getRolColor(cargo);
                 const avatarContent = foto_url
                     ? `<img src="${foto_url}" style="width:40px;height:40px;object-fit:cover;border-radius:50%;">`
                     : `<div style="width:40px;height:40px;border-radius:50%;background:${avatarColor.bg};color:${avatarColor.text};font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">${inis}</div>`;
-                const clickFn = userIdx !== -1 ? `editUser(${userIdx})` : '';
 
                 return `
-        <div onclick="${clickFn}" style="display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid #F0F0F0; cursor:${clickFn ? 'pointer' : 'default'};">
+        <div onclick="editUser(${userIdx})" style="display:flex; align-items:center; gap:12px; padding:12px 4px; border-bottom:1px solid #F0F0F0; cursor:pointer;">
           ${avatarContent}
           <div style="flex:1;min-width:0;">
-            <div style="font-size:14px;font-weight:700;color:#1B1B1B;line-height:1.3;">${s}</div>
+            <div style="font-size:14px;font-weight:700;color:#1B1B1B;line-height:1.3;">${u.nombre}</div>
             ${email ? `<div style="font-size:11px;color:#AAA;margin-top:1px;">${email}</div>` : ''}
             ${telefono ? `<div style="font-size:11px;color:#AAA;">📱 ${telefono}</div>` : ''}
           </div>
@@ -8972,7 +8968,7 @@
         `;
             }).join("");
 
-            document.getElementById("list-supervisores").innerHTML = html || '<p style="font-size:13px;color:#AAA;padding:12px 4px;">No hay supervisoras registradas</p>';
+            document.getElementById("list-supervisores").innerHTML = html || '<p style="font-size:13px;color:#AAA;padding:12px 4px;">No hay usuarias registradas</p>';
         }
 
         function editarMiPerfil() {
