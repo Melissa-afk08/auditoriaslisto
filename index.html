@@ -7879,34 +7879,13 @@
             const n = window._selAud.size;
             document.getElementById("mc-desc").innerText = `¿Mover ${n} auditoría${n>1?'s':''} a la papelera? Esta acción se puede deshacer desde Ajustes.`;
             document.getElementById("mc-btn").onclick = async function() {
-                let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
-                let papelera = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
-                const user = window.currentUser?.nombre || '';
-                window._selAud.forEach(id => {
-                    const idx = auds.findIndex(a => a.id === id);
-                    if (idx !== -1) {
-                        papelera.push({ ...auds[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: user });
-                        auds.splice(idx, 1);
-                    }
-                });
-                localStorage.setItem("auditorias", JSON.stringify(auds));
-                localStorage.setItem("papelera_auditorias", JSON.stringify(papelera));
                 const idsToDelete = Array.from(window._selAud);
                 window._selModeAud = false;
                 window._selAud = new Set();
                 closeModal('modal-confirm');
+                showToast(`Moviendo ${n} registro${n>1?'s':''} a papelera...`, 'success');
+                await Promise.all(idsToDelete.map(id => _moverAuditoriaPapelera(id)));
                 showToast(`${n} registro${n>1?'s':''} enviado${n>1?'s':''} a papelera`, 'success');
-                try { await sbClient.from('auditorias').delete().in('id', idsToDelete); } catch(e) {}
-                try {
-                    const user = window.currentUser?.nombre || '';
-                    await Promise.all(papelera.slice(-idsToDelete.length).map(item =>
-                        sbClient.from('papelera').insert({ tipo: 'auditoria', datos: item, eliminado_por: user })
-                    ));
-                } catch(e) {}
-                // Limpiar localStorage antes de re-renderizar para que no muestre datos viejos
-                let audsActuales = JSON.parse(localStorage.getItem("auditorias") || "[]");
-                audsActuales = audsActuales.filter(a => !idsToDelete.includes(a.id));
-                localStorage.setItem("auditorias", JSON.stringify(audsActuales));
                 renderHistorialAuditorias();
             };
             document.getElementById("modal-confirm").style.display = "flex";
@@ -8093,28 +8072,13 @@
             document.getElementById("mc-desc").innerText = `¿Mover ${n} auditoría${n>1?'s':''} a la papelera? Podrás recuperarla desde Ajustes.`;
             document.getElementById("mc-btn").onclick = async function() {
                 const idsToDelete = Array.from(window._miSelAud);
-                const user = window.currentUser?.nombre || '';
-                let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
-                let papelera = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
-                idsToDelete.forEach(id => {
-                    const idx = auds.findIndex(a => a.id === id);
-                    if (idx !== -1) {
-                        papelera.push({ ...auds[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: user });
-                        auds.splice(idx, 1);
-                    }
-                });
-                localStorage.setItem("auditorias", JSON.stringify(auds));
-                localStorage.setItem("papelera_auditorias", JSON.stringify(papelera));
                 window._miSelModeAud = false;
                 window._miSelAud = new Set();
                 closeModal('modal-confirm');
+                showToast(`Moviendo ${n} auditoría${n>1?'s':''} a papelera...`, 'success');
+                // Usar la función centralizada que garantiza el orden correcto
+                await Promise.all(idsToDelete.map(id => _moverAuditoriaPapelera(id)));
                 showToast(`${n} auditoría${n>1?'s':''} enviada${n>1?'s':''} a papelera`, 'success');
-                try { await sbClient.from('auditorias').delete().in('id', idsToDelete); } catch(e) {}
-                try {
-                    await Promise.all(papelera.slice(-idsToDelete.length).map(item =>
-                        sbClient.from('papelera').insert({ tipo: 'auditoria', datos: item, eliminado_por: user })
-                    ));
-                } catch(e) {}
                 renderMisAuditorias();
                 renderHistorialAuditorias();
             };
@@ -9750,24 +9714,54 @@
             }
         }
 
-        async function borrarAuditoria(id) {
+        async function _moverAuditoriaPapelera(id) {
+            const user = window.currentUser?.nombre || '';
+            // 1. Buscar en localStorage primero
             let auds = JSON.parse(localStorage.getItem("auditorias") || "[]");
             let idx = auds.findIndex(a => a.id === id);
-            if (idx === -1) return;
-            let item = { ...auds[idx], eliminadoEn: new Date().toISOString(), eliminadoPor: window.currentUser?.nombre || '' };
+            let itemLocal = idx !== -1 ? { ...auds[idx] } : null;
+            // 2. Si no está en localStorage, buscar en Supabase
+            let itemSb = null;
+            if (!itemLocal) {
+                try {
+                    let { data: raw } = await sbClient.from('auditorias').select('*').eq('id', id).single();
+                    if (raw) itemSb = {
+                        id: raw.id,
+                        tienda: { nombre: raw.tienda_nombre, distrito: raw.tienda_distrito, direccion: raw.tienda_direccion },
+                        supervisor: raw.supervisor, encargado: raw.encargado,
+                        fecha: raw.fecha, hora: raw.hora,
+                        respuestas: raw.respuestas || {}, resultadoGrupos: raw.resultado_grupos || {},
+                        notaFinal: parseFloat(raw.nota_final), clasificacion: raw.clasificacion,
+                        firma: raw.firma_url, ubicacionGPS: raw.ubicacion_gps
+                    };
+                } catch(e) {}
+            }
+            const itemBase = itemLocal || itemSb;
+            if (!itemBase) return false;
+            const item = { ...itemBase, eliminadoEn: new Date().toISOString(), eliminadoPor: user };
+            // 3. Guardar en papelera LOCAL primero
             let papelera = JSON.parse(localStorage.getItem("papelera_auditorias") || "[]");
             papelera.push(item);
             localStorage.setItem("papelera_auditorias", JSON.stringify(papelera));
-            auds.splice(idx, 1);
-            localStorage.setItem("auditorias", JSON.stringify(auds));
-            try {
-                await sbClient.from('auditorias').delete().eq('id', id);
-                await sbClient.from('papelera').insert({ tipo: 'auditoria', datos: item, eliminado_por: item.eliminadoPor });
-            } catch(e) {}
+            // 4. Guardar en papelera SUPABASE
+            try { await sbClient.from('papelera').insert({ tipo: 'auditoria', datos: item, eliminado_por: user }); } catch(e) {}
+            // 5. Eliminar de auditorias SUPABASE
+            try { await sbClient.from('auditorias').delete().eq('id', id); } catch(e) {}
+            // 6. Eliminar de localStorage
+            if (idx !== -1) {
+                auds.splice(idx, 1);
+                localStorage.setItem("auditorias", JSON.stringify(auds));
+            }
+            return true;
+        }
+
+        async function borrarAuditoria(id) {
+            const ok = await _moverAuditoriaPapelera(id);
+            if (!ok) { showToast("No se encontró la auditoría", "error"); return; }
             closeModalRo('modal-ro-auditoria');
             showToast("✓ Auditoría movida a la papelera", "success");
             renderHistorialAuditorias();
-            if (document.getElementById('view-auditoria-resultado').style.display !== 'none') {
+            if (document.getElementById('view-auditoria-resultado')?.style.display !== 'none') {
                 showView('view-historial-auditorias');
             }
         }
