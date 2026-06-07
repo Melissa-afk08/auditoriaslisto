@@ -11147,8 +11147,7 @@
             const tiendaNombre = (typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda'));
             const nota = (data.notaFinal || data.finalScore || 0).toFixed(1);
             const clasificacion = data.clasificacion || '';
-            const emoji = parseFloat(nota) >= 91 ? '✅' : parseFloat(nota) >= 71 ? '⚠️' : '🔴';
-            const asunto = `${emoji} Auditoría ${tiendaNombre} – ${clasificacion} (${nota}%) | ${data.fecha} | Sup: ${data.supervisor}`;
+            const asunto = `Reporte de Auditoría – ${tiendaNombre} | ${data.fecha} | ${clasificacion} (${nota}%) | Sup: ${data.supervisor}`;
             const cuerpo = `Estimado/a,\n\nSe adjunta el reporte de auditoría correspondiente a:\n\nTienda: ${tiendaNombre}\nFecha: ${data.fecha} ${data.hora || ''}\nSupervisor: ${data.supervisor}\nEncargado: ${data.encargado || 'N/A'}\nResultado: ${clasificacion} (${nota}%)\n\nQuedo a disposición ante cualquier consulta.\n\nSaludos cordiales.`;
             const enlacePublico = `${location.origin}${location.pathname}?resultado=${data.id}`;
             const filename = `Auditoria_${tiendaNombre.replace(/\s+/g,'_')}_${(data.fecha||'').replace(/\//g,'-')}.pdf`;
@@ -11159,29 +11158,16 @@
                 try { window._ultimoPdfBlob = await generarReporte(false, true); } catch(e) {}
             }
 
-            // MOBILE: sheet nativo con PDF adjunto automático
-            const esMobil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-            if (esMobil && navigator.share) {
-                const shareData = {
-                    title: asunto,
-                    text: cuerpo + '\n\nVer online: ' + enlacePublico
-                };
-                if (window._ultimoPdfBlob && navigator.canShare) {
-                    const file = new File([window._ultimoPdfBlob], filename, { type: 'application/pdf' });
-                    if (navigator.canShare({ files: [file] })) shareData.files = [file];
-                }
-                try { await navigator.share(shareData); return; } catch(e) { if (e.name === 'AbortError') return; }
-            }
-
-            // DESKTOP: modal con plataformas
+            // URLs para cada plataforma
             const cuerpoConEnlace = cuerpo + '\n\nVer reporte online: ' + enlacePublico;
             const urlMailto   = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpoConEnlace)}`;
             const urlGmail    = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpoConEnlace)}`;
             const urlOutlook  = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpoConEnlace)}`;
-            const urlWsp      = `https://wa.me/?text=${encodeURIComponent(emoji + ' *' + asunto.replace(emoji+' ','') + '*\n\n' + cuerpo + '\n\n🔗 Ver online: ' + enlacePublico)}`;
+            const urlWsp      = `https://wa.me/?text=${encodeURIComponent('*' + asunto + '*\n\n' + cuerpo + '\n\n🔗 Ver online: ' + enlacePublico)}`;
             const urlTelegram = `https://t.me/share/url?url=${encodeURIComponent(enlacePublico)}&text=${encodeURIComponent(asunto)}`;
             const urlTeams    = `https://teams.microsoft.com/share?href=${encodeURIComponent(enlacePublico)}&msgText=${encodeURIComponent(asunto)}`;
 
+            // Función para descargar PDF
             window._descargarPdfEnvio = () => {
                 if (!window._ultimoPdfBlob) { showToast("PDF aún generándose, intenta en un momento", "error"); return; }
                 const a = document.createElement('a');
@@ -11189,6 +11175,9 @@
                 a.download = filename; a.click();
                 showToast("✓ PDF descargado – ahora adjúntalo al correo", "success");
             };
+
+            // Detectar mobile para hints
+            const esMobil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
             // Llenar el modal moderno
             const notaColor = parseFloat(nota) >= 91 ? '#43A047' : parseFloat(nota) >= 71 ? '#F9A825' : '#C62828';
