@@ -8255,24 +8255,22 @@
             if (!user) return;
             const miNombre = user.nombre || '';
 
-            // Cargar desde Supabase
+            // Cargar desde Supabase — filtrar por email (created_by) para precisión total
+            const miEmail = (user.email || '').toLowerCase();
             let auditorias = [];
             try {
                 let { data: raw } = await sbClient.from('auditorias')
-                    .select('*').eq('es_borrador', false).order('id', { ascending: false });
+                    .select('*').eq('es_borrador', false).eq('created_by', user.email).order('id', { ascending: false });
                 if (raw) {
-                    auditorias = raw
-                        .filter(a => (a.supervisor||'').trim().toLowerCase() === miNombre.trim().toLowerCase() ||
-                                     miNombre.toLowerCase().split(' ').some(p => p.length > 2 && (a.supervisor||'').toLowerCase().includes(p)))
-                        .map(a => ({
-                            id: a.id, _src: 'supabase',
-                            tienda: { nombre: a.tienda_nombre, distrito: a.tienda_distrito, direccion: a.tienda_direccion },
-                            supervisor: a.supervisor, encargado: a.encargado,
-                            fecha: a.fecha, hora: a.hora,
-                            respuestas: a.respuestas || {}, resultadoGrupos: a.resultado_grupos || {},
-                            notaFinal: parseFloat(a.nota_final), clasificacion: a.clasificacion,
-                            firma: a.firma_url
-                        }));
+                    auditorias = raw.map(a => ({
+                        id: a.id, _src: 'supabase',
+                        tienda: { nombre: a.tienda_nombre, distrito: a.tienda_distrito, direccion: a.tienda_direccion },
+                        supervisor: a.supervisor, encargado: a.encargado,
+                        fecha: a.fecha, hora: a.hora,
+                        respuestas: a.respuestas || {}, resultadoGrupos: a.resultado_grupos || {},
+                        notaFinal: parseFloat(a.nota_final), clasificacion: a.clasificacion,
+                        firma: a.firma_url
+                    }));
                 }
             } catch(e) {}
 
@@ -8450,14 +8448,8 @@
             let visitas = [];
             try {
                 let { data: raw } = await sbClient.from('visitas')
-                    .select('*').order('id', { ascending: false });
-                if (raw) {
-                    visitas = raw.filter(v => {
-                        const sup = (v.supervisor||'').trim().toLowerCase();
-                        const nom = miNombre.trim().toLowerCase();
-                        return sup === nom || nom.split(' ').some(p => p.length > 2 && sup.includes(p));
-                    });
-                }
+                    .select('*').eq('created_by', user.email).order('id', { ascending: false });
+                if (raw) visitas = raw;
             } catch(e) {}
 
             const search = (document.getElementById('mis-vis-search')?.value || '').toLowerCase();
