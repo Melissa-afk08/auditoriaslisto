@@ -11134,7 +11134,57 @@
         }
 
         async function abrirModalEnviar() {
-            generarReporte(true);
+            const data = window.auditActual;
+            if (!data) return;
+
+            const nombreTienda = (typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Auditoria')).replace(/\s+/g, '_');
+            const fecha = new Date().toLocaleDateString('es-PE').replace(/\//g, '-');
+            const filename = `Auditoria_${nombreTienda}_${fecha}.pdf`;
+            const asunto = `Reporte de Auditoría – ${nombreTienda.replace(/_/g,' ')} | ${data.fecha} | Sup: ${data.supervisor}`;
+            const cuerpo = `Estimado/a,\n\nSe adjunta el reporte de auditoría:\n\nTienda: ${nombreTienda.replace(/_/g,' ')}\nFecha: ${data.fecha} ${data.hora || ''}\nSupervisor: ${data.supervisor}\nEncargado: ${data.encargado || 'N/A'}\nResultado: ${data.clasificacion} (${(data.notaFinal || data.finalScore || 0).toFixed(1)}%)\n\nSaludos.`;
+
+            const esMobil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+            if (esMobil && navigator.share && navigator.canShare) {
+                // Generar PDF primero
+                showToast("⏳ Generando PDF...", "");
+                let btn2 = document.getElementById('btn-rep-share');
+                if (btn2) { btn2.disabled = true; btn2.style.opacity = '0.5'; }
+                try {
+                    const blob = await generarReporte(false, true);
+                    const file = new File([blob], filename, { type: 'application/pdf' });
+                    if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({ files: [file], title: asunto, text: cuerpo });
+                    } else {
+                        pdf_save_fallback(blob, filename, asunto, cuerpo);
+                    }
+                } catch(e) {
+                    if (e.name !== 'AbortError') pdf_save_fallback(null, filename, asunto, cuerpo);
+                } finally {
+                    if (btn2) { btn2.disabled = false; btn2.style.opacity = '1'; }
+                }
+            } else {
+                // Desktop o sin soporte: descargar + mailto
+                generarReporte(false, true).then(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = filename; a.click();
+                    setTimeout(() => {
+                        window.open(`mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_self');
+                    }, 1500);
+                });
+            }
+        }
+
+        function pdf_save_fallback(blob, filename, asunto, cuerpo) {
+            if (blob) {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = filename; a.click();
+            }
+            setTimeout(() => {
+                window.open(`mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_self');
+            }, 1500);
         }
 
         window._lbFotos = [];
