@@ -3628,10 +3628,7 @@
                     </svg>
                 </div>
                 <div style="flex:1;">
-                    <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px;">
-                        <span style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:0.5px;">Fecha y Hora</span>
-                        <button onclick="toggleEditFechaHora()" style="font-size:10px;color:#FC6E20;font-weight:700;background:none;border:1px solid #FC6E20;border-radius:6px;padding:1px 7px;cursor:pointer;">Editar</button>
-                    </div>
+                    document.getElementById("modal-ro-visita").style.display = "flex";
                     <div style="font-size:14px;color:#1B1B1B;font-weight:700;"><span id="form-aud-fecha"></span> - <span id="form-aud-hora"></span></div>
                     <div id="edit-fecha-hora-panel" style="display:none;margin-top:8px;">
                         <input type="date" id="input-aud-fecha" style="padding:6px 8px;border:1.5px solid #FC6E20;border-radius:8px;font-size:13px;font-family:inherit;outline:none;margin-right:6px;">
