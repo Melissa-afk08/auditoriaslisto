@@ -11159,7 +11159,7 @@
                 try { window._ultimoPdfBlob = await generarReporte(false, true); } catch(e) {}
             }
 
-            // MOBILE: usar navigator.share con PDF adjunto automático
+            // MOBILE: sheet nativo con PDF adjunto automático
             const esMobil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
             if (esMobil && navigator.share) {
                 const shareData = {
@@ -11170,10 +11170,10 @@
                     const file = new File([window._ultimoPdfBlob], filename, { type: 'application/pdf' });
                     if (navigator.canShare({ files: [file] })) shareData.files = [file];
                 }
-                try { await navigator.share(shareData); return; } catch(e) { if (e.name !== 'AbortError') console.warn('Share error:', e); else return; }
+                try { await navigator.share(shareData); return; } catch(e) { if (e.name === 'AbortError') return; }
             }
 
-            // DESKTOP: modal con todas las plataformas
+            // DESKTOP: modal con plataformas
             const cuerpoConEnlace = cuerpo + '\n\nVer reporte online: ' + enlacePublico;
             const urlMailto   = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpoConEnlace)}`;
             const urlGmail    = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpoConEnlace)}`;
@@ -11190,6 +11190,7 @@
                 showToast("✓ PDF descargado – ahora adjúntalo al correo", "success");
             };
 
+            // Llenar el modal moderno
             const notaColor = parseFloat(nota) >= 91 ? '#43A047' : parseFloat(nota) >= 71 ? '#F9A825' : '#C62828';
             document.getElementById('menv-tienda').textContent = tiendaNombre;
             document.getElementById('menv-nota').textContent = nota + '%';
@@ -11199,16 +11200,26 @@
             document.getElementById('menv-supervisor').textContent = data.supervisor;
             document.getElementById('menv-asunto-preview').textContent = asunto;
 
-            document.getElementById('menv-btn-outlook').href  = urlOutlook;
-            document.getElementById('menv-btn-gmail').href    = urlGmail;
-            document.getElementById('menv-btn-email').href    = urlMailto;
-            document.getElementById('menv-btn-wsp').href      = urlWsp;
-            document.getElementById('menv-btn-telegram').href = urlTelegram;
-            document.getElementById('menv-btn-teams').href    = urlTeams;
+            // Configurar botones
+            const btnOutlook  = document.getElementById('menv-btn-outlook');
+            const btnGmail    = document.getElementById('menv-btn-gmail');
+            const btnEmail    = document.getElementById('menv-btn-email');
+            const btnWsp      = document.getElementById('menv-btn-wsp');
+            const btnTelegram = document.getElementById('menv-btn-telegram');
+            const btnTeams    = document.getElementById('menv-btn-teams');
 
-            document.getElementById('menv-hint-outlook').textContent = 'Asunto y cuerpo pre-rellenados · adjunta el PDF';
-            document.getElementById('menv-hint-gmail').textContent   = 'Asunto y cuerpo pre-rellenados · adjunta el PDF';
-            document.getElementById('menv-hint-email').textContent   = 'Asunto y cuerpo pre-rellenados · adjunta el PDF';
+            btnOutlook.href  = urlOutlook;
+            btnGmail.href    = urlGmail;
+            btnEmail.href    = urlMailto;
+            btnWsp.href      = urlWsp;
+            btnTelegram.href = urlTelegram;
+            btnTeams.href    = urlTeams;
+
+            // Hint de adjunto en botones de correo
+            const hintAdj = esMobil ? 'Toca para abrir · adjunta el PDF luego' : 'Asunto y cuerpo pre-rellenados · adjunta el PDF';
+            document.getElementById('menv-hint-outlook').textContent = hintAdj;
+            document.getElementById('menv-hint-gmail').textContent   = hintAdj;
+            document.getElementById('menv-hint-email').textContent   = hintAdj;
 
             document.getElementById('modal-enviar-nuevo').style.display = 'flex';
         }
