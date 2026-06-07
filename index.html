@@ -7432,17 +7432,13 @@
                 const data = window.auditActual;
                 if (!data) throw new Error("NO_DATA");
 
-                // Cargar fotos desde Supabase si la auditoría tiene ID
+                // Cargar fotos desde Supabase en paralelo con el inicio del PDF
                 let fotosMapPdf = {};
-                if (data.id) {
-                    try {
-                        let { data: fds } = await sbClient.from('fotos_auditoria').select('*').eq('auditoria_id', data.id);
-                        (fds || []).forEach(f => {
-                            if (!fotosMapPdf[f.pregunta_id]) fotosMapPdf[f.pregunta_id] = [];
-                            fotosMapPdf[f.pregunta_id].push(f.storage_url);
-                        });
-                    } catch(e) {}
-                }
+                const fotosFetch = data.id
+                    ? sbClient.from('fotos_auditoria').select('*').eq('auditoria_id', data.id)
+                        .then(({ data: fds }) => { (fds || []).forEach(f => { if (!fotosMapPdf[f.pregunta_id]) fotosMapPdf[f.pregunta_id] = []; fotosMapPdf[f.pregunta_id].push(f.storage_url); }); })
+                        .catch(() => {})
+                    : Promise.resolve();
 
                 const checkPageBreak = (neededHeight) => {
                     if (y + neededHeight > pageHeight - margin) {
@@ -7591,6 +7587,9 @@
                 checkPageBreak(15);
                 addText("DETALLE DE RESPUESTAS", 12, true, [27, 27, 27]);
                 y += 10;
+
+                // Esperar fotos de Supabase antes del loop
+                await fotosFetch;
 
                 // PREGUNTAS Y FOTOS
                 for (let index = 0; index < window.PREGUNTAS.length; index++) {
