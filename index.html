@@ -3775,7 +3775,7 @@
                             Enviar a:</button>
                     </div>
                     <button onclick="compartirEnlaceAuditoria()" style="background:white; color:#1B1B1B; border:1.5px solid #E0E0E0; border-radius:50px; padding:10px 20px; font-size:13px; font-weight:700; width:100%; height:44px; cursor:pointer; display:flex; justify-content:center; align-items:center; gap:8px;">🔗 Copiar enlace público</button>
-                    <button id="btn-drive" onclick="guardarEnDrive()" style="background:#34A853; color:white; border:none; border-radius:50px; padding:10px 20px; font-size:13px; font-weight:700; width:100%; height:44px; box-shadow:0 4px 12px rgba(52,168,83,0.3); cursor:pointer; display:flex; justify-content:center; align-items:center; gap:8px;">📁 Abrir carpeta Drive</button>
+                    <a href="https://drive.google.com/drive/folders/1RS7TL2FwjfoSImy0Hg9gQnZH0xnA5wJQ" target="_blank" rel="noopener" id="btn-drive" style="background:#34A853; color:white; border-radius:50px; padding:10px 20px; font-size:13px; font-weight:700; width:100%; height:44px; box-shadow:0 4px 12px rgba(52,168,83,0.3); cursor:pointer; display:flex; justify-content:center; align-items:center; gap:8px; text-decoration:none;">📁 Abrir carpeta Drive</a>
                     <p id="drive-info" style="display:none; text-align:center; font-size:11px; color:#888; margin:0;"></p>
                     <button id="btn-volver-resultado" onclick="volverDesdeResultado()"
                         style="background:transparent; color:#FC6E20; border:1.5px solid #FC6E20; border-radius:50px; padding:12px; width:100%; font-size:14px; font-weight:700; cursor:pointer;">←
@@ -7199,7 +7199,7 @@
                 if (btnDrive) { btnDrive.disabled = true; btnDrive.innerHTML = '✓ Ya guardado en Drive'; btnDrive.style.background = '#888'; }
                 if (driveInfo) { driveInfo.textContent = `Subido el ${driveSubido}`; driveInfo.style.display = 'block'; }
             } else {
-                if (btnDrive) { btnDrive.disabled = false; btnDrive.innerHTML = '📁 Abrir carpeta Drive'; btnDrive.style.background = '#34A853'; }
+                if (btnDrive) { btnDrive.disabled = false; btnDrive.innerHTML = '☁️ Guardar en Drive'; btnDrive.style.background = '#34A853'; }
                 if (driveInfo) { driveInfo.style.display = 'none'; }
             }
             showView('view-auditoria-resultado');
@@ -8657,7 +8657,7 @@
                 if (btnDriveH) { btnDriveH.disabled = true; btnDriveH.innerHTML = '✓ Ya guardado en Drive'; btnDriveH.style.background = '#888'; }
                 if (driveInfoH) { driveInfoH.textContent = `Subido el ${driveSubidoH}`; driveInfoH.style.display = 'block'; }
             } else {
-                if (btnDriveH) { btnDriveH.disabled = false; btnDriveH.innerHTML = '📁 Abrir carpeta Drive'; btnDriveH.style.background = '#34A853'; }
+                if (btnDriveH) { btnDriveH.disabled = false; btnDriveH.innerHTML = '☁️ Guardar en Drive'; btnDriveH.style.background = '#34A853'; }
                 if (driveInfoH) { driveInfoH.style.display = 'none'; }
             }
             showView('view-auditoria-resultado');
@@ -9900,8 +9900,6 @@
         // ========== FIN IMPORTADOR GLIDE ==========
 
         async function guardarEnDrive() {
-            window.open('https://drive.google.com/drive/folders/1RS7TL2FwjfoSImy0Hg9gQnZH0xnA5wJQ', '_blank');
-            return;
             const btn = document.getElementById('btn-drive');
             if (btn) { btn.disabled = true; btn.innerHTML = '<div style="width:16px;height:16px;border:2px solid #fff;border-top:2px solid transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;"></div> Subiendo...'; }
             try {
@@ -9927,7 +9925,7 @@
             } catch(e) {
                 console.error(e);
                 showToast('Error al guardar en Drive', 'error');
-                if (btn) { btn.disabled = false; btn.innerHTML = '📁 Abrir carpeta Drive'; }
+                if (btn) { btn.disabled = false; btn.innerHTML = '☁️ Guardar en Drive'; }
             }
         }
 
