@@ -2762,7 +2762,6 @@
             right: 0;
             bottom: 0;
             background: rgba(0, 0, 0, 0.5);
-            display: flex;
             align-items: flex-end;
             justify-content: center;
         }
@@ -8826,7 +8825,7 @@
             try {
                 const { data, error } = await sbClient.from('visitas').select('*').order('id', { ascending: false });
                 if (!error && data && data.length > 0) {
-                    const mapped = data.filter(r => r.nota_final !== null).map(r => ({
+                    const mapped = data.map(r => ({
                         id: r.id,
                         tienda: r.tienda,
                         datetime: r.datetime,
