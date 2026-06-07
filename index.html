@@ -6899,7 +6899,7 @@
             e.faltas = e.faltas.filter(f => f.palabra !== palabra);
             if (e.faltas.length === 0) window._ortografiaErrores = errores.filter(x => x.pregunta !== preguntaId);
             const btn = document.querySelector(`[onclick="corregirErrorOrtografia(${preguntaId},'${palabra}','${sugerencia}')"]`);
-            if (btn) btn.closest('div').style.opacity = '0.4';
+            if (btn) btn.closest('div[style*="display:flex"]').style.opacity = '0.4';
         }
 
         function corregirTodoOrtografia() {
