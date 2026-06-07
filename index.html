@@ -4389,11 +4389,11 @@
                         </div>
                         <div style="font-size:10px;color:#CCC;margin-top:4px;">Bucket: fotos-auditorias · Límite: 1 GB</div>
                     </div>
-                    <div class="ajustes-item" onclick="solicitarPasswordAdmin('limpiar-historico')" style="cursor:pointer;border-top:1px solid #F5F5F5;">
-                        <div class="ajustes-item-icon" style="background:#FFF3E0;">🗂️</div>
+                    <div class="ajustes-item" onclick="sincronizarNombresSupervisores()" style="cursor:pointer;border-top:1px solid #F5F5F5;">
+                        <div class="ajustes-item-icon" style="background:#E8F5E9;">🔄</div>
                         <div class="ajustes-item-text">
-                            <div class="ajustes-item-label" style="color:#E65100;">Limpiar fotos históricas</div>
-                            <div class="ajustes-item-desc">Elimina fotos de <code>historico/</code> fuera de un rango de fechas</div>
+                            <div class="ajustes-item-label" style="color:#2E7D32;">Sincronizar nombres supervisores</div>
+                            <div class="ajustes-item-desc">Actualiza el nombre en todas las auditorías según la tabla usuarios</div>
                         </div>
                         <span class="ajustes-item-arrow">›</span>
                     </div>
@@ -4463,62 +4463,6 @@
             </div>
 
         </div>
-
-        <!-- MODAL LIMPIAR FOTOS HISTÓRICAS -->
-        <div id="modal-limpiar-historico" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;padding:16px;">
-            <div style="background:white;border-radius:24px;padding:24px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-                <div style="font-size:28px;text-align:center;margin-bottom:8px;">🗂️</div>
-                <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:4px;">Limpiar fotos históricas</div>
-                <div style="font-size:12px;color:#888;text-align:center;margin-bottom:20px;">Se eliminarán fotos de <strong>historico/</strong> cuya auditoría <strong>no</strong> esté en el rango de fechas que quieres conservar.</div>
-
-                <div style="background:#FFF8F3;border:1px solid rgba(252,110,32,0.2);border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:12px;color:#888;line-height:1.5;">
-                    📌 Define el rango <strong style="color:#FC6E20;">a conservar</strong>. Todo lo que quede fuera será eliminado.
-                </div>
-
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;">
-                    <div>
-                        <div style="font-size:11px;font-weight:700;color:#AAA;text-transform:uppercase;margin-bottom:6px;">Desde</div>
-                        <input type="month" id="historico-desde" style="width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid #DDD;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;" oninput="resetConteoHistorico()">
-                    </div>
-                    <div>
-                        <div style="font-size:11px;font-weight:700;color:#AAA;text-transform:uppercase;margin-bottom:6px;">Hasta</div>
-                        <input type="month" id="historico-hasta" style="width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid #DDD;font-size:14px;font-family:inherit;box-sizing:border-box;outline:none;" oninput="resetConteoHistorico()">
-                    </div>
-                </div>
-
-                <button onclick="contarFotosAEliminar()" id="btn-contar-historico" style="width:100%;padding:12px;border-radius:50px;background:#1B1B1B;border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:12px;">
-                    🔍 Calcular fotos a eliminar
-                </button>
-
-                <div id="historico-conteo-result" style="display:none;background:#F5F5F5;border-radius:14px;padding:14px 16px;margin-bottom:16px;">
-                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                        <span style="font-size:12px;color:#888;">Total en historico/</span>
-                        <span id="historico-total" style="font-size:12px;font-weight:700;">—</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
-                        <span style="font-size:12px;color:#43A047;">A conservar (en rango)</span>
-                        <span id="historico-conservar" style="font-size:12px;font-weight:700;color:#43A047;">—</span>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;">
-                        <span style="font-size:12px;color:#C62828;">A eliminar (fuera de rango)</span>
-                        <span id="historico-eliminar" style="font-size:12px;font-weight:700;color:#C62828;">—</span>
-                    </div>
-                </div>
-
-                <div id="historico-progress-wrap" style="display:none;margin-bottom:16px;">
-                    <div style="font-size:12px;color:#888;margin-bottom:6px;text-align:center;" id="historico-progress-text">Procesando...</div>
-                    <div style="background:#F0F0F0;border-radius:50px;height:8px;overflow:hidden;">
-                        <div id="historico-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#FC6E20,#e55a0a);border-radius:50px;transition:width 0.3s;"></div>
-                    </div>
-                </div>
-
-                <div style="display:flex;gap:10px;">
-                    <button onclick="cerrarModalLimpiarHistorico()" style="flex:1;padding:12px;border-radius:50px;background:#EEE;border:none;font-size:13px;font-weight:700;cursor:pointer;">Cancelar</button>
-                    <button id="btn-ejecutar-historico" onclick="ejecutarLimpiezaHistorica()" style="flex:1;padding:12px;border-radius:50px;background:#C62828;border:none;color:white;font-size:13px;font-weight:700;cursor:pointer;display:none;">🗑️ Eliminar</button>
-                </div>
-            </div>
-        </div>
-        <!-- FIN MODAL LIMPIAR FOTOS HISTÓRICAS -->
 
         <!-- MODAL CAMBIAR CONTRASEÑA MADRE -->
         <div id="modal-cambiar-pass" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
@@ -5350,7 +5294,6 @@
                 else if (window.adminDestino === 'papelera') abrirPapelera();
                 else if (window.adminDestino === 'editor-registros') abrirEditorRegistros();
                 else if (window.adminDestino === 'reset-global') confirmarResetGlobal();
-                else if (window.adminDestino === 'limpiar-historico') abrirModalLimpiarHistorico();
                 else if (window.adminDestino === 'cambiar-password') abrirCambiarPassword();
             } else {
                 document.getElementById('admin-pass-error').style.display = 'block';
@@ -5383,182 +5326,6 @@
             }
         }
 
-        // ── LIMPIEZA FOTOS HISTÓRICAS POR RANGO ──────────────────────────────
-
-        function abrirModalLimpiarHistorico() {
-            // Defaults: conservar mayo y junio 2026
-            const hoy = new Date();
-            document.getElementById('historico-desde').value = '2026-05';
-            document.getElementById('historico-hasta').value =
-                `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
-            resetConteoHistorico();
-            document.getElementById('modal-limpiar-historico').style.display = 'flex';
-        }
-
-        function cerrarModalLimpiarHistorico() {
-            document.getElementById('modal-limpiar-historico').style.display = 'none';
-        }
-
-        function resetConteoHistorico() {
-            document.getElementById('historico-conteo-result').style.display = 'none';
-            document.getElementById('btn-ejecutar-historico').style.display = 'none';
-            document.getElementById('historico-progress-wrap').style.display = 'none';
-        }
-
-        async function contarFotosAEliminar() {
-            const desde = document.getElementById('historico-desde').value; // YYYY-MM
-            const hasta = document.getElementById('historico-hasta').value;
-            if (!desde || !hasta) { showToast('Selecciona ambas fechas', 'error'); return; }
-            if (desde > hasta) { showToast('La fecha "desde" debe ser anterior a "hasta"', 'error'); return; }
-
-            const btn = document.getElementById('btn-contar-historico');
-            btn.textContent = '⏳ Calculando...';
-            btn.disabled = true;
-            resetConteoHistorico();
-
-            try {
-                // Convertir YYYY-MM a objetos Date para comparar
-                const [desdeY, desdeM] = desde.split('-').map(Number);
-                const [hastaY, hastaM] = hasta.split('-').map(Number);
-
-                // 1. Listar todos los archivos en historico/ (paginado)
-                let allFiles = [];
-                let offset = 0;
-                const pageSize = 1000;
-                while (true) {
-                    const { data, error } = await sbClient.storage
-                        .from('fotos-auditorias')
-                        .list('historico', { limit: pageSize, offset });
-                    if (error) throw error;
-                    // Cada item es una "carpeta" (ID de auditoría)
-                    if (!data || data.length === 0) break;
-                    allFiles = allFiles.concat(data);
-                    if (data.length < pageSize) break;
-                    offset += pageSize;
-                }
-
-                // allFiles son carpetas con name = ID de auditoría
-                const ids = allFiles.map(f => f.name).filter(n => !isNaN(parseInt(n)));
-                if (ids.length === 0) {
-                    showToast('No hay carpetas en historico/', 'error');
-                    btn.textContent = '🔍 Calcular fotos a eliminar';
-                    btn.disabled = false;
-                    return;
-                }
-
-                // 2. Obtener fechas de esas auditorías en batches de 500
-                const batchSize = 500;
-                const fechaMap = {}; // id -> fecha string DD/MM/YYYY
-                for (let i = 0; i < ids.length; i += batchSize) {
-                    const batch = ids.slice(i, i + batchSize);
-                    const { data: rows } = await sbClient
-                        .from('auditorias')
-                        .select('id, fecha')
-                        .in('id', batch);
-                    if (rows) rows.forEach(r => { fechaMap[String(r.id)] = r.fecha; });
-                }
-
-                // 3. Clasificar cada carpeta
-                let conservar = 0, eliminar = 0;
-                window._historicoToDelete = []; // IDs a borrar
-
-                for (const id of ids) {
-                    const fecha = fechaMap[id]; // "DD/MM/YYYY"
-                    if (!fecha) {
-                        // Sin registro en auditorias → eliminar
-                        window._historicoToDelete.push(id);
-                        eliminar++;
-                        continue;
-                    }
-                    const parts = fecha.split('/');
-                    if (parts.length !== 3) { eliminar++; window._historicoToDelete.push(id); continue; }
-                    const y = parseInt(parts[2]);
-                    const m = parseInt(parts[1]);
-                    const enRango = (y > desdeY || (y === desdeY && m >= desdeM)) &&
-                                    (y < hastaY || (y === hastaY && m <= hastaM));
-                    if (enRango) conservar++;
-                    else { eliminar++; window._historicoToDelete.push(id); }
-                }
-
-                // 4. Contar archivos reales en las carpetas a eliminar (para el total)
-                // Usamos ids.length como proxy de carpetas; cada carpeta puede tener N fotos
-                // Mostramos carpetas, no archivos individuales, para no hacer 8k peticiones
-                document.getElementById('historico-total').textContent = ids.length + ' carpetas';
-                document.getElementById('historico-conservar').textContent = conservar + ' carpetas';
-                document.getElementById('historico-eliminar').textContent = eliminar + ' carpetas ≈ ' + (eliminar * 5) + ' fotos est.';
-                document.getElementById('historico-conteo-result').style.display = 'block';
-                if (eliminar > 0) {
-                    document.getElementById('btn-ejecutar-historico').style.display = 'block';
-                }
-            } catch(e) {
-                showToast('Error al calcular: ' + e.message, 'error');
-            }
-
-            btn.textContent = '🔍 Calcular fotos a eliminar';
-            btn.disabled = false;
-        }
-
-        async function ejecutarLimpiezaHistorica() {
-            const toDelete = window._historicoToDelete || [];
-            if (toDelete.length === 0) { showToast('Nada que eliminar', 'error'); return; }
-
-            if (!confirm(`⚠️ Se eliminarán las fotos de ${toDelete.length} auditorías fuera del rango seleccionado.\n\nEsta acción es irreversible. ¿Continuar?`)) return;
-
-            const btnEj = document.getElementById('btn-ejecutar-historico');
-            const btnCont = document.getElementById('btn-contar-historico');
-            btnEj.disabled = true;
-            btnCont.disabled = true;
-            document.getElementById('historico-progress-wrap').style.display = 'block';
-
-            const progressBar = document.getElementById('historico-progress-bar');
-            const progressText = document.getElementById('historico-progress-text');
-
-            let totalEliminados = 0;
-            let errores = 0;
-
-            for (let i = 0; i < toDelete.length; i++) {
-                const folderId = toDelete[i];
-                const pct = Math.round((i / toDelete.length) * 100);
-                progressBar.style.width = pct + '%';
-                progressText.textContent = `Procesando ${i + 1} / ${toDelete.length} carpetas...`;
-
-                try {
-                    // Listar archivos dentro de historico/{id}/
-                    const { data: files } = await sbClient.storage
-                        .from('fotos-auditorias')
-                        .list(`historico/${folderId}`);
-
-                    if (files && files.length > 0) {
-                        const paths = files.map(f => `historico/${folderId}/${f.name}`);
-                        // Borrar en lotes de 100
-                        for (let j = 0; j < paths.length; j += 100) {
-                            const chunk = paths.slice(j, j + 100);
-                            await sbClient.storage.from('fotos-auditorias').remove(chunk);
-                            totalEliminados += chunk.length;
-                        }
-                    }
-                } catch(e) {
-                    errores++;
-                }
-            }
-
-            progressBar.style.width = '100%';
-            progressText.textContent = '✅ Listo';
-
-            const msg = `✅ ${totalEliminados} fotos eliminadas de ${toDelete.length} carpetas.` +
-                        (errores > 0 ? ` (${errores} carpetas con error)` : '');
-            showToast(msg, 'success');
-            calcularAlmacenamiento();
-
-            setTimeout(() => {
-                cerrarModalLimpiarHistorico();
-                btnEj.disabled = false;
-                btnCont.disabled = false;
-            }, 2000);
-        }
-
-        // ── FIN LIMPIEZA HISTÓRICAS ───────────────────────────────────────────
-
         async function confirmarResetGlobal() {
             if (!confirm('🗜️ LIBERAR ESPACIO: Esta acción eliminará TODAS las fotos del sistema de forma permanente.\n\nLas auditorías y visitas se conservan intactas.\n\n¿Continuar?')) return;
             if (!confirm('Segunda confirmación: ¿Eliminar todas las fotos del bucket?')) return;
@@ -5585,6 +5352,38 @@
                 calcularAlmacenamiento();
             } catch(e) {
                 showToast('Error al eliminar fotos: ' + e.message, 'error');
+            }
+        }
+
+        async function sincronizarNombresSupervisores() {
+            // Actualiza el campo supervisor en auditorias usando el nombre actual de usuarios
+            // cruza por created_by (email). Solo Kleiddy puede ejecutar esto.
+            if (!confirm('¿Sincronizar nombres de supervisores en todas las auditorías?\n\nEsto actualiza el campo "supervisor" para que coincida con el nombre actual en la tabla usuarios.')) return;
+            showToast('Sincronizando...', 'success');
+            try {
+                // 1. Cargar todos los usuarios
+                const { data: usuarios } = await sbClient.from('usuarios').select('email, nombre');
+                if (!usuarios || usuarios.length === 0) { showToast('Sin usuarios en BD', 'error'); return; }
+                const emailNombre = {};
+                usuarios.forEach(u => { if (u.email) emailNombre[u.email.toLowerCase()] = u.nombre; });
+
+                // 2. Cargar auditorias con created_by
+                const { data: auds } = await sbClient.from('auditorias').select('id, supervisor, created_by').eq('es_borrador', false);
+                if (!auds) { showToast('Error cargando auditorías', 'error'); return; }
+
+                // 3. Actualizar solo las que tienen nombre distinto
+                let actualizadas = 0;
+                for (let a of auds) {
+                    if (!a.created_by) continue;
+                    const nombreCorrecto = emailNombre[a.created_by.toLowerCase()];
+                    if (!nombreCorrecto) continue;
+                    if (a.supervisor === nombreCorrecto) continue;
+                    await sbClient.from('auditorias').update({ supervisor: nombreCorrecto }).eq('id', a.id);
+                    actualizadas++;
+                }
+                showToast(`✅ ${actualizadas} auditorías actualizadas`, 'success');
+            } catch(e) {
+                showToast('Error: ' + e.message, 'error');
             }
         }
 
@@ -8840,7 +8639,7 @@
                 let mesStr = String(ahora.getMonth() + 1).padStart(2,'0');
                 let anioStr = String(ahora.getFullYear());
                 const { data, error } = await sbClient.from('auditorias')
-                    .select('id,tienda_nombre,supervisor,fecha,nota_final,clasificacion')
+                    .select('id,tienda_nombre,supervisor,fecha,nota_final,clasificacion,created_by')
                     .eq('es_borrador', false)
                     .order('id', { ascending: false });
                 if (!error && data) {
@@ -8851,7 +8650,8 @@
                         fecha: r.fecha,
                         notaFinal: r.nota_final || 0,
                         finalScore: r.nota_final || 0,
-                        clasificacion: r.clasificacion
+                        clasificacion: r.clasificacion,
+                        createdBy: r.created_by
                     }));
                 }
             } catch(e) {
@@ -8879,12 +8679,18 @@
                 return d.getMonth() === mesActual && d.getFullYear() === anioActual;
             });
 
+            // Filtrar por email (created_by) para evitar fallos por variaciones de nombre
+            // Fallback: match por nombre si created_by no está disponible (auditorías antiguas)
+            let userEmail = (u.email || '').toLowerCase();
             let partes = u.nombre.trim().split(' ');
             let primerNombre = partes[0];
             let primerApellido = partes[2] || partes[1] || '';
-            let misMes = delMes.filter(a => a.supervisor &&
-                a.supervisor.trim().toLowerCase().includes(primerNombre.toLowerCase()) &&
-                a.supervisor.trim().toLowerCase().includes(primerApellido.toLowerCase()));
+            let misMes = delMes.filter(a => {
+                if (a.createdBy && userEmail) return a.createdBy.toLowerCase() === userEmail;
+                return a.supervisor &&
+                    a.supervisor.trim().toLowerCase().includes(primerNombre.toLowerCase()) &&
+                    a.supervisor.trim().toLowerCase().includes(primerApellido.toLowerCase());
+            });
             let miPromedio = misMes.length > 0
                 ? (misMes.reduce((s,a) => s + (a.notaFinal||0), 0) / misMes.length).toFixed(1) + '%'
                 : '—';
