@@ -9911,7 +9911,10 @@
                 window._ultimoPdfBlob = null;
                 if (!pdfBlob) throw new Error('No se pudo generar el PDF');
                 const tiendaNombre = typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda');
-                await driveSubirPDF(pdfBlob, tiendaNombre, data.supervisor, data.fecha);
+                await Promise.race([
+    driveSubirPDF(pdfBlob, tiendaNombre, data.supervisor, data.fecha),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 30000))
+]);
 
                 // Solo subir PDF, fotos quedan en Supabase
 
