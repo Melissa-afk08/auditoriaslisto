@@ -3129,7 +3129,7 @@
                         <div class="action-label">Historial</div>
                         <div class="action-desc">Auditorías y visitas anteriores</div>
                     </div>
-                    <div id="home-historial-opts" style="display:none; grid-column: 1/-1; gap: 8px;">
+                    <div id="home-historial-opts" style="display:none; grid-column: 1/-1; grid-template-columns: 1fr 1fr; gap: 8px;">
                         <button class="btn-home-historial" onclick="showView('view-historial-auditorias')">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                 stroke-linecap="round" stroke-linejoin="round">
@@ -5760,7 +5760,7 @@
 
         function toggleHistorialHome(el) {
             let opts = document.getElementById("home-historial-opts");
-            if (opts.style.display === "none") opts.style.display = "flex";
+            if (opts.style.display === "none") opts.style.display = "grid";
             else opts.style.display = "none";
         }
 
