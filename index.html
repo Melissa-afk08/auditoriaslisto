@@ -7733,19 +7733,11 @@
                         try { await navigator.share({ files: [file], title: asunto }); }
                         catch(e) { pdf.save(filename); }
                     } else {
-                        // Desktop: compartir enlace público
-                        const enlacePublico = `${location.origin}${location.pathname}?resultado=${window.auditActual?.id}`;
-                        const asuntoCorto = `Reporte ${nombreTienda.replace(/_/g,' ')} | ${data.fecha}`;
-                        const mensajeWsp = `${asuntoCorto}%0A${encodeURIComponent(enlacePublico)}`;
-                        const cuerpoEmail = `${cuerpo}%0A%0AVer reporte online: ${enlacePublico}`;
-                        const urlGmail = `https://mail.google.com/mail/?view=cm&su=${encodeURIComponent(asuntoCorto)}&body=${cuerpoEmail}`;
-                        const urlOutlook = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(asuntoCorto)}&body=${cuerpoEmail}`;
-                        const urlWsp = `https://web.whatsapp.com/send?text=${mensajeWsp}`;
-                        document.getElementById('modal-enviar-desktop').style.display = 'flex';
-                        document.getElementById('modal-enviar-gmail').href = urlGmail;
-                        document.getElementById('modal-enviar-outlook').href = urlOutlook;
-                        document.getElementById('modal-enviar-wsp').href = urlWsp;
-                        document.getElementById('modal-enviar-enlace').textContent = enlacePublico;
+                        // Fallback: descargar PDF y abrir mailto con asunto y cuerpo
+                        pdf.save(filename);
+                        setTimeout(() => {
+                            window.open(`mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`, '_self');
+                        }, 1500);
                     }
                 } else if (returnBlob) {
                     return blob;
