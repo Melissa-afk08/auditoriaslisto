@@ -7434,6 +7434,7 @@
 
                 // Cargar fotos desde Supabase en paralelo con el inicio del PDF
                 let fotosMapPdf = {};
+                window._fotosMapPdfCache = fotosMapPdf;
                 const fotosFetch = data.id
                     ? sbClient.from('fotos_auditoria').select('*').eq('auditoria_id', data.id)
                         .then(({ data: fds }) => { (fds || []).forEach(f => { if (!fotosMapPdf[f.pregunta_id]) fotosMapPdf[f.pregunta_id] = []; fotosMapPdf[f.pregunta_id].push(f.storage_url); }); })
@@ -9912,7 +9913,14 @@
 
                 // Subir fotos: base64 si disponible, si no descargar desde URL
                 const respuestasParaFotos = {};
-                const respSrc = window._auditFotosBase64 || data.respuestas || {};
+                // Fusionar fotos de Supabase (fotosMapPdf) con las respuestas locales
+                const respConFotos = {};
+                for (const pid in (data.respuestas || {})) {
+                    const r = data.respuestas[pid];
+                    const fotosSupabase = (window._fotosMapPdfCache || {})[pid] || [];
+                    respConFotos[pid] = { ...r, fotos: [...(r.fotos || []), ...fotosSupabase] };
+                }
+                const respSrc = window._auditFotosBase64 || respConFotos;
                 await Promise.all(Object.keys(respSrc).map(async pid => {
                     const r = respSrc[pid];
                     const fotosB64 = await Promise.all((r.fotos || []).filter(Boolean).map(async f => {
