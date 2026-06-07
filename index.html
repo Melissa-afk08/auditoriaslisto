@@ -9919,7 +9919,7 @@
                 const driveKey = `drive_subido_${data.id}`;
                 localStorage.setItem(driveKey, ahora);
                 showToast('✓ Guardado en Drive', 'success');
-                if (btn) { btn.disabled = true; btn.innerHTML = '✓ Ya guardado en Drive'; btn.style.background = '#888'; }
+                if (btn) { btn.style.background = '#888'; }
                 const driveInfo = document.getElementById('drive-info');
                 if (driveInfo) { driveInfo.textContent = `Subido el ${ahora}`; driveInfo.style.display = 'block'; }
             } catch(e) {
