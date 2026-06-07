@@ -7718,6 +7718,7 @@
 
                 // GUARDAR / COMPARTIR
                 const blob = pdf.output('blob');
+                window._ultimoPdfBlob = blob;
                 const nombreTienda = (typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || window.selectedStore?.nombre || 'Auditoria')).replace(/\s+/g, '_');
                 const fecha = new Date().toLocaleDateString('es-PE').replace(/\//g, '-');
                 const filename = `Auditoria_${nombreTienda}_${fecha}.pdf`;
@@ -9906,7 +9907,8 @@
                 if (!data) throw new Error('Sin datos');
 
                 // Usar mismo PDF que boton Reporte
-                const pdfBlob = await generarReporte(false, true);
+                const pdfBlob = window._ultimoPdfBlob || await generarReporte(false, true);
+                window._ultimoPdfBlob = null;
                 if (!pdfBlob) throw new Error('No se pudo generar el PDF');
                 const tiendaNombre = typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda');
                 await driveSubirPDF(pdfBlob, tiendaNombre, data.supervisor, data.fecha);
