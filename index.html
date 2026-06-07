@@ -4397,6 +4397,14 @@
                         </div>
                         <span class="ajustes-item-arrow">›</span>
                     </div>
+                    <div class="ajustes-item" onclick="sincronizarNombresSupervisores()" style="cursor:pointer;border-top:1px solid #F5F5F5;">
+                        <div class="ajustes-item-icon" style="background:#E8F5E9;">🔄</div>
+                        <div class="ajustes-item-text">
+                            <div class="ajustes-item-label" style="color:#2E7D32;">Sincronizar nombres supervisores</div>
+                            <div class="ajustes-item-desc">Actualiza el nombre en todas las auditorías según la tabla usuarios</div>
+                        </div>
+                        <span class="ajustes-item-arrow">›</span>
+                    </div>
                     <div class="ajustes-item" onclick="solicitarPasswordAdmin('cambiar-password')" style="cursor:pointer;border-top:1px solid #F5F5F5;">
                         <div class="ajustes-item-icon" style="background:#FFF0E6;">🔑</div>
                         <div class="ajustes-item-text">
@@ -5382,6 +5390,30 @@
                     actualizadas++;
                 }
                 showToast(`✅ ${actualizadas} auditorías actualizadas`, 'success');
+            } catch(e) {
+                showToast('Error: ' + e.message, 'error');
+            }
+        }
+
+        async function sincronizarNombresSupervisores() {
+            if (!confirm('¿Sincronizar nombres de supervisores en todas las auditorías?\n\nEsto actualiza el campo supervisor para que coincida con el nombre actual en la tabla usuarios.')) return;
+            showToast('Sincronizando...', 'success');
+            try {
+                const { data: usuarios } = await sbClient.from('usuarios').select('email, nombre');
+                if (!usuarios || usuarios.length === 0) { showToast('Sin usuarios en BD', 'error'); return; }
+                const emailNombre = {};
+                usuarios.forEach(u => { if (u.email) emailNombre[u.email.toLowerCase()] = u.nombre; });
+                const { data: auds } = await sbClient.from('auditorias').select('id, supervisor, created_by').eq('es_borrador', false);
+                if (!auds) { showToast('Error cargando auditorías', 'error'); return; }
+                let actualizadas = 0;
+                for (let a of auds) {
+                    if (!a.created_by) continue;
+                    const nombreCorrecto = emailNombre[a.created_by.toLowerCase()];
+                    if (!nombreCorrecto || a.supervisor === nombreCorrecto) continue;
+                    await sbClient.from('auditorias').update({ supervisor: nombreCorrecto }).eq('id', a.id);
+                    actualizadas++;
+                }
+                showToast('✅ ' + actualizadas + ' auditorías actualizadas', 'success');
             } catch(e) {
                 showToast('Error: ' + e.message, 'error');
             }
@@ -6408,8 +6440,13 @@
         }
 
         function openModalRoVisita(id) {
-            let viss = JSON.parse(localStorage.getItem("visitas") || "[]");
+            let viss = window._misVisitasCache || JSON.parse(localStorage.getItem("visitas") || "[]");
             let v = viss.find(x => x.id === id);
+            if (!v) {
+                // Intentar también en localStorage como fallback
+                let local = JSON.parse(localStorage.getItem("visitas") || "[]");
+                v = local.find(x => x.id === id);
+            }
             if (!v) return;
 
             document.getElementById("content-ro-visita").innerHTML = `
@@ -8255,8 +8292,7 @@
             if (!user) return;
             const miNombre = user.nombre || '';
 
-            // Cargar desde Supabase — filtrar por email (created_by) para precisión total
-            const miEmail = (user.email || '').toLowerCase();
+            // Cargar desde Supabase — filtrar por email para precisión total
             let auditorias = [];
             try {
                 let { data: raw } = await sbClient.from('auditorias')
@@ -8449,7 +8485,7 @@
             try {
                 let { data: raw } = await sbClient.from('visitas')
                     .select('*').eq('created_by', user.email).order('id', { ascending: false });
-                if (raw) visitas = raw;
+                if (raw) { visitas = raw; window._misVisitasCache = raw; }
             } catch(e) {}
 
             const search = (document.getElementById('mis-vis-search')?.value || '').toLowerCase();
