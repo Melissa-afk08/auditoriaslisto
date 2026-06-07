@@ -9150,9 +9150,17 @@
                 document.getElementById('ep-foto-estado').textContent = '⏳ Subiendo foto...';
                 const ext = window._epFotoFile.name.split('.').pop();
                 const path = `perfiles/${u.email.replace(/[@.]/g,'_')}_${Date.now()}.${ext}`;
+                // Comprimir foto de perfil antes de subir
+                const epBase64 = await new Promise((res) => {
+                    const reader = new FileReader();
+                    reader.onload = e => res(e.target.result);
+                    reader.readAsDataURL(window._epFotoFile);
+                });
+                const epComprimido = await comprimirBase64(epBase64, 0.8);
+                const epBlob = await (await fetch(epComprimido)).blob();
                 const { data: upData, error: upErr } = await sbClient.storage
                     .from('fotos-auditorias')
-                    .upload(path, window._epFotoFile, { upsert: true, contentType: window._epFotoFile.type });
+                    .upload(path, epBlob, { upsert: true, contentType: 'image/jpeg' });
                 if (upErr) { errEl.textContent = 'Error al subir foto: ' + upErr.message; errEl.style.display='block'; return; }
                 const { data: urlData } = sbClient.storage.from('fotos-auditorias').getPublicUrl(path);
                 foto_url = urlData.publicUrl;
@@ -9477,9 +9485,28 @@
 
         // --- SUPABASE SYNC ---
 
+        async function comprimirBase64(base64, calidad = 0.8) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL('image/jpeg', calidad));
+                };
+                img.onerror = () => resolve(base64); // si falla, usar original
+                img.src = base64;
+            });
+        }
+
         async function supabaseUploadFoto(base64, auditoriaId, preguntaId, fotoIndex) {
             try {
-                const blob = await (await fetch(base64)).blob();
+                // No comprimir firmas
+                const esFirma = preguntaId === 'firma';
+                const base64Final = esFirma ? base64 : await comprimirBase64(base64, 0.8);
+                const blob = await (await fetch(base64Final)).blob();
                 const ext = blob.type === 'image/png' ? 'png' : 'jpg';
                 const path = `${auditoriaId}/p${preguntaId}_${fotoIndex}.${ext}`;
                 const { error } = await sbClient.storage.from('fotos-auditorias').upload(path, blob, { upsert: true });
