@@ -7648,13 +7648,13 @@
                             try {
                                 const imgProps = pdf.getImageProperties(fotoBase64);
                                 const maxW = pageWidth - 2 * margin - 6;
-                                const maxH = 100;
+                                const maxH = 60;
                                 const ratio = Math.min(maxW / imgProps.width, maxH / imgProps.height, 1);
                                 const fotoW2 = imgProps.width * ratio;
                                 const fotoH = imgProps.height * ratio;
                                 const xCentered = margin + 3 + (maxW - fotoW2) / 2;
                                 checkPageBreak(fotoH + 6);
-                                pdf.addImage(fotoBase64, 'JPEG', xCentered, y, fotoW2, fotoH, '', 'NONE');
+                                pdf.addImage(fotoBase64, 'JPEG', xCentered, y, fotoW2, fotoH, '', 'FAST');
                                 y += fotoH + 6;
                             } catch(e) {
                                 pdf.setTextColor(150,150,150); pdf.setFontSize(7);
