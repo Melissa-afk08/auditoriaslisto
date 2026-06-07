@@ -7432,6 +7432,18 @@
                 const data = window.auditActual;
                 if (!data) throw new Error("NO_DATA");
 
+                // Cargar fotos desde Supabase si la auditoría tiene ID
+                let fotosMapPdf = {};
+                if (data.id) {
+                    try {
+                        let { data: fds } = await sbClient.from('fotos_auditoria').select('*').eq('auditoria_id', data.id);
+                        (fds || []).forEach(f => {
+                            if (!fotosMapPdf[f.pregunta_id]) fotosMapPdf[f.pregunta_id] = [];
+                            fotosMapPdf[f.pregunta_id].push(f.storage_url);
+                        });
+                    } catch(e) {}
+                }
+
                 const checkPageBreak = (neededHeight) => {
                     if (y + neededHeight > pageHeight - margin) {
                         pdf.addPage();
@@ -7628,9 +7640,10 @@
                         y += obsH + 4;
                     }
 
-                    if (r.fotos && r.fotos.length > 0) {
+                    const fotosCombinadas = [...(r.fotos || []), ...(fotosMapPdf[p.id] || [])];
+                    if (fotosCombinadas.length > 0) {
                         const fotoW = pageWidth - 2 * margin - 6;
-                        for (const fotoBase64 of r.fotos) {
+                        for (const fotoBase64 of fotosCombinadas) {
                             await new Promise(res => setTimeout(res, 0));
                             try {
                                 const imgProps = pdf.getImageProperties(fotoBase64);
