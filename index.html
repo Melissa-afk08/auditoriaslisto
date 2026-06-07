@@ -11142,75 +11142,7 @@
         }
 
         async function abrirModalEnviar() {
-            const data = window.auditActual;
-            if (!data) return;
-            const tiendaNombre = (typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda'));
-            const nota = (data.notaFinal || data.finalScore || 0).toFixed(1);
-            const clasificacion = data.clasificacion || '';
-            const asunto = `Reporte de Auditoría – ${tiendaNombre} | ${data.fecha} | ${clasificacion} (${nota}%) | Sup: ${data.supervisor}`;
-            const cuerpo = `Estimado/a,\n\nSe adjunta el reporte de auditoría correspondiente a:\n\nTienda: ${tiendaNombre}\nFecha: ${data.fecha} ${data.hora || ''}\nSupervisor: ${data.supervisor}\nEncargado: ${data.encargado || 'N/A'}\nResultado: ${clasificacion} (${nota}%)\n\nQuedo a disposición ante cualquier consulta.\n\nSaludos cordiales.`;
-            const enlacePublico = `${location.origin}${location.pathname}?resultado=${data.id}`;
-            const filename = `Auditoria_${tiendaNombre.replace(/\s+/g,'_')}_${(data.fecha||'').replace(/\//g,'-')}.pdf`;
-
-            // Generar PDF si no existe
-            if (!window._ultimoPdfBlob) {
-                showToast("⏳ Generando PDF...", "");
-                try { window._ultimoPdfBlob = await generarReporte(false, true); } catch(e) {}
-            }
-
-            // URLs para cada plataforma
-            const cuerpoConEnlace = cuerpo + '\n\nVer reporte online: ' + enlacePublico;
-            const urlMailto   = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpoConEnlace)}`;
-            const urlGmail    = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpoConEnlace)}`;
-            const urlOutlook  = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpoConEnlace)}`;
-            const urlWsp      = `https://wa.me/?text=${encodeURIComponent('*' + asunto + '*\n\n' + cuerpo + '\n\n🔗 Ver online: ' + enlacePublico)}`;
-            const urlTelegram = `https://t.me/share/url?url=${encodeURIComponent(enlacePublico)}&text=${encodeURIComponent(asunto)}`;
-            const urlTeams    = `https://teams.microsoft.com/share?href=${encodeURIComponent(enlacePublico)}&msgText=${encodeURIComponent(asunto)}`;
-
-            // Función para descargar PDF
-            window._descargarPdfEnvio = () => {
-                if (!window._ultimoPdfBlob) { showToast("PDF aún generándose, intenta en un momento", "error"); return; }
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(window._ultimoPdfBlob);
-                a.download = filename; a.click();
-                showToast("✓ PDF descargado – ahora adjúntalo al correo", "success");
-            };
-
-            // Detectar mobile para hints
-            const esMobil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-            // Llenar el modal moderno
-            const notaColor = parseFloat(nota) >= 91 ? '#43A047' : parseFloat(nota) >= 71 ? '#F9A825' : '#C62828';
-            document.getElementById('menv-tienda').textContent = tiendaNombre;
-            document.getElementById('menv-nota').textContent = nota + '%';
-            document.getElementById('menv-nota').style.color = notaColor;
-            document.getElementById('menv-clasificacion').textContent = clasificacion;
-            document.getElementById('menv-fecha').textContent = data.fecha + (data.hora ? ' · ' + data.hora : '');
-            document.getElementById('menv-supervisor').textContent = data.supervisor;
-            document.getElementById('menv-asunto-preview').textContent = asunto;
-
-            // Configurar botones
-            const btnOutlook  = document.getElementById('menv-btn-outlook');
-            const btnGmail    = document.getElementById('menv-btn-gmail');
-            const btnEmail    = document.getElementById('menv-btn-email');
-            const btnWsp      = document.getElementById('menv-btn-wsp');
-            const btnTelegram = document.getElementById('menv-btn-telegram');
-            const btnTeams    = document.getElementById('menv-btn-teams');
-
-            btnOutlook.href  = urlOutlook;
-            btnGmail.href    = urlGmail;
-            btnEmail.href    = urlMailto;
-            btnWsp.href      = urlWsp;
-            btnTelegram.href = urlTelegram;
-            btnTeams.href    = urlTeams;
-
-            // Hint de adjunto en botones de correo
-            const hintAdj = esMobil ? 'Toca para abrir · adjunta el PDF luego' : 'Asunto y cuerpo pre-rellenados · adjunta el PDF';
-            document.getElementById('menv-hint-outlook').textContent = hintAdj;
-            document.getElementById('menv-hint-gmail').textContent   = hintAdj;
-            document.getElementById('menv-hint-email').textContent   = hintAdj;
-
-            document.getElementById('modal-enviar-nuevo').style.display = 'flex';
+            generarReporte(true);
         }
 
         window._lbFotos = [];
