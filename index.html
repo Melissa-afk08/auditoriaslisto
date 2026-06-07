@@ -6440,14 +6440,17 @@
         }
 
         function openModalRoVisita(id) {
-            let viss = window._misVisitasCache || JSON.parse(localStorage.getItem("visitas") || "[]");
-            let v = viss.find(x => x.id === id);
+            const idStr = String(id);
+            // Buscar en cache de Mis Visitas, luego en localStorage (historial)
+            let v = (window._misVisitasCache || []).find(x => String(x.id) === idStr);
+            if (!v) v = JSON.parse(localStorage.getItem("visitas") || "[]").find(x => String(x.id) === idStr);
+            // Último recurso: buscar en Supabase de forma asíncrona
             if (!v) {
-                // Intentar también en localStorage como fallback
-                let local = JSON.parse(localStorage.getItem("visitas") || "[]");
-                v = local.find(x => x.id === id);
+                sbClient.from('visitas').select('*').eq('id', id).single().then(({ data }) => {
+                    if (data) { window._misVisitasCache = (window._misVisitasCache||[]).concat([data]); openModalRoVisita(id); }
+                });
+                return;
             }
-            if (!v) return;
 
             document.getElementById("content-ro-visita").innerHTML = `
                 <h3 style="font-size:18px; font-weight:800; text-align:center;">Detalle de Visita</h3>
