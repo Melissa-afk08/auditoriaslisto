@@ -7414,7 +7414,7 @@
             
         }
 
-        async function generarReporte(share = false, returnBlob = false, fotoCalidad = null) {
+        async function generarReporte(share = false, returnBlob = false) {
             let btn1 = document.getElementById('btn-rep-pdf');
             let btn2 = document.getElementById('btn-rep-share');
             if (btn1) { btn1.disabled = true; btn1.innerHTML = '<div style="width:16px;height:16px;border:2px solid #fff;border-top:2px solid transparent;border-radius:50%;animation:spin 1s linear infinite;display:inline-block;"></div>'; }
@@ -7592,6 +7592,28 @@
                 // Esperar fotos de Supabase antes del loop
                 await fotosFetch;
 
+                // Pre-descargar fotos de Supabase en paralelo (evita congelamiento)
+                const todasLasUrls = new Set();
+                window.PREGUNTAS.forEach(p => {
+                    (fotosMapPdf[p.id] || []).forEach(url => { if (url && url.startsWith('http')) todasLasUrls.add(url); });
+                });
+                const urlToBase64 = {};
+                await Promise.all([...todasLasUrls].map(async url => {
+                    try {
+                        const resp = await fetch(url);
+                        const blob = await resp.blob();
+                        urlToBase64[url] = await new Promise(res => {
+                            const reader = new FileReader();
+                            reader.onload = () => res(reader.result);
+                            reader.readAsDataURL(blob);
+                        });
+                    } catch(e) { urlToBase64[url] = null; }
+                }));
+                // Reemplazar URLs por base64 en fotosMapPdf
+                for (const pid in fotosMapPdf) {
+                    fotosMapPdf[pid] = fotosMapPdf[pid].map(f => urlToBase64[f] || f);
+                }
+
                 // PREGUNTAS Y FOTOS
                 for (let index = 0; index < window.PREGUNTAS.length; index++) {
                     if (index % 5 === 0) await new Promise(r => setTimeout(r, 0));
@@ -7643,12 +7665,9 @@
                     const fotosCombinadas = [...(r.fotos || []), ...(fotosMapPdf[p.id] || [])];
                     if (fotosCombinadas.length > 0) {
                         const fotoW = pageWidth - 2 * margin - 6;
-                        for (let fotoBase64 of fotosCombinadas) {
+                        for (const fotoBase64 of fotosCombinadas) {
                             await new Promise(res => setTimeout(res, 0));
                             try {
-                                if (fotoCalidad && fotoBase64.startsWith('data:image')) {
-                                    fotoBase64 = await comprimirBase64(fotoBase64, fotoCalidad);
-                                }
                                 const imgProps = pdf.getImageProperties(fotoBase64);
                                 const maxW = pageWidth - 2 * margin - 6;
                                 const maxH = 60;
@@ -9629,7 +9648,7 @@
             }
         }
 
-        const DRIVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pfX7roiYdnnsSpqJnZ937auQ3XLfLq69_6LuQ--gLvsWwYd_pgIy5IV9QdQ4CkXm/exec';
+        const DRIVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwd-GQT6xW3qLY0gfj_r0yedFcpSLidZWD3mjOnHuswrVcrqTrda-6uzeu7YdcuWjri/exec';
 
         function formatFecha(f) {
             if (!f) return '';
@@ -9910,7 +9929,7 @@
                 if (!data) throw new Error('Sin datos');
 
                 // Usar mismo PDF que boton Reporte
-                const pdfBlob = window._ultimoPdfBlob || await generarReporte(false, true, 0.2);
+                const pdfBlob = window._ultimoPdfBlob || await generarReporte(false, true);
                 window._ultimoPdfBlob = null;
                 if (!pdfBlob) throw new Error('No se pudo generar el PDF');
                 const tiendaNombre = typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda');
