@@ -9911,29 +9911,7 @@
                 const tiendaNombre = typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda');
                 await driveSubirPDF(pdfBlob, tiendaNombre, data.supervisor, data.fecha);
 
-                // Subir fotos: base64 si disponible, si no descargar desde URL
-                const respuestasParaFotos = {};
-                // Fusionar fotos de Supabase (fotosMapPdf) con las respuestas locales
-                const respConFotos = {};
-                for (const pid in (data.respuestas || {})) {
-                    const r = data.respuestas[pid];
-                    const fotosSupabase = (window._fotosMapPdfCache || {})[pid] || [];
-                    respConFotos[pid] = { ...r, fotos: [...(r.fotos || []), ...fotosSupabase] };
-                }
-                const respSrc = window._auditFotosBase64 || respConFotos;
-                await Promise.all(Object.keys(respSrc).map(async pid => {
-                    const r = respSrc[pid];
-                    const fotosB64 = await Promise.all((r.fotos || []).filter(Boolean).map(async f => {
-                        if (f.startsWith('data:')) return f;
-                        try {
-                            const respFoto = await fetch(f);
-                            const blobFoto = await respFoto.blob();
-                            return await new Promise(res => { const rd = new FileReader(); rd.onload = () => res(rd.result); rd.readAsDataURL(blobFoto); });
-                        } catch(e) { return null; }
-                    }));
-                    respuestasParaFotos[pid] = { ...r, fotos: fotosB64.filter(Boolean) };
-                }));
-                await driveSubirFotos({ ...data, respuestas: respuestasParaFotos }, {});
+                // Solo subir PDF, fotos quedan en Supabase
 
                 const ahora = new Date().toLocaleString('es-PE', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
                 const driveKey = `drive_subido_${data.id}`;
