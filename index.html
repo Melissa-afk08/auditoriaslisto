@@ -11142,7 +11142,25 @@
         }
 
         function abrirModalEnviar() {
-            generarReporte(true);
+            const data = window.auditActual;
+            if (!data) return;
+            const tiendaNombre = (typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda'));
+            const asunto = `Reporte de Auditoría – ${tiendaNombre} | ${data.fecha} | Sup: ${data.supervisor}`;
+            const cuerpo = `Estimado/a,\n\nSe adjunta el reporte de auditoría:\n\nTienda: ${tiendaNombre}\nFecha: ${data.fecha} ${data.hora}\nSupervisor: ${data.supervisor}\nEncargado: ${data.encargado || 'N/A'}\nResultado: ${data.clasificacion} (${(data.notaFinal || data.finalScore || 0).toFixed(1)}%)\n\nSaludos.`;
+            const enlacePublico = `${location.origin}${location.pathname}?auditoria=${data.id}`;
+            const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+            const urlOutlook = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+            const urlWsp = `https://wa.me/?text=${encodeURIComponent(asunto + '\n\n' + enlacePublico)}`;
+            const esMobil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            if (esMobil && navigator.share) {
+                generarReporte(true);
+                return;
+            }
+            document.getElementById('modal-enviar-desktop').style.display = 'flex';
+            document.getElementById('modal-enviar-gmail').href = urlGmail;
+            document.getElementById('modal-enviar-outlook').href = urlOutlook;
+            document.getElementById('modal-enviar-wsp').href = urlWsp;
+            document.getElementById('modal-enviar-enlace').textContent = enlacePublico;
         }
 
         window._lbFotos = [];
