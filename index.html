@@ -7592,28 +7592,6 @@
                 // Esperar fotos de Supabase antes del loop
                 await fotosFetch;
 
-                // Pre-descargar fotos de Supabase en paralelo (evita congelamiento)
-                const todasLasUrls = new Set();
-                window.PREGUNTAS.forEach(p => {
-                    (fotosMapPdf[p.id] || []).forEach(url => { if (url && url.startsWith('http')) todasLasUrls.add(url); });
-                });
-                const urlToBase64 = {};
-                await Promise.all([...todasLasUrls].map(async url => {
-                    try {
-                        const resp = await fetch(url);
-                        const blob = await resp.blob();
-                        urlToBase64[url] = await new Promise(res => {
-                            const reader = new FileReader();
-                            reader.onload = () => res(reader.result);
-                            reader.readAsDataURL(blob);
-                        });
-                    } catch(e) { urlToBase64[url] = null; }
-                }));
-                // Reemplazar URLs por base64 en fotosMapPdf
-                for (const pid in fotosMapPdf) {
-                    fotosMapPdf[pid] = fotosMapPdf[pid].map(f => urlToBase64[f] || f);
-                }
-
                 // PREGUNTAS Y FOTOS
                 for (let index = 0; index < window.PREGUNTAS.length; index++) {
                     if (index % 5 === 0) await new Promise(r => setTimeout(r, 0));
@@ -9648,7 +9626,7 @@
             }
         }
 
-        const DRIVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby8pfX7roiYdnnsSpqJnZ937auQ3XLfLq69_6LuQ--gLvsWwYd_pgIy5IV9QdQ4CkXm/exec';
+        const DRIVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwd-GQT6xW3qLY0gfj_r0yedFcpSLidZWD3mjOnHuswrVcrqTrda-6uzeu7YdcuWjri/exec';
 
         function formatFecha(f) {
             if (!f) return '';
@@ -9953,22 +9931,22 @@
 
 
         async function driveSubirPDF(pdfBlob, tienda, supervisor, fecha) {
-            try {
-                const nombreTienda = (tienda || 'Tienda').replace(/\s+/g, '_');
-                const sup = (supervisor || '').split(' ').slice(0,2).join('_');
-                const fechaStr = (fecha || '').replace(/\//g, '-');
-                const nombre = `${nombreTienda} - ${sup} - ${fechaStr}.pdf`;
-                const base64 = await new Promise(resolve => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.readAsDataURL(pdfBlob);
-                });
-                await fetch(DRIVE_SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ tipo: 'pdf', base64, nombre }),
-                });
-            } catch(e) { /* silencioso */ }
+            const nombreTienda = (tienda || 'Tienda').replace(/\s+/g, '_');
+            const sup = (supervisor || '').split(' ').slice(0,2).join('_');
+            const fechaStr = (fecha || '').replace(/\//g, '-');
+            const nombre = `${nombreTienda} - ${sup} - ${fechaStr}.pdf`;
+            const base64 = await new Promise(resolve => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.readAsDataURL(pdfBlob);
+            });
+            const resp = await fetch('/api/drive', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ base64, nombre }),
+            });
+            const data = await resp.json();
+            if (!data.ok) throw new Error(data.error || 'Error al subir a Drive');
         }
 
         async function driveSubirFotos(record, respuestasSinFotos) {
