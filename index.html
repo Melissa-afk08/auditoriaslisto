@@ -11141,26 +11141,59 @@
             renderEditorRegistros();
         }
 
-        function abrirModalEnviar() {
+        async function abrirModalEnviar() {
             const data = window.auditActual;
             if (!data) return;
             const tiendaNombre = (typeof data.tienda === 'string' ? data.tienda : (data.tienda?.nombre || 'Tienda'));
-            const asunto = `Reporte de Auditoría – ${tiendaNombre} | ${data.fecha} | Sup: ${data.supervisor}`;
-            const cuerpo = `Estimado/a,\n\nSe adjunta el reporte de auditoría:\n\nTienda: ${tiendaNombre}\nFecha: ${data.fecha} ${data.hora}\nSupervisor: ${data.supervisor}\nEncargado: ${data.encargado || 'N/A'}\nResultado: ${data.clasificacion} (${(data.notaFinal || data.finalScore || 0).toFixed(1)}%)\n\nSaludos.`;
-            const enlacePublico = `${location.origin}${location.pathname}?auditoria=${data.id}`;
-            const urlGmail = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-            const urlOutlook = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
-            const urlWsp = `https://wa.me/?text=${encodeURIComponent(asunto + '\n\n' + enlacePublico)}`;
-            const esMobil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-            if (esMobil && navigator.share) {
-                generarReporte(true);
-                return;
+            const nota = (data.notaFinal || data.finalScore || 0).toFixed(1);
+            const clasificacion = data.clasificacion || '';
+            const asunto = `Reporte de Auditoría – ${tiendaNombre} | ${data.fecha} | ${clasificacion} (${nota}%) | Sup: ${data.supervisor}`;
+            const cuerpo = `Estimado/a,\n\nSe adjunta el reporte de auditoría correspondiente a:\n\nTienda: ${tiendaNombre}\nFecha: ${data.fecha} ${data.hora || ''}\nSupervisor: ${data.supervisor}\nEncargado: ${data.encargado || 'N/A'}\nResultado: ${clasificacion} (${nota}%)\n\nQuedo a disposición ante cualquier consulta.\n\nSaludos cordiales.`;
+            const enlacePublico = `${location.origin}${location.pathname}?resultado=${data.id}`;
+
+            // Generar PDF y guardarlo en window._ultimoPdfBlob
+            if (!window._ultimoPdfBlob) {
+                showToast("⏳ Generando PDF...", "");
+                try { window._ultimoPdfBlob = await generarReporte(false, true); } catch(e) {}
             }
+
+            // Construir URLs de plataformas
+            const urlGmail    = `https://mail.google.com/mail/?view=cm&fs=1&su=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo + '\n\nVer online: ' + enlacePublico)}`;
+            const urlOutlook  = `https://outlook.live.com/mail/0/deeplink/compose?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo + '\n\nVer online: ' + enlacePublico)}`;
+            const urlWsp      = `https://wa.me/?text=${encodeURIComponent(asunto + '\n\n' + cuerpo + '\n\nVer online: ' + enlacePublico)}`;
+            const urlTelegram = `https://t.me/share/url?url=${encodeURIComponent(enlacePublico)}&text=${encodeURIComponent(asunto)}`;
+            const urlTeams    = `https://teams.microsoft.com/share?href=${encodeURIComponent(enlacePublico)}&msgText=${encodeURIComponent(asunto)}`;
+
+            const esMobil = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            if (esMobil && navigator.share && navigator.canShare) {
+                const shareData = { title: asunto, text: cuerpo, url: enlacePublico };
+                if (window._ultimoPdfBlob) {
+                    const filename = `Auditoria_${tiendaNombre.replace(/\s+/g,'_')}_${data.fecha.replace(/\//g,'-')}.pdf`;
+                    const file = new File([window._ultimoPdfBlob], filename, { type: 'application/pdf' });
+                    if (navigator.canShare({ files: [file] })) shareData.files = [file];
+                }
+                try { await navigator.share(shareData); return; } catch(e) {}
+            }
+
+            // Modal desktop con todas las plataformas
+            document.getElementById('modal-enviar-asunto').textContent  = asunto;
+            document.getElementById('modal-enviar-enlace').textContent  = enlacePublico;
+            document.getElementById('modal-enviar-gmail').href    = urlGmail;
+            document.getElementById('modal-enviar-outlook').href  = urlOutlook;
+            document.getElementById('modal-enviar-wsp').href      = urlWsp;
+            document.getElementById('modal-enviar-telegram').href = urlTelegram;
+            document.getElementById('modal-enviar-teams').href    = urlTeams;
+
+            // Botón descargar PDF
+            document.getElementById('btn-enviar-descargar-pdf').onclick = () => {
+                if (!window._ultimoPdfBlob) { showToast("Primero genera el PDF", "error"); return; }
+                const filename = `Auditoria_${tiendaNombre.replace(/\s+/g,'_')}_${data.fecha.replace(/\//g,'-')}.pdf`;
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(window._ultimoPdfBlob);
+                a.download = filename; a.click();
+            };
+
             document.getElementById('modal-enviar-desktop').style.display = 'flex';
-            document.getElementById('modal-enviar-gmail').href = urlGmail;
-            document.getElementById('modal-enviar-outlook').href = urlOutlook;
-            document.getElementById('modal-enviar-wsp').href = urlWsp;
-            document.getElementById('modal-enviar-enlace').textContent = enlacePublico;
         }
 
         window._lbFotos = [];
@@ -11583,29 +11616,43 @@
     </div>
 
         <!-- MODAL ENVIAR DESKTOP -->
-<div id="modal-enviar-desktop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:center;justify-content:center;padding:20px;">
-    <div style="background:white;border-radius:24px;padding:28px 24px;width:100%;max-width:380px;box-shadow:0 8px 32px rgba(0,0,0,0.2);">
-        <div style="font-size:18px;font-weight:800;color:#1B1B1B;margin-bottom:4px;">📤 Enviar reporte</div>
-        <div style="font-size:12px;color:#888;margin-bottom:12px;">Se incluirá el enlace al reporte online:</div>
-        <div id="modal-enviar-enlace" style="font-size:11px;font-weight:600;color:#FC6E20;background:#FFF5EE;border-radius:8px;padding:8px 12px;margin-bottom:16px;word-break:break-all;"></div>
-        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;">
-            <a id="modal-enviar-gmail" href="#" target="_blank" style="display:flex;align-items:center;gap:12px;background:#F5F5F5;border-radius:14px;padding:12px 16px;text-decoration:none;color:#1B1B1B;font-weight:700;font-size:14px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#EA4335"/><path d="M4 6l8 7 8-7" stroke="white" stroke-width="2"/><rect x="4" y="6" width="16" height="13" rx="1" stroke="white" stroke-width="2" fill="none"/></svg>
-                Gmail
+<div id="modal-enviar-desktop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:99999;align-items:flex-end;justify-content:center;padding:0;">
+    <div style="background:white;border-radius:24px 24px 0 0;padding:24px 20px 32px;width:100%;max-width:430px;box-shadow:0 -4px 32px rgba(0,0,0,0.2);max-height:92vh;overflow-y:auto;">
+        <div style="width:40px;height:4px;background:#E0E0E0;border-radius:4px;margin:0 auto 20px;"></div>
+        <div style="font-size:17px;font-weight:800;color:#1B1B1B;margin-bottom:2px;">📤 Enviar reporte</div>
+        <div id="modal-enviar-asunto" style="font-size:11px;color:#888;margin-bottom:10px;line-height:1.4;"></div>
+        <div style="background:#FFF5EE;border-radius:10px;padding:8px 12px;margin-bottom:16px;display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;">🔗</span>
+            <div id="modal-enviar-enlace" style="font-size:11px;font-weight:600;color:#FC6E20;word-break:break-all;flex:1;"></div>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Elige plataforma</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+            <a id="modal-enviar-outlook" href="#" target="_blank" style="display:flex;align-items:center;gap:12px;background:#F0F6FF;border-radius:14px;padding:13px 16px;text-decoration:none;color:#1B1B1B;font-weight:700;font-size:14px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="#0078D4"/><path d="M4 6h16v12H4z" fill="none" stroke="white" stroke-width="1.5"/><path d="M4 6l8 7 8-7" stroke="white" stroke-width="1.5"/></svg>
+                <div><div style="font-size:13px;font-weight:800;">Outlook</div><div style="font-size:11px;color:#888;font-weight:500;">Se abre con asunto y cuerpo listos</div></div>
             </a>
-            <a id="modal-enviar-outlook" href="#" target="_blank" style="display:flex;align-items:center;gap:12px;background:#F5F5F5;border-radius:14px;padding:12px 16px;text-decoration:none;color:#1B1B1B;font-weight:700;font-size:14px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="4" fill="#0078D4"/><path d="M4 6h16v12H4z" fill="none" stroke="white" stroke-width="1.5"/><path d="M4 6l8 7 8-7" stroke="white" stroke-width="1.5"/></svg>
-                Outlook
+            <a id="modal-enviar-gmail" href="#" target="_blank" style="display:flex;align-items:center;gap:12px;background:#FFF5F5;border-radius:14px;padding:13px 16px;text-decoration:none;color:#1B1B1B;font-weight:700;font-size:14px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="#EA4335"/><path d="M4 6l8 7 8-7" stroke="white" stroke-width="2"/><rect x="4" y="6" width="16" height="13" rx="1" stroke="white" stroke-width="2" fill="none"/></svg>
+                <div><div style="font-size:13px;font-weight:800;">Gmail</div><div style="font-size:11px;color:#888;font-weight:500;">Se abre con asunto y cuerpo listos</div></div>
             </a>
-            <a id="modal-enviar-wsp" href="#" target="_blank" style="display:flex;align-items:center;gap:12px;background:#F5F5F5;border-radius:14px;padding:12px 16px;text-decoration:none;color:#1B1B1B;font-weight:700;font-size:14px;">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.07-1.35A9.93 9.93 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.64 13.41c-.19.54-1.12 1.04-1.54 1.1-.38.05-.86.07-1.38-.09-.32-.1-.73-.23-1.25-.46-2.19-.95-3.62-3.16-3.73-3.3-.11-.14-.89-1.18-.89-2.25 0-1.07.56-1.6.76-1.82.19-.21.42-.27.56-.27h.4c.13 0 .3-.05.47.36.19.44.63 1.54.69 1.65.06.11.1.24.02.38-.08.14-.12.23-.23.35-.11.12-.23.27-.33.36-.11.1-.22.2-.1.4.13.19.56.93 1.2 1.5.82.74 1.51.97 1.73 1.08.21.11.34.09.46-.05.13-.14.54-.63.68-.85.14-.21.28-.18.47-.11.19.07 1.2.57 1.41.67.21.1.34.15.39.23.05.08.05.46-.14 1z"/></svg>
-                WhatsApp Web
+            <a id="modal-enviar-wsp" href="#" target="_blank" style="display:flex;align-items:center;gap:12px;background:#F0FFF5;border-radius:14px;padding:13px 16px;text-decoration:none;color:#1B1B1B;font-weight:700;font-size:14px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#25D366"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.37 5.07L2 22l5.07-1.35A9.93 9.93 0 0012 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.64 13.41c-.19.54-1.12 1.04-1.54 1.1-.38.05-.86.07-1.38-.09-.32-.1-.73-.23-1.25-.46-2.19-.95-3.62-3.16-3.73-3.3-.11-.14-.89-1.18-.89-2.25 0-1.07.56-1.6.76-1.82.19-.21.42-.27.56-.27h.4c.13 0 .3-.05.47.36.19.44.63 1.54.69 1.65.06.11.1.24.02.38-.08.14-.12.23-.23.35-.11.12-.23.27-.33.36-.11.1-.22.2-.1.4.13.19.56.93 1.2 1.5.82.74 1.51.97 1.73 1.08.21.11.34.09.46-.05.13-.14.54-.63.68-.85.14-.21.28-.18.47-.11.19.07 1.2.57 1.41.67.21.1.34.15.39.23.05.08.05.46-.14 1z"/></svg>
+                <div><div style="font-size:13px;font-weight:800;">WhatsApp</div><div style="font-size:11px;color:#888;font-weight:500;">Envía enlace público + resumen</div></div>
+            </a>
+            <a id="modal-enviar-telegram" href="#" target="_blank" style="display:flex;align-items:center;gap:12px;background:#F0F8FF;border-radius:14px;padding:13px 16px;text-decoration:none;color:#1B1B1B;font-weight:700;font-size:14px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="#229ED9"/><path d="M5 12l4 3 8-7-7 8-1-4z" fill="white"/></svg>
+                <div><div style="font-size:13px;font-weight:800;">Telegram</div><div style="font-size:11px;color:#888;font-weight:500;">Envía enlace público</div></div>
+            </a>
+            <a id="modal-enviar-teams" href="#" target="_blank" style="display:flex;align-items:center;gap:12px;background:#F5F0FF;border-radius:14px;padding:13px 16px;text-decoration:none;color:#1B1B1B;font-weight:700;font-size:14px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect width="24" height="24" rx="5" fill="#6264A7"/><text x="5" y="17" font-size="11" fill="white" font-weight="bold">T</text></svg>
+                <div><div style="font-size:13px;font-weight:800;">Microsoft Teams</div><div style="font-size:11px;color:#888;font-weight:500;">Comparte en tu canal</div></div>
             </a>
         </div>
-        <div style="background:#FFF8F3;border:1px solid rgba(252,110,32,0.2);border-radius:12px;padding:10px 14px;margin-bottom:16px;display:flex;gap:8px;align-items:flex-start;">
-            <span style="font-size:16px;">📱</span>
-            <div style="font-size:12px;color:#888;line-height:1.5;">Para enviar el PDF adjunto, usa la app desde tu <strong style="color:#FC6E20;">celular</strong> — el móvil permite compartir el archivo directamente.</div>
-        </div>
+        <div style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">PDF del reporte</div>
+        <button id="btn-enviar-descargar-pdf" style="width:100%;padding:13px;border-radius:14px;background:#1B1B1B;border:none;font-size:13px;font-weight:700;cursor:pointer;color:white;margin-bottom:8px;display:flex;align-items:center;justify-content:center;gap:8px;">
+            ⬇️ Descargar PDF para adjuntar
+        </button>
+        <div style="font-size:11px;color:#AAA;text-align:center;margin-bottom:16px;">Descarga el PDF y adjúntalo manualmente al correo o chat</div>
         <button onclick="document.getElementById('modal-enviar-desktop').style.display='none'" style="width:100%;padding:12px;border-radius:50px;background:#EEE;border:none;font-size:13px;font-weight:700;cursor:pointer;color:#555;">Cerrar</button>
     </div>
 </div>
