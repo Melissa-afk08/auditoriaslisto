@@ -11320,10 +11320,10 @@
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') autoGuardarBorradorSiActivo();
         });
-        // Autoguardado periódico cada 60 segundos
+        // Autoguardado periódico cada 20 segundos
         setInterval(() => {
             autoGuardarBorradorSiActivo();
-        }, 60000);
+        }, 20000);
 
         document.addEventListener('keydown', e => {
             let lb = document.getElementById('lightbox');
