@@ -7062,34 +7062,40 @@
 
             if (observaciones.length > 0) {
                 showToast("Verificando ortografía...", "success");
-                const timeout = (ms) => new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms));
-                const checkObs = async (o) => {
-                    try {
-                        let res = await Promise.race([
-                            fetch(`https://api.languagetool.org/v2/check`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                body: `text=${encodeURIComponent(o.texto)}&language=es`
-                            }),
-                            timeout(4000)
-                        ]);
-                        let json = await res.json();
-                        let faltas = json.matches.filter(m => m.rule.issueType === 'misspelling');
+                let errores = [];
+                try {
+                    // Una sola llamada con todo el texto concatenado
+                    let separador = '\n\n';
+                    let textoCompleto = observaciones.map(o => o.texto).join(separador);
+                    let res = await Promise.race([
+                        fetch(`https://api.languagetool.org/v2/check`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: `text=${encodeURIComponent(textoCompleto)}&language=es`
+                        }),
+                        new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 5000))
+                    ]);
+                    let json = await res.json();
+                    // Mapear errores de vuelta a cada observación por offset
+                    let offsets = [];
+                    let pos = 0;
+                    observaciones.forEach(o => { offsets.push(pos); pos += o.texto.length + separador.length; });
+                    observaciones.forEach((o, i) => {
+                        let start = offsets[i];
+                        let end = start + o.texto.length;
+                        let faltas = (json.matches || []).filter(m => m.rule.issueType === 'misspelling' && m.offset >= start && m.offset < end);
                         if (faltas.length > 0) {
-                            return {
+                            errores.push({
                                 pregunta: o.id,
                                 texto: o.texto,
                                 faltas: faltas.map(f => ({
-                                    palabra: o.texto.substring(f.offset, f.offset + f.length),
+                                    palabra: textoCompleto.substring(f.offset, f.offset + f.length),
                                     sugerencia: f.replacements[0]?.value || '—'
                                 }))
-                            };
+                            });
                         }
-                    } catch (e) { /* timeout o sin conexión */ }
-                    return null;
-                };
-                let resultados = await Promise.all(observaciones.map(checkObs));
-                let errores = resultados.filter(Boolean);
+                    });
+                } catch (e) { /* timeout o sin conexión — continuar */ }
 
                 if (errores.length > 0) {
                     window._ortografiaErrores = errores;
